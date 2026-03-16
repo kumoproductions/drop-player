@@ -1,10 +1,18 @@
 import {
+  createContext,
   type ReactNode,
   type RefObject,
+  useCallback,
+  useContext,
   useEffect,
   useId,
+  useLayoutEffect,
+  useRef,
   useState,
 } from 'react';
+
+export const TooltipContainerContext =
+  createContext<RefObject<HTMLElement | null> | null>(null);
 
 interface TooltipProps {
   content: string;
@@ -17,47 +25,68 @@ export function Tooltip({
   content,
   children,
   position = 'top',
-  containerRef,
+  containerRef: containerRefProp,
 }: TooltipProps) {
+  const containerRefFromContext = useContext(TooltipContainerContext);
+  const containerRef = containerRefProp ?? containerRefFromContext;
   const [isVisible, setIsVisible] = useState(false);
-  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const tooltipId = useId();
 
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseEnter = useCallback(() => {
     setIsVisible(true);
+  }, []);
 
-    // Calculate position to keep tooltip within container bounds
-    const target = e.currentTarget;
-    const targetRect = target.getBoundingClientRect();
+  const handleMouseLeave = useCallback(() => {
+    setIsVisible(false);
+  }, []);
+
+  const handleFocus = useCallback(() => {
+    setIsVisible(true);
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    setIsVisible(false);
+  }, []);
+
+  // Position the tooltip within container bounds after render
+  useLayoutEffect(() => {
+    const tooltip = tooltipRef.current;
     const container = containerRef?.current;
+    if (!isVisible || !tooltip) return;
+
+    const wrapper = tooltip.parentElement;
+    if (!wrapper) return;
+
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const tooltipWidth = tooltip.offsetWidth;
+    const padding = 4;
+
+    // Default: centered on wrapper
+    let left = (wrapperRect.width - tooltipWidth) / 2;
 
     if (container) {
       const containerRect = container.getBoundingClientRect();
 
-      // Calculate horizontal position (used for future position clamping)
-      const _targetCenterX = targetRect.left + targetRect.width / 2;
-      void _targetCenterX; // Reserved for future use
+      // Tooltip edges in container-local coordinates
+      const tooltipLeftInContainer =
+        wrapperRect.left - containerRect.left + left;
+      const tooltipRightInContainer = tooltipLeftInContainer + tooltipWidth;
 
-      setTooltipStyle({
-        left: '50%',
-        transform: 'translateX(-50%)',
-        // Clamp to container bounds (with some padding)
-        maxWidth: containerRect.width - 16,
-      });
+      if (tooltipLeftInContainer < padding) {
+        left = padding - (wrapperRect.left - containerRect.left);
+      } else if (tooltipRightInContainer > containerRect.width - padding) {
+        left =
+          containerRect.width -
+          padding -
+          tooltipWidth -
+          (wrapperRect.left - containerRect.left);
+      }
     }
-  };
 
-  const handleMouseLeave = () => {
-    setIsVisible(false);
-  };
-
-  const handleFocus = () => {
-    setIsVisible(true);
-  };
-
-  const handleBlur = () => {
-    setIsVisible(false);
-  };
+    tooltip.style.left = `${left}px`;
+    tooltip.style.transform = 'none';
+  }, [isVisible, containerRef]);
 
   // Handle Escape key to close tooltip
   useEffect(() => {
@@ -88,6 +117,7 @@ export function Tooltip({
       {children}
       {isVisible && content && (
         <div
+          ref={tooltipRef}
           id={tooltipId}
           role="tooltip"
           className={`drop-player-tooltip ${
@@ -95,11 +125,6 @@ export function Tooltip({
               ? 'drop-player-tooltip--top'
               : 'drop-player-tooltip--bottom'
           }`}
-          style={{
-            left: '50%',
-            transform: 'translateX(-50%)',
-            ...tooltipStyle,
-          }}
           tabIndex={-1}
         >
           {content}

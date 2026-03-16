@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 import type {
   HlsLevelInfo,
   MediaMode,
@@ -13,6 +13,7 @@ import { LoopButton } from './controls/LoopButton';
 import { PlayButton } from './controls/PlayButton';
 import { QualitySelector } from './controls/QualitySelector';
 import { TimeDisplay, type TimeDisplayFormat } from './controls/TimeDisplay';
+import { TooltipContainerContext } from './controls/Tooltip';
 import { VolumeControl } from './controls/VolumeControl';
 import { ZoomControls } from './controls/ZoomControls';
 
@@ -230,24 +231,28 @@ export function ControlsBar({
     }
   };
 
-  return (
-    <div className="drop-player-controls">
-      <div className="drop-player-controls-group">
-        {renderLeftControls()}
-        {controlsStart}
-      </div>
+  const controlsRef = useRef<HTMLDivElement>(null);
 
-      <div className="drop-player-controls-group">
-        {renderRightControls()}
-        {controlsEnd}
-        {features.fullscreen && (
-          <FullscreenButton
-            isFullscreen={isFullscreen}
-            onToggle={onFullscreenToggle}
-            t={t}
-          />
-        )}
+  return (
+    <TooltipContainerContext.Provider value={controlsRef}>
+      <div ref={controlsRef} className="drop-player-controls">
+        <div className="drop-player-controls-group">
+          {renderLeftControls()}
+          {controlsStart}
+        </div>
+
+        <div className="drop-player-controls-group">
+          {renderRightControls()}
+          {controlsEnd}
+          {features.fullscreen && (
+            <FullscreenButton
+              isFullscreen={isFullscreen}
+              onToggle={onFullscreenToggle}
+              t={t}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </TooltipContainerContext.Provider>
   );
 }
