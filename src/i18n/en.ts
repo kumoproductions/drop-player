@@ -36,4 +36,9 @@ export const en: Translations = {
   zoomOut: 'Zoom out',
   resetZoom: 'Reset',
   zoomLevel: 'Zoom',
+  // Playback speed
+  playbackSpeed: 'Speed',
+  // PIP
+  pip: 'Picture in Picture',
+  exitPip: 'Exit Picture in Picture',
 };

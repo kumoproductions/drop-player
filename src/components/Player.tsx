@@ -114,6 +114,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       onSeeking,
       onSeekEnd,
       onFullscreenChange,
+      onPipChange,
       onFrameCapture,
       onPositionSave,
       onPositionRestore,
@@ -218,6 +219,16 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
       null
     );
+
+    // Playback speed state
+    const [playbackRate, setPlaybackRate] = useState(1);
+
+    // PIP state
+    const [isPip, setIsPip] = useState(false);
+    const isPipSupported =
+      typeof document !== 'undefined' &&
+      'pictureInPictureEnabled' in document &&
+      document.pictureInPictureEnabled;
 
     const showTitle = showTitleProp !== undefined ? showTitleProp : hasSource;
 
@@ -487,6 +498,64 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       }
     }, [mediaMode]);
 
+    const handlePlaybackRateChange = useCallback(
+      (rate: number) => {
+        switch (mediaMode) {
+          case 'video':
+            videoCoreRef.current?.setPlaybackRate(rate);
+            break;
+          case 'audio':
+            audioCoreRef.current?.setPlaybackRate(rate);
+            break;
+          case 'image':
+          case 'pdf':
+            break;
+        }
+        setPlaybackRate(rate);
+        onPlaybackRateChange?.(rate);
+      },
+      [mediaMode, onPlaybackRateChange]
+    );
+
+    const handlePipToggle = useCallback(async () => {
+      if (mediaMode !== 'video') return;
+      const video = videoCoreRef.current?.getVideoElement();
+      if (!video) return;
+
+      try {
+        if (document.pictureInPictureElement === video) {
+          await document.exitPictureInPicture();
+        } else {
+          await video.requestPictureInPicture();
+        }
+      } catch {
+        // PIP request may fail silently (e.g., user gesture required)
+      }
+    }, [mediaMode]);
+
+    // Sync PIP state with browser events
+    useEffect(() => {
+      if (mediaMode !== 'video') return;
+      const video = videoCoreRef.current?.getVideoElement();
+      if (!video) return;
+
+      const handleEnterPip = () => {
+        setIsPip(true);
+        onPipChange?.(true);
+      };
+      const handleLeavePip = () => {
+        setIsPip(false);
+        onPipChange?.(false);
+      };
+
+      video.addEventListener('enterpictureinpicture', handleEnterPip);
+      video.addEventListener('leavepictureinpicture', handleLeavePip);
+      return () => {
+        video.removeEventListener('enterpictureinpicture', handleEnterPip);
+        video.removeEventListener('leavepictureinpicture', handleLeavePip);
+      };
+    }, [mediaMode, onPipChange, videoState.duration]); // videoState.duration ensures re-attach after video element ready
+
     const handleAmbientLightToggle = useCallback(() => {
       videoCoreRef.current?.toggleAmbientLight();
     }, []);
@@ -648,7 +717,17 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           }
         },
         isFullscreen: () => isFullscreen,
-        getPlaybackRate: () => videoCoreRef.current?.getPlaybackRate() ?? 1,
+        getPlaybackRate: () => {
+          switch (mediaMode) {
+            case 'video':
+              return videoCoreRef.current?.getPlaybackRate() ?? 1;
+            case 'audio':
+              return audioCoreRef.current?.getPlaybackRate() ?? 1;
+            case 'image':
+            case 'pdf':
+              return 1;
+          }
+        },
         setVolume: handleVolumeChange,
         setMuted: (muted: boolean) => {
           switch (mediaMode) {
@@ -664,7 +743,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           }
         },
         setPlaybackRate: (rate: number) => {
-          videoCoreRef.current?.setPlaybackRate(rate);
+          handlePlaybackRateChange(rate);
         },
         captureFrame: async (
           options?: CaptureOptions
@@ -714,6 +793,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         audioState.isMuted,
         isFullscreen,
         handleVolumeChange,
+        handlePlaybackRateChange,
         requestFullscreen,
         exitFullscreen,
         toggleFullscreen,
@@ -738,6 +818,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             activeSourceIndex,
             sourceCount: entries.length,
             qualityLevel: videoState.qualityLevel,
+            playbackRate,
+            isPip,
           };
         case 'audio':
           return {
@@ -753,6 +835,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             activeSourceIndex,
             sourceCount: entries.length,
             qualityLevel: undefined,
+            playbackRate,
+            isPip: false,
           };
         case 'image':
         case 'pdf':
@@ -769,6 +853,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             activeSourceIndex,
             sourceCount: entries.length,
             qualityLevel: undefined,
+            playbackRate: 1,
+            isPip: false,
           };
       }
     }, [
@@ -779,6 +865,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       controlsVisible,
       activeSourceIndex,
       entries.length,
+      playbackRate,
+      isPip,
     ]);
 
     useEffect(() => {
@@ -1117,12 +1205,17 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               frameRate={frameRate}
               timeDisplayFormat={timeDisplayFormat}
               onTimeDisplayFormatChange={handleTimeDisplayFormatChange}
+              playbackRate={playbackRate}
+              onPlaybackRateChange={handlePlaybackRateChange}
               hlsLevels={videoState.hlsLevels}
               currentHlsLevel={videoState.currentHlsLevel}
               qualityLevel={videoState.qualityLevel}
               hasOriginal={!!activeEntry?.originalUrl}
               isPlayingOriginal={videoState.isPlayingOriginal}
               isAmbientLight={videoState.isAmbientLight}
+              isPip={isPip}
+              isPipSupported={isPipSupported}
+              onPipToggle={handlePipToggle}
               onPlayToggle={handlePlayToggle}
               onLoopToggle={handleLoopToggle}
               onVolumeChange={handleVolumeChange}
