@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.7
+
+### Bug Fixes
+
+- Fix tooltip not dismissing on Safari and touch devices
+- Fix multiple tooltips displaying simultaneously
+- Auto-dismiss tooltips after timeout on touch interactions
+- Fix muted state behavior
+
 ## 1.0.6
 
 ### Features
