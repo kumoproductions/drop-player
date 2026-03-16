@@ -725,6 +725,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
         playsInline
         poster={poster}
         autoPlay={autoPlay}
+        muted={initialMuted}
         onMouseDown={handleVideoMouseDown}
         onDoubleClick={handleDoubleClick}
         onMouseMove={handleContainerMouseMove}

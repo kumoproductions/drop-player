@@ -227,7 +227,12 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
     return (
       <div className="drop-player-audio-container">
-        <audio ref={audioRef} autoPlay={autoPlay} style={{ display: 'none' }}>
+        <audio
+          ref={audioRef}
+          autoPlay={autoPlay}
+          muted={initialMuted}
+          style={{ display: 'none' }}
+        >
           <track kind="captions" />
         </audio>
 
