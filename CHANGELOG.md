@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.0.4
+
+### Features
+
+- Support `hlsConfig` prop for custom hls.js configuration
+- Tune ABR settings for smoother adaptive bitrate switching
+
+### Bug Fixes
+
+- Dynamically import `waveform-data` to reduce initial bundle size
+- Fix tooltip position
+
+### Maintenance
+
+- Disable sourcemap output and enable minification in build
+- Remove unnecessary documentation files
+
 ## 1.0.3
 
 ### Breaking Changes

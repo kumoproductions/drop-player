@@ -96,6 +96,7 @@ Props are organised into four groups to keep the surface area manageable:
 | `className` | `string` | — | CSS class on root container |
 | `crossOrigin` | `'anonymous' \| 'use-credentials'` | `'anonymous'` | CORS for media elements |
 | `poster` | `string` | — | Poster image (video) |
+| `hlsConfig` | `Record<string, unknown>` | — | Custom [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) overrides |
 
 ### `playback` — `PlayerPlaybackConfig`
 
