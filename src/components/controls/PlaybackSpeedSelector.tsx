@@ -66,6 +66,7 @@ export function PlaybackSpeedSelector({
       {isOpen && (
         <>
           {/* biome-ignore lint/a11y/noStaticElementInteractions: Backdrop for closing dropdown */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: Escape handled by window keydown listener */}
           <div
             className="drop-player-backdrop"
             onClick={() => setIsOpen(false)}
