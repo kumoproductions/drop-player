@@ -1,0 +1,47 @@
+import type { PlayerFeatures } from './types';
+
+/**
+ * Sensible defaults: most controls enabled, heavy options (ambientLight, capture) off.
+ * Partial overrides merge on top: `{ capture: true }` enables capture while keeping the rest.
+ */
+export const defaultFeatures: Required<PlayerFeatures> = {
+  playButton: true,
+  loop: true,
+  timeDisplay: true,
+  seekBar: true,
+  volume: true,
+  ambientLight: false,
+  capture: false,
+  qualitySelector: true,
+  fullscreen: true,
+  zoom: true,
+  keyboardShortcuts: true,
+};
+
+/**
+ * All features off. Use as a base when building a minimal player:
+ * `features={{ ...noFeatures, playButton: true, fullscreen: true }}`
+ */
+export const noFeatures: Required<PlayerFeatures> = {
+  playButton: false,
+  loop: false,
+  timeDisplay: false,
+  seekBar: false,
+  volume: false,
+  ambientLight: false,
+  capture: false,
+  qualitySelector: false,
+  fullscreen: false,
+  zoom: false,
+  keyboardShortcuts: false,
+};
+
+/**
+ * Resolve partial features into a fully-specified object.
+ * Omitted keys inherit from `defaultFeatures`.
+ */
+export function resolveFeatures(
+  features?: PlayerFeatures
+): Required<PlayerFeatures> {
+  return { ...defaultFeatures, ...features };
+}

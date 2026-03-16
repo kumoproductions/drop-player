@@ -1,0 +1,950 @@
+import type { ReactNode } from 'react';
+
+// ============================================================================
+// Source Types
+// ============================================================================
+
+/**
+ * Media source definition (public API)
+ */
+export interface MediaSource {
+  /** Primary playback URL */
+  url: string;
+  /** Original source URL. Shown as "Original" option in quality selector. */
+  originalUrl?: string;
+  /** Silent fallback URL (not shown in UI). Reserved for future use. */
+  fallbackUrl?: string;
+  /** MIME type (inferred from URL extension if omitted) */
+  mimeType?: string;
+  /** Display label for source selector (auto-generated if omitted) */
+  label?: string;
+}
+
+/**
+ * Source type (inferred from URL or mimeType).
+ * @internal
+ */
+export type SourceType = 'hls' | 'progressive' | 'image' | 'pdf' | 'audio';
+
+/**
+ * Normalized source entry.
+ * @internal
+ */
+export interface SourceEntry {
+  url: string;
+  originalUrl?: string;
+  fallbackUrl?: string;
+  label: string;
+  sourceType: SourceType;
+}
+
+/**
+ * Normalized sources result.
+ * @internal
+ */
+export interface NormalizedSources {
+  mediaMode: MediaMode;
+  entries: SourceEntry[];
+}
+
+/**
+ * Source mode for video delivery (internal)
+ */
+export type SourceMode = 'hls' | 'progressive';
+
+/**
+ * Media mode (video, image, pdf, or audio)
+ */
+export type MediaMode = 'video' | 'image' | 'pdf' | 'audio';
+
+// ============================================================================
+// Image State Types
+// ============================================================================
+
+/**
+ * Image viewer state.
+ * @internal
+ */
+export interface ImageState {
+  /** Current zoom level (1 = 100%) */
+  zoom: number;
+  /** Pan offset X (pixels) */
+  panX: number;
+  /** Pan offset Y (pixels) */
+  panY: number;
+  /** Whether the image has loaded */
+  isLoaded: boolean;
+  /** Natural image dimensions */
+  naturalWidth: number;
+  naturalHeight: number;
+}
+
+// ============================================================================
+// Quality Types
+// ============================================================================
+
+/**
+ * Simplified HLS level info (subset of hls.js Level)
+ */
+export interface HlsLevelInfo {
+  height: number;
+  bitrate: number;
+}
+
+/**
+ * HLS quality level (HLS playback only)
+ */
+export interface QualityLevel {
+  /** 'auto' = ABR auto-selection, 'manual' = manual selection */
+  mode: 'auto' | 'manual';
+  /**
+   * Resolution e.g., 1080, 720, 480
+   * - Auto mode: undefined
+   * - Manual mode: selected resolution
+   */
+  height?: number;
+  /** HLS internal level index (manual mode only) */
+  levelIndex?: number;
+  /** Display label e.g., "Auto", "1080p" */
+  label?: string;
+}
+
+/**
+ * Fallback reason
+ */
+export type FallbackReason =
+  | 'hls-not-supported'
+  | 'manifest-load-error'
+  | 'manifest-parse-error'
+  | 'no-levels'
+  | 'playback-error';
+
+/**
+ * Fallback event (emitted when primary URL fails and falls back to originalUrl)
+ */
+export interface FallbackEvent {
+  sourceIndex: number;
+  reason: FallbackReason;
+}
+
+// ============================================================================
+// Player State
+// ============================================================================
+
+/**
+ * Player state (exposed to slots)
+ */
+export interface PlayerState {
+  // Playback state
+  isPlaying: boolean;
+  isPaused: boolean;
+  isEnded: boolean;
+  currentTime: number;
+  duration: number;
+  volume: number;
+  isMuted: boolean;
+  isFullscreen: boolean;
+  showControls: boolean;
+
+  // Source
+  activeSourceIndex: number;
+  sourceCount: number;
+  qualityLevel?: QualityLevel;
+}
+
+// ============================================================================
+// Video Metadata
+// ============================================================================
+
+export interface VideoMetadata {
+  duration: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
+}
+
+// ============================================================================
+// Frame Capture
+// ============================================================================
+
+export interface FrameCapture {
+  blob: Blob;
+  time: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
+}
+
+export interface CaptureOptions {
+  maxWidth?: number;
+  format?: 'image/png' | 'image/jpeg' | 'image/webp';
+  quality?: number;
+}
+
+// ============================================================================
+// Marker Types
+// ============================================================================
+
+export interface Marker {
+  time: number;
+  type?: 'scene' | 'custom';
+  color?: string;
+  snapThreshold?: number;
+}
+
+// ============================================================================
+// Feature Flags
+// ============================================================================
+
+/**
+ * Toggle individual player UI features on/off.
+ * All properties default to `false` when omitted.
+ * Use `defaultFeatures` spread to enable all, then override selectively.
+ */
+export interface PlayerFeatures {
+  /** Play/pause button (video/audio) */
+  playButton?: boolean;
+  /** Loop toggle button (video/audio) */
+  loop?: boolean;
+  /** Time display (video/audio) */
+  timeDisplay?: boolean;
+  /** Seek bar (video) */
+  seekBar?: boolean;
+  /** Volume control (video/audio) */
+  volume?: boolean;
+  /** Ambient light effect button (video) */
+  ambientLight?: boolean;
+  /** Frame capture save/copy buttons (video/image) */
+  capture?: boolean;
+  /** HLS quality selector (video) */
+  qualitySelector?: boolean;
+  /** Fullscreen button (all modes) */
+  fullscreen?: boolean;
+  /** Zoom controls (image/pdf) */
+  zoom?: boolean;
+  /** Keyboard shortcuts (video/audio) */
+  keyboardShortcuts?: boolean;
+}
+
+// ============================================================================
+// Slots
+// ============================================================================
+
+export interface PlayerSlots {
+  /** Add to the left of the controls bar */
+  controlsStart?: ReactNode;
+
+  /** Add to the right of the controls bar (before fullscreen button) */
+  controlsEnd?: ReactNode;
+
+  /** Overlay on the timeline (comment markers, etc.). Shown above controls for video (with seek bar) and for audio (no seek bar). */
+  seekbarOverlay?: (state: PlayerState) => ReactNode;
+
+  /** Overlay on the top-left of the player */
+  topLeftOverlay?: ReactNode;
+
+  /** Overlay on the top-right of the player */
+  topRightOverlay?: ReactNode;
+
+  /** Custom loading indicator */
+  loadingIndicator?: ReactNode;
+
+  /**
+   * Custom error display.
+   * `error.name` may be: `errorNoSources` | `errorAborted` | `errorNetwork` | `errorDecode` | `errorNotSupported` | `errorUnknown`.
+   * Use with built-in `TranslationKey` / `locale` or your own copy.
+   */
+  errorDisplay?: (error: Error) => ReactNode;
+}
+
+// ============================================================================
+// Event Callbacks
+// ============================================================================
+
+export interface PlayerEvents {
+  // Playback state
+  onPlay?: () => void;
+  onPause?: () => void;
+  onEnded?: () => void;
+  onTimeUpdate?: (time: number) => void;
+  onDurationChange?: (duration: number) => void;
+  onVolumeChange?: (volume: number, muted: boolean) => void;
+  onPlaybackRateChange?: (rate: number) => void;
+  /**
+   * Fired on playback error. `error.name` may be: `errorAborted` | `errorNetwork` | `errorDecode` | `errorNotSupported` | `errorUnknown`.
+   * (No sources is reported via slots.errorDisplay / "No sources" UI, not onError.)
+   */
+  onError?: (error: Error) => void;
+  onLoadedMetadata?: (metadata: VideoMetadata) => void;
+
+  // Buffering state
+  onLoadStart?: () => void;
+  onProgress?: (buffered: TimeRanges) => void;
+  onWaiting?: () => void;
+  onCanPlay?: () => void;
+  onPlaying?: () => void;
+
+  // Seek
+  onSeekStart?: (time: number) => void;
+  onSeeking?: (time: number) => void;
+  onSeekEnd?: (time: number) => void;
+
+  // Other
+  onFullscreenChange?: (isFullscreen: boolean) => void;
+  onFrameCapture?: (capture: FrameCapture) => void;
+  onPositionSave?: (position: number) => void;
+  onPositionRestore?: (position: number) => void;
+
+  // Source/Quality
+  onActiveSourceChange?: (index: number) => void;
+  onQualityLevelChange?: (level: QualityLevel) => void;
+  onFallback?: (event: FallbackEvent) => void;
+
+  // Aggregated state snapshot (fires on every state change)
+  onStateChange?: (state: PlayerState) => void;
+}
+
+// ============================================================================
+// Player Props (grouped)
+// ============================================================================
+
+/**
+ * Playback behaviour configuration.
+ * All properties are optional and have sensible defaults.
+ */
+export interface PlayerPlaybackConfig {
+  /** Start playing immediately. Default: false */
+  autoPlay?: boolean;
+  /** Loop playback. Default: false */
+  loop?: boolean;
+  /** Start muted. Default: false */
+  muted?: boolean;
+  /** Initial volume (0–1). Default: 1 */
+  volume?: number;
+  /** Start time in seconds. Default: 0 */
+  initialTime?: number;
+  /** localStorage key for position persistence */
+  persistenceKey?: string;
+}
+
+/**
+ * UI / appearance configuration.
+ * Controls what the player shows and how it displays.
+ */
+export interface PlayerUiConfig {
+  /** Show the bottom controls bar. Default: true */
+  showControls?: boolean;
+  /** Show the source title/selector in the top-left. Default: true when sources >= 1 */
+  showTitle?: boolean;
+  /** Feature flags for individual controls. Default: `defaultFeatures` */
+  features?: PlayerFeatures;
+  /** Display locale. Default: 'en' */
+  locale?: 'en' | 'ja';
+  /** Frame rate for timecode display (video). Default: 30 */
+  frameRate?: number;
+  /** Seekbar markers */
+  markers?: Marker[];
+}
+
+export interface PlayerProps {
+  /**
+   * Media sources.
+   * - String: single URL (type inferred from extension)
+   * - MediaSource: single source with optional originalUrl/fallbackUrl
+   * - MediaSource[]: multiple sources (Source Selector enabled)
+   */
+  sources: MediaSource[] | MediaSource | string | null;
+
+  /** CSS class for the root container */
+  className?: string;
+  /** CORS setting for media elements. Default: 'anonymous' */
+  crossOrigin?: 'anonymous' | 'use-credentials';
+  /** Poster image for video */
+  poster?: string;
+
+  /** Playback behaviour */
+  playback?: PlayerPlaybackConfig;
+  /** UI / appearance */
+  ui?: PlayerUiConfig;
+  /** Custom slot content */
+  slots?: PlayerSlots;
+  /** Event callbacks */
+  events?: PlayerEvents;
+}
+
+// ============================================================================
+// Player Ref (Imperative API)
+// ============================================================================
+
+export interface PlayerRef {
+  // Playback control
+  play: () => Promise<void>;
+  pause: () => void;
+  toggle: () => void;
+
+  // Seek
+  seek: (time: number) => void;
+  seekRelative: (delta: number) => void;
+  seekToFrame: (frame: number) => void;
+
+  // State getters
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getVolume: () => number;
+  isMuted: () => boolean;
+  isPaused: () => boolean;
+  isFullscreen: () => boolean;
+  getPlaybackRate: () => number;
+
+  // State setters
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  setPlaybackRate: (rate: number) => void;
+
+  // Frame capture
+  captureFrame: (options?: CaptureOptions) => Promise<FrameCapture>;
+
+  // Fullscreen
+  requestFullscreen: () => Promise<void>;
+  exitFullscreen: () => Promise<void>;
+  toggleFullscreen: () => void;
+
+  // Internal element access
+  getVideoElement: () => HTMLVideoElement | null;
+  getContainerElement: () => HTMLDivElement | null;
+}
+
+// ============================================================================
+// Translation Types
+// ============================================================================
+
+export type TranslationKey =
+  | 'play'
+  | 'pause'
+  | 'mute'
+  | 'unmute'
+  | 'fullscreen'
+  | 'exitFullscreen'
+  | 'quality'
+  | 'volume'
+  | 'seek'
+  | 'loop'
+  | 'enableRepeat'
+  | 'disableRepeat'
+  | 'ambientLight'
+  | 'saveCapture'
+  | 'copyCapture'
+  | 'original'
+  | 'error'
+  | 'errorAborted'
+  | 'errorNetwork'
+  | 'errorDecode'
+  | 'errorNotSupported'
+  | 'errorUnknown'
+  | 'errorNoSources'
+  | 'captureError'
+  | 'captureSaved'
+  | 'captureCopied'
+  | 'clipboardNotSupported'
+  | 'toggleTimeDisplay'
+  | 'auto'
+  // Image mode keys
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'resetZoom'
+  | 'zoomLevel';
+
+export type Translations = Record<TranslationKey, string>;
+
+// ============================================================================
+// Storage Adapter
+// ============================================================================
+
+export interface StorageAdapter {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+}
+
+// ============================================================================
+// useMediaPlayerState Types (Internal)
+// ============================================================================
+
+/**
+ * Options for useMediaPlayerState hook (shared by AudioCore / VideoCore)
+ */
+export interface UseMediaPlayerStateOptions {
+  initialVolume?: number;
+  initialMuted?: boolean;
+  initialLoop?: boolean;
+  initialTime?: number;
+  persistenceKey?: string;
+  onPositionSave?: (position: number) => void;
+  onPositionRestore?: (position: number) => void;
+  onPlay?: () => void;
+  onPause?: () => void;
+  onEnded?: () => void;
+  onTimeUpdate?: (time: number) => void;
+  onDurationChange?: (duration: number) => void;
+  onVolumeChange?: (volume: number, muted: boolean) => void;
+  onError?: (error: Error) => void;
+  onLoadStart?: () => void;
+  onCanPlay?: () => void;
+  onSeekStart?: (time: number) => void;
+  onSeeking?: (time: number) => void;
+  onSeekEnd?: (time: number) => void;
+  onPlaying?: () => void;
+}
+
+/**
+ * Imperative API base returned by useMediaPlayerState (extended by AudioCoreRef / VideoCoreRef)
+ */
+export interface MediaPlayerImperativeBase {
+  play: () => Promise<void>;
+  pause: () => void;
+  toggle: () => void;
+  seek: (time: number) => void;
+  seekRelative: (delta: number) => void;
+  handleSeekStart: () => void;
+  handleSeekChange: (time: number) => void;
+  handleSeekEnd: (time: number) => void;
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getVolume: () => number;
+  isMuted: () => boolean;
+  isPaused: () => boolean;
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  toggleLoop: () => void;
+  toggleMute: () => void;
+}
+
+/**
+ * Return type of useMediaPlayerState
+ */
+export interface UseMediaPlayerStateReturn {
+  state: {
+    currentTime: number;
+    duration: number;
+    volume: number;
+    isMuted: boolean;
+    isPlaying: boolean;
+    isEnded: boolean;
+    isLoop: boolean;
+    isSeeking: boolean;
+    seekValue: number;
+  };
+  handlers: {
+    togglePlayPause: () => void;
+    handleSeekStart: () => void;
+    handleSeekChange: (time: number) => void;
+    handleSeekEnd: (time: number) => void;
+    handleVolumeChange: (volume: number) => void;
+    handleMuteToggle: () => void;
+    handleLoopToggle: () => void;
+  };
+  /** Setters for custom seek UIs (e.g. drag-to-seek) */
+  setSeeking: (value: boolean) => void;
+  setCurrentTime: (value: number) => void;
+  setSeekValue: (value: number) => void;
+  /** Set position (and optionally auto-play) to restore on next loadedmetadata (e.g. before source switch) */
+  setInitialPositionForNextLoad: (
+    position: number | null,
+    autoPlay?: boolean
+  ) => void;
+  storage: {
+    savePosition: (position: number, force?: boolean) => void;
+    loadPosition: () => number | null;
+    clearPosition: () => void;
+    getStoredValue: <T>(key: string, defaultValue: T) => T;
+    setStoredValue: <T>(key: string, value: T) => void;
+  };
+  getImperativeBase: () => MediaPlayerImperativeBase;
+}
+
+// ============================================================================
+// VideoCore Types (Internal)
+// ============================================================================
+
+/**
+ * Video playback state exposed by VideoCore to parent.
+ * @internal
+ */
+export interface VideoState {
+  // Playback
+  isPlaying: boolean;
+  isPaused: boolean;
+  isEnded: boolean;
+  currentTime: number;
+  duration: number;
+
+  // Audio
+  volume: number;
+  isMuted: boolean;
+
+  // Seek
+  isSeeking: boolean;
+  seekValue: number;
+
+  // Loop
+  isLoop: boolean;
+
+  // Ambient light
+  isAmbientLight: boolean;
+  ambientColor: { r: number; g: number; b: number };
+
+  // Source/Quality
+  isPlayingOriginal: boolean;
+  qualityLevel?: QualityLevel;
+  hlsLevels: HlsLevelInfo[];
+  currentHlsLevel: number;
+}
+
+/**
+ * VideoCore props.
+ * @internal
+ */
+export interface VideoCoreProps {
+  // Sources (same-mode entries from normalization)
+  videoSources: SourceEntry[];
+  activeSourceIndex: number;
+
+  // Display
+  crossOrigin?: 'anonymous' | 'use-credentials';
+  poster?: string;
+
+  // Playback
+  autoPlay?: boolean;
+  initialLoop?: boolean;
+  initialMuted?: boolean;
+  initialVolume?: number;
+  initialTime?: number;
+
+  // Timecode
+  frameRate?: number;
+
+  // Persistence
+  persistenceKey?: string;
+
+  // Seekbar markers
+  markers?: Marker[];
+
+  // i18n
+  locale?: 'en' | 'ja';
+
+  // Container ref for drag-to-seek calculations
+  containerRef: React.RefObject<HTMLDivElement | null>;
+
+  // State callback - called whenever video state changes
+  onStateChange: (state: VideoState) => void;
+
+  // Event callbacks (subset of PlayerEvents relevant to video)
+  onPlay?: () => void;
+  onPause?: () => void;
+  onEnded?: () => void;
+  onTimeUpdate?: (time: number) => void;
+  onDurationChange?: (duration: number) => void;
+  onVolumeChange?: (volume: number, muted: boolean) => void;
+  onPlaybackRateChange?: (rate: number) => void;
+  onError?: (error: Error) => void;
+  onLoadedMetadata?: (metadata: VideoMetadata) => void;
+  onLoadStart?: () => void;
+  onProgress?: (buffered: TimeRanges) => void;
+  onWaiting?: () => void;
+  onCanPlay?: () => void;
+  onPlaying?: () => void;
+  onSeekStart?: (time: number) => void;
+  onSeeking?: (time: number) => void;
+  onSeekEnd?: (time: number) => void;
+  onFrameCapture?: (capture: FrameCapture) => void;
+  onPositionSave?: (position: number) => void;
+  onPositionRestore?: (position: number) => void;
+  onQualityLevelChange?: (level: QualityLevel) => void;
+  onFallback?: (event: FallbackEvent) => void;
+
+  /** Called on double-click to toggle fullscreen */
+  onFullscreenToggle?: () => void;
+}
+
+/**
+ * VideoCore imperative handle.
+ * @internal
+ */
+export interface VideoCoreRef {
+  // Playback control
+  play: () => Promise<void>;
+  pause: () => void;
+  toggle: () => void;
+
+  // Seek
+  seek: (time: number) => void;
+  seekRelative: (delta: number) => void;
+  seekToFrame: (frame: number) => void;
+
+  // Seekbar handlers (called from SeekBar component)
+  handleSeekStart: () => void;
+  handleSeekChange: (time: number) => void;
+  handleSeekEnd: (time: number) => void;
+
+  // State getters
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getVolume: () => number;
+  isMuted: () => boolean;
+  isPaused: () => boolean;
+  getPlaybackRate: () => number;
+
+  // State setters
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+  setPlaybackRate: (rate: number) => void;
+
+  // Toggles
+  toggleLoop: () => void;
+  toggleMute: () => void;
+  toggleAmbientLight: () => void;
+
+  // Source/Quality
+  setPlayOriginal: (playing: boolean) => void;
+  setQualityLevel: (level: number | 'auto') => void;
+
+  // Frame capture
+  captureFrame: (options?: CaptureOptions) => Promise<FrameCapture>;
+  saveCapture: () => Promise<void>;
+  copyCapture: () => Promise<void>;
+
+  // Element access
+  getVideoElement: () => HTMLVideoElement | null;
+}
+
+// ============================================================================
+// ImageCore Types (Internal)
+// ============================================================================
+
+/**
+ * ImageCore props.
+ * @internal
+ */
+export interface ImageCoreProps {
+  /** Image source URL */
+  src: string;
+
+  /** Alt text for accessibility */
+  alt?: string;
+
+  // Display
+  crossOrigin?: 'anonymous' | 'use-credentials';
+
+  /** Min zoom level. Default: 1 */
+  minZoom?: number;
+  /** Max zoom level. Default: 5 */
+  maxZoom?: number;
+  /** Zoom step for buttons/wheel. Default: 0.25 */
+  zoomStep?: number;
+
+  // i18n
+  locale?: 'en' | 'ja';
+
+  // Container ref for calculations
+  containerRef: React.RefObject<HTMLDivElement | null>;
+
+  // State callback - called whenever image state changes
+  onStateChange: (state: ImageState) => void;
+
+  // Event callbacks
+  onError?: (error: Error) => void;
+  onLoad?: () => void;
+  onFrameCapture?: (capture: FrameCapture) => void;
+
+  /** Called on double-click to toggle fullscreen */
+  onFullscreenToggle?: () => void;
+}
+
+/**
+ * ImageCore imperative handle.
+ * @internal
+ */
+export interface ImageCoreRef {
+  // Zoom control
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+  setZoom: (zoom: number) => void;
+
+  // State getters
+  getZoomLevel: () => number;
+  getPan: () => { x: number; y: number };
+  isLoaded: () => boolean;
+
+  // Frame capture (same interface as VideoCoreRef)
+  captureFrame: (options?: CaptureOptions) => Promise<FrameCapture>;
+  saveCapture: () => Promise<void>;
+  copyCapture: () => Promise<void>;
+
+  // Element access
+  getImageElement: () => HTMLImageElement | null;
+}
+
+// ============================================================================
+// PdfCore Types (Internal)
+// ============================================================================
+
+/**
+ * PDF viewer state.
+ * @internal
+ */
+export interface PdfState {
+  /** Current zoom level (1 = 100%) */
+  zoom: number;
+  /** Pan offset X (pixels) */
+  panX: number;
+  /** Pan offset Y (pixels) */
+  panY: number;
+  /** Whether the PDF has loaded */
+  isLoaded: boolean;
+}
+
+/**
+ * PdfCore props.
+ * @internal
+ */
+export interface PdfCoreProps {
+  /** PDF source URL */
+  src: string;
+
+  // Zoom settings
+  minZoom?: number;
+  maxZoom?: number;
+  zoomStep?: number;
+
+  // Container ref for calculations
+  containerRef: React.RefObject<HTMLDivElement | null>;
+
+  // State callback
+  onStateChange: (state: PdfState) => void;
+
+  // Event callbacks
+  onError?: (error: Error) => void;
+  onLoad?: () => void;
+}
+
+// ============================================================================
+// AudioCore Types (Internal)
+// ============================================================================
+
+/**
+ * Audio playback state exposed by AudioCore to parent.
+ * @internal
+ */
+export interface AudioState {
+  // Playback
+  isPlaying: boolean;
+  isPaused: boolean;
+  isEnded: boolean;
+  currentTime: number;
+  duration: number;
+
+  // Audio
+  volume: number;
+  isMuted: boolean;
+
+  // Seek
+  isSeeking: boolean;
+  seekValue: number;
+
+  // Loop
+  isLoop: boolean;
+
+  // Waveform
+  waveformReady: boolean;
+  /** True when waveform generation failed; readiness can fall back to duration/metadata */
+  waveformFailedFallback: boolean;
+}
+
+/**
+ * AudioCore props.
+ * @internal
+ */
+export interface AudioCoreProps {
+  /** Audio source URL */
+  src: string;
+
+  // Playback
+  autoPlay?: boolean;
+  initialLoop?: boolean;
+  initialMuted?: boolean;
+  initialVolume?: number;
+  initialTime?: number;
+
+  // Persistence
+  persistenceKey?: string;
+
+  // Waveform
+  waveColor?: string;
+  progressColor?: string;
+  waveformScale?: number;
+
+  // i18n
+  locale?: 'en' | 'ja';
+
+  // Container ref for calculations
+  containerRef: React.RefObject<HTMLDivElement | null>;
+
+  // State callback - called whenever audio state changes
+  onStateChange: (state: AudioState) => void;
+
+  // Event callbacks
+  onPlay?: () => void;
+  onPause?: () => void;
+  onEnded?: () => void;
+  onTimeUpdate?: (time: number) => void;
+  onDurationChange?: (duration: number) => void;
+  onVolumeChange?: (volume: number, muted: boolean) => void;
+  onError?: (error: Error) => void;
+  onLoadStart?: () => void;
+  onCanPlay?: () => void;
+  onSeekStart?: (time: number) => void;
+  onSeeking?: (time: number) => void;
+  onSeekEnd?: (time: number) => void;
+  onPositionSave?: (position: number) => void;
+  onPositionRestore?: (position: number) => void;
+  onWaveformReady?: () => void;
+}
+
+/**
+ * AudioCore imperative handle.
+ * @internal
+ */
+export interface AudioCoreRef {
+  // Playback control
+  play: () => Promise<void>;
+  pause: () => void;
+  toggle: () => void;
+
+  // Seek
+  seek: (time: number) => void;
+  seekRelative: (delta: number) => void;
+
+  // Seekbar handlers (called from waveform component)
+  handleSeekStart: () => void;
+  handleSeekChange: (time: number) => void;
+  handleSeekEnd: (time: number) => void;
+
+  // State getters
+  getCurrentTime: () => number;
+  getDuration: () => number;
+  getVolume: () => number;
+  isMuted: () => boolean;
+  isPaused: () => boolean;
+
+  // State setters
+  setVolume: (volume: number) => void;
+  setMuted: (muted: boolean) => void;
+
+  // Toggles
+  toggleLoop: () => void;
+  toggleMute: () => void;
+
+  // Element access
+  getAudioElement: () => HTMLAudioElement | null;
+}

@@ -1,0 +1,257 @@
+import { Music } from 'lucide-react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
+import WaveformData from 'waveform-data';
+import { useMediaPlayerState } from '../hooks/useMediaPlayerState';
+import type { AudioCoreProps, AudioCoreRef, AudioState } from '../types';
+import { WaveformCanvas } from './WaveformCanvas';
+
+export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
+  function AudioCore(props, ref) {
+    const {
+      src,
+      autoPlay = false,
+      initialLoop = false,
+      initialMuted = false,
+      initialVolume = 1,
+      initialTime,
+      persistenceKey,
+      waveColor = '#666',
+      progressColor = '#0066ff',
+      waveformScale = 512,
+      containerRef: _containerRef,
+      onStateChange,
+      onPlay,
+      onPause,
+      onEnded,
+      onTimeUpdate,
+      onDurationChange,
+      onVolumeChange,
+      onError,
+      onLoadStart,
+      onCanPlay,
+      onSeekStart,
+      onSeeking,
+      onSeekEnd,
+      onPositionSave,
+      onPositionRestore,
+      onWaveformReady,
+    } = props;
+
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
+
+    const { state, handlers, getImperativeBase } = useMediaPlayerState(
+      audioRef,
+      {
+        initialVolume,
+        initialMuted,
+        initialLoop,
+        initialTime,
+        persistenceKey,
+        onPositionSave,
+        onPositionRestore,
+        onPlay,
+        onPause,
+        onEnded,
+        onTimeUpdate,
+        onDurationChange,
+        onVolumeChange,
+        onError,
+        onLoadStart,
+        onCanPlay,
+        onSeekStart,
+        onSeeking,
+        onSeekEnd,
+      }
+    );
+
+    const {
+      currentTime,
+      duration,
+      volume,
+      isMuted,
+      isPlaying,
+      isEnded,
+      isLoop,
+      isSeeking,
+      seekValue,
+    } = state;
+
+    const [waveformData, setWaveformData] = useState<WaveformData | null>(null);
+    const [waveformReady, setWaveformReady] = useState(false);
+    const [waveformFailedFallback, setWaveformFailedFallback] = useState(false);
+
+    const onErrorRef = useRef(onError);
+    onErrorRef.current = onError;
+    const onWaveformReadyRef = useRef(onWaveformReady);
+    onWaveformReadyRef.current = onWaveformReady;
+
+    useEffect(() => {
+      const stateSnapshot: AudioState = {
+        isPlaying,
+        isPaused: !isPlaying,
+        isEnded,
+        currentTime,
+        duration,
+        volume,
+        isMuted,
+        isSeeking,
+        seekValue,
+        isLoop,
+        waveformReady,
+        waveformFailedFallback,
+      };
+      onStateChange(stateSnapshot);
+    }, [
+      isPlaying,
+      isEnded,
+      currentTime,
+      duration,
+      volume,
+      isMuted,
+      isSeeking,
+      seekValue,
+      isLoop,
+      waveformReady,
+      waveformFailedFallback,
+      onStateChange,
+    ]);
+
+    const generateWaveform = useCallback(
+      async (audioSrc: string, signal: AbortSignal) => {
+        const response = await fetch(audioSrc, { signal });
+        if (!response.ok) {
+          throw new Error(
+            `Waveform fetch failed: ${response.status} ${response.statusText}`
+          );
+        }
+
+        const arrayBuffer = await response.arrayBuffer();
+        if (signal.aborted) return null;
+
+        if (!audioContextRef.current) {
+          audioContextRef.current = new AudioContext();
+        }
+
+        return new Promise<WaveformData>((resolve, reject) => {
+          WaveformData.createFromAudio(
+            {
+              audio_context: audioContextRef.current!,
+              array_buffer: arrayBuffer,
+              scale: waveformScale,
+            },
+            (err, waveform) => {
+              if (err) reject(err);
+              else if (waveform) resolve(waveform);
+              else reject(new Error('Failed to create waveform data'));
+            }
+          );
+        });
+      },
+      [waveformScale]
+    );
+
+    useEffect(() => {
+      if (!src) {
+        setWaveformReady(false);
+        setWaveformData(null);
+        setWaveformFailedFallback(false);
+        return;
+      }
+
+      setWaveformReady(false);
+      setWaveformData(null);
+      setWaveformFailedFallback(false);
+
+      const controller = new AbortController();
+
+      generateWaveform(src, controller.signal)
+        .then((waveform) => {
+          if (controller.signal.aborted || !waveform) return;
+          setWaveformData(waveform);
+          setWaveformReady(true);
+          onWaveformReadyRef.current?.();
+        })
+        .catch(() => {
+          if (controller.signal.aborted) return;
+          setWaveformFailedFallback(true);
+        });
+
+      return () => {
+        controller.abort();
+      };
+    }, [src, generateWaveform]);
+
+    useEffect(() => {
+      return () => {
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+          audioContextRef.current = null;
+        }
+      };
+    }, []);
+
+    useEffect(() => {
+      const audio = audioRef.current;
+      if (!audio || !src) return;
+      audio.src = src;
+    }, [src]);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        ...getImperativeBase(),
+        getAudioElement: () => audioRef.current,
+      }),
+      [getImperativeBase]
+    );
+
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-800 rounded-sm">
+        <audio ref={audioRef} autoPlay={autoPlay} style={{ display: 'none' }}>
+          <track kind="captions" />
+        </audio>
+
+        <div className="w-full flex-1 min-h-0 px-2 flex items-center justify-center">
+          {waveformReady ? (
+            <WaveformCanvas
+              waveformData={waveformData}
+              currentTime={currentTime}
+              duration={duration}
+              isSeeking={isSeeking}
+              seekValue={seekValue}
+              waveColor={waveColor}
+              progressColor={progressColor}
+              onSeekStart={handlers.handleSeekStart}
+              onSeekChange={handlers.handleSeekChange}
+              onSeekEnd={handlers.handleSeekEnd}
+              onClick={handlers.togglePlayPause}
+            />
+          ) : waveformFailedFallback ? (
+            // biome-ignore lint/a11y/useSemanticElements: status message for "waveform unavailable", not form output
+            <div
+              role="status"
+              aria-live="polite"
+              className="text-zinc-500 text-sm shrink-0"
+            >
+              Waveform unavailable
+            </div>
+          ) : (
+            <Music
+              size={32}
+              className="text-zinc-500 shrink-0"
+              aria-hidden="true"
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+);

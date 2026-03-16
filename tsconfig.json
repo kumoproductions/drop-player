@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist",
+    "rootDir": ".",
+    "customConditions": ["development"]
+  },
+  "include": ["src/**/*", "demo/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,94 @@
+{
+  "name": "drop-player",
+  "version": "1.0.0",
+  "description": "A comprehensive React media player powering drop.mov.",
+  "license": "MIT",
+  "author": "kumo.productions™",
+  "repository": "github:kumoproductions/drop-player",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "development": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/index.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/index.css"
+  ],
+  "keywords": [
+    "react",
+    "player",
+    "media-player",
+    "video-player",
+    "audio-player",
+    "hls",
+    "pdf-viewer",
+    "image-viewer",
+    "component"
+  ],
+  "homepage": "https://github.com/kumoproductions/drop-player#readme",
+  "bugs": {
+    "url": "https://github.com/kumoproductions/drop-player/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "lint:fix:unsafe": "biome check --write --unsafe .",
+    "prepublishOnly": "npm run build",
+    "prepare": "node -e \"try{require('fs').statSync('.husky')}catch{process.exit(1)}\" && npx husky || true"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,jsonc,css,md}": "biome check --write"
+  },
+  "peerDependencies": {
+    "hls.js": "^1.4.0",
+    "lucide-react": "^0.300.0 || ^0.525.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "waveform-data": "^4.5.0"
+  },
+  "peerDependenciesMeta": {
+    "hls.js": {
+      "optional": true
+    },
+    "waveform-data": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.7",
+    "@cumuloworks/configs": "^2.0.0",
+    "@tailwindcss/vite": "^4.1.11",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "hls.js": "^1.6.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "lucide-react": "^0.525.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.9.3",
+    "vite": "^7.0.0",
+    "vite-plugin-dts": "^4.5.4",
+    "waveform-data": "^4.5.0"
+  }
+}

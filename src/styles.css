@@ -1,0 +1,193 @@
+/* Custom CSS Variables for theming */
+:root {
+  --drop-player-primary: #3b82f6;
+  --drop-player-success: #22c55e;
+  --drop-player-warning: #eab308;
+  --drop-player-marker-scene: #eab308;
+  --drop-player-marker-custom: #3b82f6;
+}
+
+/* Player container styles */
+.drop-player {
+  --dp-primary: var(--drop-player-primary);
+  --dp-success: var(--drop-player-success);
+  --dp-warning: var(--drop-player-warning);
+}
+
+/* Hide Safari native media controls so custom controls are not obscured */
+.drop-player video::-webkit-media-controls {
+  display: none !important;
+  -webkit-appearance: none;
+}
+.drop-player video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+.drop-player video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+/* Slider thumb styles */
+.drop-player-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  margin-top: -4px; /* Center thumb on track: (thumb_height - track_height) / 2 */
+}
+
+.drop-player-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border: none;
+}
+
+/* Slider track styles */
+.drop-player-slider {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.drop-player-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+.drop-player-slider::-moz-range-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+
+/* Button styles */
+.drop-player-button {
+  cursor: pointer;
+}
+
+/* Focus styles */
+.drop-player-button:focus-visible {
+  outline: 2px solid var(--dp-primary);
+  outline-offset: 2px;
+}
+
+/* Tooltip styles */
+.drop-player-tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Controls gradient overlay */
+.drop-player-controls-gradient {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+/* Ambient light effect: glow on pseudo-element with additive blend so it does not obscure content below (e.g. page title) */
+.drop-player-ambient {
+  --drop-player-ambient-shadow: none;
+}
+.drop-player-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: var(--drop-player-ambient-shadow);
+  mix-blend-mode: plus-lighter;
+  transition: box-shadow 0.3s ease-out;
+}
+
+/* Animation for loading spinner */
+@keyframes drop-player-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.drop-player-spinner {
+  animation: drop-player-spin 1s linear infinite;
+}
+
+/* Dropdown/Popover styles */
+.drop-player-dropdown {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 120px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.drop-player-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+}
+
+.drop-player-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.drop-player-dropdown-item[data-selected="true"] {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Error display */
+.drop-player-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #999;
+  text-align: center;
+  padding: 16px;
+  max-width: 320px;
+}
+
+.drop-player-error-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.drop-player-error-message {
+  font-size: 12px;
+  color: #666;
+  word-break: break-word;
+}
+
+/* Source Selector (top-left overlay) */
+.drop-player-source-selector {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.drop-player-source-dropdown {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 140px;
+  max-width: 280px;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
