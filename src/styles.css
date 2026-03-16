@@ -12,6 +12,8 @@
   --dp-primary: var(--drop-player-primary);
   --dp-success: var(--drop-player-success);
   --dp-warning: var(--drop-player-warning);
+  width: 100%;
+  min-width: 100%;
 }
 
 /* Hide Safari native media controls so custom controls are not obscured */
@@ -94,6 +96,8 @@
 /* Controls gradient overlay */
 .drop-player-controls-gradient {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  width: 100%;
+  min-width: 100%;
 }
 
 /* Ambient light effect: glow on pseudo-element with additive blend so it does not obscure content below (e.g. page title) */
