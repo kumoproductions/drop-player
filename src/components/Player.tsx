@@ -71,6 +71,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       crossOrigin = 'anonymous',
       poster,
       slots,
+      hlsConfig,
     } = props;
 
     // -- Playback group --
@@ -857,6 +858,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               frameRate={frameRate}
               persistenceKey={persistenceKey}
               markers={markers}
+              hlsConfig={hlsConfig}
               locale={locale}
               containerRef={containerRef}
               onStateChange={handleVideoStateChange}

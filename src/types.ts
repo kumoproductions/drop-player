@@ -370,6 +370,14 @@ export interface PlayerProps {
   slots?: PlayerSlots;
   /** Event callbacks */
   events?: PlayerEvents;
+
+  /**
+   * hls.js configuration overrides.
+   * Merged on top of default settings. Use this to tune ABR behaviour,
+   * buffer sizes, or any other hls.js option.
+   * @see https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning
+   */
+  hlsConfig?: Record<string, unknown>;
 }
 
 // ============================================================================
@@ -628,6 +636,9 @@ export interface VideoCoreProps {
 
   // Seekbar markers
   markers?: Marker[];
+
+  // hls.js configuration overrides
+  hlsConfig?: Record<string, unknown>;
 
   // i18n
   locale?: 'en' | 'ja';

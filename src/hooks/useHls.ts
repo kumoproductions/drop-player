@@ -1,5 +1,5 @@
 import type Hls from 'hls.js';
-import type { Level } from 'hls.js';
+import type { HlsConfig, Level } from 'hls.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FallbackReason, QualityLevel } from '../types';
 
@@ -9,6 +9,8 @@ interface UseHlsOptions {
   /** URL to fall back to when HLS fails (e.g. originalUrl from MediaSource) */
   originalUrl?: string | null;
   enabled: boolean;
+  /** Override hls.js configuration. Merged on top of default settings. */
+  hlsConfig?: Partial<HlsConfig>;
   onFallbackToOriginal?: (reason: FallbackReason) => void;
   onQualityLevelChange?: (level: QualityLevel) => void;
   onError?: (error: Error) => void;
@@ -62,6 +64,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
     videoElement,
     originalUrl,
     enabled,
+    hlsConfig,
     onFallbackToOriginal,
     onQualityLevelChange,
     onError,
@@ -146,6 +149,10 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
         enableWorker: true,
         lowLatencyMode: false,
         backBufferLength: 90,
+        // ABR tuning: more aggressive upswitch for better quality on good connections
+        abrBandWidthUpFactor: 0.9,
+        abrEwmaDefaultEstimate: 10_000_000,
+        ...hlsConfig,
       });
 
       hlsRef.current = hls;
@@ -227,7 +234,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
       // (enabled=false), we need to keep them so QualitySelector can show
       // HLS options for switching back.
     };
-  }, [hlsUrl, videoElement, enabled, fallbackToOriginal]);
+  }, [hlsUrl, videoElement, enabled, hlsConfig, fallbackToOriginal]);
 
   /** Use nextLevel for smooth switching without buffer flush */
   const setQualityLevel = useCallback((level: number | 'auto') => {

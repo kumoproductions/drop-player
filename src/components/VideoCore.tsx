@@ -33,6 +33,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       initialTime,
       frameRate = 30,
       persistenceKey,
+      hlsConfig,
       containerRef,
       onStateChange,
       onPlay,
@@ -168,6 +169,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       videoElement: videoRef.current,
       originalUrl: activeEntry?.originalUrl,
       enabled: isHlsSource && !isPlayingOriginal,
+      hlsConfig,
       onFallbackToOriginal: handleFallbackToOriginal,
       onQualityLevelChange: handleHlsQualityChange,
       onError: (error) => {
