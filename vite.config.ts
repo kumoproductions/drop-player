@@ -49,8 +49,8 @@ export default defineConfig(({ command }) => {
               },
             },
             cssCodeSplit: false,
-            sourcemap: true,
-            minify: false,
+            sourcemap: false,
+            minify: true,
           },
         }
       : {}),
