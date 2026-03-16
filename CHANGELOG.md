@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.3
+
+### Breaking Changes
+
+- Remove Tailwind CSS dependency from library output; all styles are now plain CSS with `drop-player-*` BEM classes
+- Consumers no longer need Tailwind — just import `drop-player/styles.css`
+
+### Bug Fixes
+
+- Fix controls and seekbar not rendering (Tailwind utility classes missing from build output)
+
 ## 1.0.2
 
 ### Bug Fixes

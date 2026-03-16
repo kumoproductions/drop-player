@@ -55,7 +55,7 @@
     "prepare": "node -e \"try{require('fs').statSync('.husky')}catch{process.exit(1)}\" && npx husky || true"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,jsonc,css,md}": "biome check --write"
+    "*.{ts,tsx,js,jsx,json,jsonc,css}": "biome check --write"
   },
   "peerDependencies": {
     "hls.js": "^1.4.0",
