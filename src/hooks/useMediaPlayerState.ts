@@ -57,9 +57,6 @@ export function useMediaPlayerState(
     initialMuted = false,
     initialLoop = false,
     initialTime,
-    persistenceKey,
-    onPositionSave,
-    onPositionRestore,
     onPlay,
     onPause,
     onEnded,
@@ -77,9 +74,6 @@ export function useMediaPlayerState(
 
   const storage = usePlayerStorage({
     storageKey,
-    persistenceKey,
-    onPositionSave,
-    onPositionRestore,
   });
 
   const [currentTime, setCurrentTime] = useState(0);
@@ -103,13 +97,10 @@ export function useMediaPlayerState(
   const autoPlayOnNextLoadRef = useRef(false);
 
   useEffect(() => {
-    const savedPosition = storage.loadPosition();
-    if (savedPosition !== null) {
-      initialPositionRef.current = savedPosition;
-    } else if (initialTime !== undefined) {
+    if (initialTime !== undefined) {
       initialPositionRef.current = initialTime;
     }
-  }, [storage, initialTime]);
+  }, [initialTime]);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -149,13 +140,11 @@ export function useMediaPlayerState(
       pause: () => {
         setIsPlaying(false);
         onPause?.();
-        storage.savePosition(media.currentTime, true);
       },
       ended: () => {
         setIsEnded(true);
         setIsPlaying(false);
         onEnded?.();
-        storage.clearPosition();
       },
       timeupdate: () => {
         if (!isSeeking) {
@@ -199,7 +188,6 @@ export function useMediaPlayerState(
   }, [
     mediaRef,
     isSeeking,
-    storage,
     onPlay,
     onPause,
     onEnded,
@@ -239,29 +227,6 @@ export function useMediaPlayerState(
     const media = mediaRef.current;
     if (media) media.muted = isMuted;
   }, [mediaRef, isMuted]);
-
-  useEffect(() => {
-    if (!isPlaying || !persistenceKey) return;
-    const interval = setInterval(() => {
-      const media = mediaRef.current;
-      if (media) storage.savePosition(media.currentTime);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [mediaRef, isPlaying, persistenceKey, storage]);
-
-  useEffect(() => {
-    if (!persistenceKey) return;
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        const media = mediaRef.current;
-        if (media) storage.savePosition(media.currentTime, true);
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, [mediaRef, persistenceKey, storage]);
 
   const normalizeSeekTime = useCallback(
     (time: number): number => Math.max(0, Math.min(duration, time)),

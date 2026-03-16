@@ -22,7 +22,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       initialVolume = 1,
       initialTime,
       storageKey,
-      persistenceKey,
       waveColor = '#666',
       progressColor = '#0066ff',
       waveformScale = 512,
@@ -40,8 +39,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       onSeekStart,
       onSeeking,
       onSeekEnd,
-      onPositionSave,
-      onPositionRestore,
       onWaveformReady,
     } = props;
 
@@ -56,9 +53,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
         initialMuted,
         initialLoop,
         initialTime,
-        persistenceKey,
-        onPositionSave,
-        onPositionRestore,
         onPlay,
         onPause,
         onEnded,

@@ -36,7 +36,6 @@ const PLAYBACK_DEFAULTS = {
   muted: false,
   volume: 1,
   initialTime: undefined,
-  persistenceKey: undefined,
 } as const;
 
 const UI_DEFAULTS = {
@@ -82,7 +81,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       muted: initialMuted = PLAYBACK_DEFAULTS.muted,
       volume: initialVolume = PLAYBACK_DEFAULTS.volume,
       initialTime,
-      persistenceKey,
     } = props.playback ?? {};
 
     // -- UI group --
@@ -117,8 +115,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       onFullscreenChange,
       onPipChange,
       onFrameCapture,
-      onPositionSave,
-      onPositionRestore,
       onActiveSourceChange,
       onQualityLevelChange,
       onFallback,
@@ -955,7 +951,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               initialTime={initialTime}
               frameRate={frameRate}
               storageKey={storageKey}
-              persistenceKey={persistenceKey}
               markers={markers}
               hlsConfig={hlsConfig}
               locale={locale}
@@ -979,8 +974,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               onSeeking={onSeeking}
               onSeekEnd={onSeekEnd}
               onFrameCapture={onFrameCapture}
-              onPositionSave={onPositionSave}
-              onPositionRestore={onPositionRestore}
               onQualityLevelChange={onQualityLevelChange}
               onFallback={onFallback}
               onFullscreenToggle={toggleFullscreen}
@@ -1024,7 +1017,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               initialVolume={initialVolume}
               initialTime={initialTime}
               storageKey={storageKey}
-              persistenceKey={persistenceKey}
               locale={locale}
               containerRef={containerRef}
               onStateChange={handleAudioStateChange}
@@ -1040,8 +1032,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               onSeekStart={onSeekStart}
               onSeeking={onSeeking}
               onSeekEnd={onSeekEnd}
-              onPositionSave={onPositionSave}
-              onPositionRestore={onPositionRestore}
             />
           );
       }

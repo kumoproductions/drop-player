@@ -299,8 +299,6 @@ export interface PlayerEvents {
   onFullscreenChange?: (isFullscreen: boolean) => void;
   onPipChange?: (isPip: boolean) => void;
   onFrameCapture?: (capture: FrameCapture) => void;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
 
   // Source/Quality
   onActiveSourceChange?: (index: number) => void;
@@ -330,8 +328,6 @@ export interface PlayerPlaybackConfig {
   volume?: number;
   /** Start time in seconds. Default: 0 */
   initialTime?: number;
-  /** localStorage key for position persistence */
-  persistenceKey?: string;
 }
 
 /**
@@ -506,9 +502,6 @@ export interface UseMediaPlayerStateOptions {
   initialMuted?: boolean;
   initialLoop?: boolean;
   initialTime?: number;
-  persistenceKey?: string;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
@@ -583,9 +576,6 @@ export interface UseMediaPlayerStateReturn {
     autoPlay?: boolean
   ) => void;
   storage: {
-    savePosition: (position: number, force?: boolean) => void;
-    loadPosition: () => number | null;
-    clearPosition: () => void;
     getStoredValue: <T>(key: string, defaultValue: T) => T;
     setStoredValue: <T>(key: string, value: T) => void;
   };
@@ -653,9 +643,8 @@ export interface VideoCoreProps {
   // Timecode
   frameRate?: number;
 
-  // Persistence
+  // Storage
   storageKey?: string;
-  persistenceKey?: string;
 
   // Seekbar markers
   markers?: Marker[];
@@ -691,8 +680,6 @@ export interface VideoCoreProps {
   onSeeking?: (time: number) => void;
   onSeekEnd?: (time: number) => void;
   onFrameCapture?: (capture: FrameCapture) => void;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
   onQualityLevelChange?: (level: QualityLevel) => void;
   onFallback?: (event: FallbackEvent) => void;
 
@@ -910,9 +897,8 @@ export interface AudioCoreProps {
   initialVolume?: number;
   initialTime?: number;
 
-  // Persistence
+  // Storage
   storageKey?: string;
-  persistenceKey?: string;
 
   // Waveform
   waveColor?: string;
@@ -941,8 +927,6 @@ export interface AudioCoreProps {
   onSeekStart?: (time: number) => void;
   onSeeking?: (time: number) => void;
   onSeekEnd?: (time: number) => void;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
   onWaveformReady?: () => void;
 }
 

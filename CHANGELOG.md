@@ -7,6 +7,11 @@
 - Add `storageKey` prop to customize localStorage key prefix (default: `drop_player_`, custom: `<storageKey>_`)
 - Persist and restore muted state across sessions via localStorage
 
+### Breaking Changes
+
+- Remove `persistenceKey` prop and playback position persistence feature
+- Remove `onPositionSave` / `onPositionRestore` event callbacks
+
 ## 1.0.7
 
 ### Bug Fixes
