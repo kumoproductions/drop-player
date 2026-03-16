@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import WaveformData from 'waveform-data';
+import type WaveformData from 'waveform-data';
 import { useMediaPlayerState } from '../hooks/useMediaPlayerState';
 import type { AudioCoreProps, AudioCoreRef, AudioState } from '../types';
 import { WaveformCanvas } from './WaveformCanvas';
@@ -126,6 +126,17 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
     const generateWaveform = useCallback(
       async (audioSrc: string, signal: AbortSignal) => {
+        let WaveformDataModule: typeof WaveformData;
+        try {
+          const mod = await import('waveform-data');
+          WaveformDataModule = mod.default;
+        } catch {
+          console.warn(
+            '[drop-player] waveform-data is not installed. Audio will play without waveform visualization. Install it with: npm i waveform-data'
+          );
+          return null;
+        }
+
         const response = await fetch(audioSrc, { signal });
         if (!response.ok) {
           throw new Error(
@@ -142,7 +153,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
         const audioContext = audioContextRef.current;
         return new Promise<WaveformData>((resolve, reject) => {
-          WaveformData.createFromAudio(
+          WaveformDataModule.createFromAudio(
             {
               audio_context: audioContext,
               array_buffer: arrayBuffer,
