@@ -14,6 +14,24 @@ import {
 export const TooltipContainerContext =
   createContext<RefObject<HTMLElement | null> | null>(null);
 
+// Global active tooltip management — ensures only one tooltip is visible at a time
+let globalDismiss: (() => void) | null = null;
+
+function registerTooltip(dismiss: () => void): void {
+  if (globalDismiss && globalDismiss !== dismiss) {
+    globalDismiss();
+  }
+  globalDismiss = dismiss;
+}
+
+function unregisterTooltip(dismiss: () => void): void {
+  if (globalDismiss === dismiss) {
+    globalDismiss = null;
+  }
+}
+
+const AUTO_DISMISS_MS = 2500;
+
 interface TooltipProps {
   content: string;
   children: ReactNode;
@@ -32,24 +50,70 @@ export function Tooltip({
   const [isVisible, setIsVisible] = useState(false);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const tooltipId = useId();
+  const autoDismissTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const isTouchRef = useRef(false);
+
+  const dismiss = useCallback(() => {
+    setIsVisible(false);
+    isTouchRef.current = false;
+    if (autoDismissTimer.current !== undefined) {
+      clearTimeout(autoDismissTimer.current);
+      autoDismissTimer.current = undefined;
+    }
+  }, []);
+
+  const show = useCallback(() => {
+    registerTooltip(dismiss);
+    setIsVisible(true);
+  }, [dismiss]);
+
+  // Start/reset auto-dismiss timer for touch interactions
+  const startAutoDismiss = useCallback(() => {
+    if (autoDismissTimer.current !== undefined) {
+      clearTimeout(autoDismissTimer.current);
+    }
+    autoDismissTimer.current = setTimeout(() => {
+      dismiss();
+    }, AUTO_DISMISS_MS);
+  }, [dismiss]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      unregisterTooltip(dismiss);
+      if (autoDismissTimer.current !== undefined) {
+        clearTimeout(autoDismissTimer.current);
+      }
+    };
+  }, [dismiss]);
 
   const handleMouseEnter = useCallback(() => {
-    setIsVisible(true);
-  }, []);
+    // Ignore synthetic mouse events fired after touch
+    if (isTouchRef.current) return;
+    show();
+  }, [show]);
 
   const handleMouseLeave = useCallback(() => {
-    setIsVisible(false);
-  }, []);
+    if (isTouchRef.current) return;
+    dismiss();
+  }, [dismiss]);
 
   const handleFocus = useCallback(() => {
-    setIsVisible(true);
-  }, []);
+    show();
+  }, [show]);
 
   const handleBlur = useCallback(() => {
-    setIsVisible(false);
-  }, []);
+    dismiss();
+  }, [dismiss]);
+
+  const handleTouchStart = useCallback(() => {
+    isTouchRef.current = true;
+    show();
+    startAutoDismiss();
+  }, [show, startAutoDismiss]);
 
   // Position the tooltip within container bounds after render
+  // biome-ignore lint/correctness/useExhaustiveDependencies: content changes require repositioning
   useLayoutEffect(() => {
     const tooltip = tooltipRef.current;
     const container = containerRef?.current;
@@ -94,7 +158,7 @@ export function Tooltip({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsVisible(false);
+        dismiss();
       }
     };
 
@@ -102,7 +166,7 @@ export function Tooltip({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isVisible]);
+  }, [isVisible, dismiss]);
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: Tooltip wrapper for mouse events
@@ -112,6 +176,7 @@ export function Tooltip({
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onTouchStart={handleTouchStart}
       aria-describedby={isVisible && content ? tooltipId : undefined}
     >
       {children}
