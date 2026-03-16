@@ -52,6 +52,7 @@ export function useMediaPlayerState(
   options: UseMediaPlayerStateOptions = {}
 ): UseMediaPlayerStateReturn {
   const {
+    storageKey,
     initialVolume = 1,
     initialMuted = false,
     initialLoop = false,
@@ -75,6 +76,7 @@ export function useMediaPlayerState(
   } = options;
 
   const storage = usePlayerStorage({
+    storageKey,
     persistenceKey,
     onPositionSave,
     onPositionRestore,
@@ -85,7 +87,9 @@ export function useMediaPlayerState(
   const [volume, setVolume] = useState(() =>
     storage.getStoredValue('volume', initialVolume)
   );
-  const [isMuted, setIsMuted] = useState(initialMuted);
+  const [isMuted, setIsMuted] = useState(() =>
+    storage.getStoredValue('muted', initialMuted)
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [isEnded, setIsEnded] = useState(false);
   const [isLoop, setIsLoop] = useState(() =>
@@ -328,9 +332,11 @@ export function useMediaPlayerState(
       if (newVolume === 0 && !isMuted) {
         media.muted = true;
         setIsMuted(true);
+        storage.setStoredValue('muted', true);
       } else if (newVolume > 0 && isMuted) {
         media.muted = false;
         setIsMuted(false);
+        storage.setStoredValue('muted', false);
       }
     },
     [mediaRef, isMuted, storage]
@@ -349,6 +355,7 @@ export function useMediaPlayerState(
     }
     media.muted = newMuted;
     setIsMuted(newMuted);
+    storage.setStoredValue('muted', newMuted);
   }, [mediaRef, isMuted, volume, storage]);
 
   const handleLoopToggle = useCallback(() => {

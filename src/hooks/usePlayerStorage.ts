@@ -91,6 +91,7 @@ if (typeof window !== 'undefined') {
 }
 
 interface UsePlayerStorageOptions {
+  storageKey?: string;
   persistenceKey?: string;
   storage?: StorageAdapter;
   onPositionSave?: (position: number) => void;
@@ -112,23 +113,26 @@ export function usePlayerStorage(
   options: UsePlayerStorageOptions = {}
 ): UsePlayerStorageReturn {
   const {
+    storageKey,
     persistenceKey,
     storage = defaultStorage,
     onPositionSave,
     onPositionRestore,
   } = options;
 
+  const prefix = storageKey ? `${storageKey}_` : STORAGE_PREFIX;
+
   const lastSaveTimeRef = useRef<number>(0);
   const positionKeyRef = useRef<string | null>(
-    persistenceKey ? `${STORAGE_PREFIX}position_${persistenceKey}` : null
+    persistenceKey ? `${prefix}position_${persistenceKey}` : null
   );
 
-  // Update key ref when persistenceKey changes
+  // Update key ref when persistenceKey or prefix changes
   useEffect(() => {
     positionKeyRef.current = persistenceKey
-      ? `${STORAGE_PREFIX}position_${persistenceKey}`
+      ? `${prefix}position_${persistenceKey}`
       : null;
-  }, [persistenceKey]);
+  }, [persistenceKey, prefix]);
 
   const savePosition = useCallback(
     (position: number, force = false) => {
@@ -195,21 +199,21 @@ export function usePlayerStorage(
 
   const getStoredValue = useCallback(
     <T>(key: string, defaultValue: T): T => {
-      const fullKey = `${STORAGE_PREFIX}${key}`;
+      const fullKey = `${prefix}${key}`;
       const saved = storage.getItem(fullKey);
       if (!saved) return defaultValue;
 
       return JSON.parse(saved) as T;
     },
-    [storage]
+    [storage, prefix]
   );
 
   const setStoredValue = useCallback(
     <T>(key: string, value: T) => {
-      const fullKey = `${STORAGE_PREFIX}${key}`;
+      const fullKey = `${prefix}${key}`;
       storage.setItem(fullKey, JSON.stringify(value));
     },
-    [storage]
+    [storage, prefix]
   );
 
   return useMemo(

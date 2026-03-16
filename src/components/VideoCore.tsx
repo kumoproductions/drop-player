@@ -32,6 +32,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       initialVolume = 1,
       initialTime,
       frameRate = 30,
+      storageKey,
       persistenceKey,
       hlsConfig,
       containerRef,
@@ -82,6 +83,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       setInitialPositionForNextLoad,
       getImperativeBase,
     } = useMediaPlayerState(videoRef, {
+      storageKey,
       initialVolume,
       initialMuted,
       initialLoop,

@@ -21,6 +21,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       initialMuted = false,
       initialVolume = 1,
       initialTime,
+      storageKey,
       persistenceKey,
       waveColor = '#666',
       progressColor = '#0066ff',
@@ -50,6 +51,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
     const { state, handlers, getImperativeBase } = useMediaPlayerState(
       audioRef,
       {
+        storageKey,
         initialVolume,
         initialMuted,
         initialLoop,

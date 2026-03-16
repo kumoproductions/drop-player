@@ -70,6 +70,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       className,
       crossOrigin = 'anonymous',
       poster,
+      storageKey,
       slots,
       hlsConfig,
     } = props;
@@ -238,7 +239,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
     const showTitle = showTitleProp !== undefined ? showTitleProp : hasSource;
 
-    const globalStorage = usePlayerStorage();
+    const globalStorage = usePlayerStorage({ storageKey });
 
     const showFrameFormat = mediaMode === 'video';
     const [timeDisplayFormat, setTimeDisplayFormat] =
@@ -542,6 +543,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     }, [mediaMode]);
 
     // Sync PIP state with browser events
+    // biome-ignore lint/correctness/useExhaustiveDependencies: videoState.duration ensures re-attach after video element ready
     useEffect(() => {
       if (mediaMode !== 'video') return;
       const video = videoCoreRef.current?.getVideoElement();
@@ -952,6 +954,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               initialVolume={initialVolume}
               initialTime={initialTime}
               frameRate={frameRate}
+              storageKey={storageKey}
               persistenceKey={persistenceKey}
               markers={markers}
               hlsConfig={hlsConfig}
@@ -1020,6 +1023,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               initialMuted={initialMuted}
               initialVolume={initialVolume}
               initialTime={initialTime}
+              storageKey={storageKey}
               persistenceKey={persistenceKey}
               locale={locale}
               containerRef={containerRef}

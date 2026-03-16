@@ -369,6 +369,13 @@ export interface PlayerProps {
   /** Poster image for video */
   poster?: string;
 
+  /**
+   * Custom prefix for localStorage keys.
+   * Default: 'drop_player' → keys are stored as `drop_player_<key>`.
+   * When set, keys are stored as `<storageKey>_<key>`.
+   */
+  storageKey?: string;
+
   /** Playback behaviour */
   playback?: PlayerPlaybackConfig;
   /** UI / appearance */
@@ -494,6 +501,7 @@ export interface StorageAdapter {
  * Options for useMediaPlayerState hook (shared by AudioCore / VideoCore)
  */
 export interface UseMediaPlayerStateOptions {
+  storageKey?: string;
   initialVolume?: number;
   initialMuted?: boolean;
   initialLoop?: boolean;
@@ -646,6 +654,7 @@ export interface VideoCoreProps {
   frameRate?: number;
 
   // Persistence
+  storageKey?: string;
   persistenceKey?: string;
 
   // Seekbar markers
@@ -902,6 +911,7 @@ export interface AudioCoreProps {
   initialTime?: number;
 
   // Persistence
+  storageKey?: string;
   persistenceKey?: string;
 
   // Waveform
