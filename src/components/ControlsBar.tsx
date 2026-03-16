@@ -10,7 +10,9 @@ import { AmbientLightButton } from './controls/AmbientLightButton';
 import { CaptureButtons } from './controls/CaptureButtons';
 import { FullscreenButton } from './controls/FullscreenButton';
 import { LoopButton } from './controls/LoopButton';
+import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
+import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
 import { QualitySelector } from './controls/QualitySelector';
 import { TimeDisplay, type TimeDisplayFormat } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
@@ -32,6 +34,10 @@ interface ControlsBarProps {
   timeDisplayFormat?: TimeDisplayFormat;
   onTimeDisplayFormatChange?: (format: TimeDisplayFormat) => void;
 
+  // Playback speed
+  playbackRate?: number;
+  onPlaybackRateChange?: (rate: number) => void;
+
   // Video quality (HLS levels + originalUrl)
   hlsLevels?: HlsLevelInfo[];
   currentHlsLevel?: number;
@@ -41,6 +47,11 @@ interface ControlsBarProps {
 
   // Video ambient light
   isAmbientLight?: boolean;
+
+  // PIP
+  isPip?: boolean;
+  isPipSupported?: boolean;
+  onPipToggle?: () => void;
 
   // Video callbacks
   onPlayToggle?: () => void;
@@ -86,12 +97,17 @@ export function ControlsBar({
   frameRate = 30,
   timeDisplayFormat = 'elapsed-total',
   onTimeDisplayFormatChange,
+  playbackRate = 1,
+  onPlaybackRateChange,
   hlsLevels = [],
   currentHlsLevel = -1,
   qualityLevel,
   hasOriginal = false,
   isPlayingOriginal = false,
   isAmbientLight = false,
+  isPip = false,
+  isPipSupported = false,
+  onPipToggle,
   onPlayToggle,
   onLoopToggle,
   onVolumeChange,
@@ -177,6 +193,13 @@ export function ControlsBar({
                 t={t}
               />
             )}
+            {features.playbackSpeed && (
+              <PlaybackSpeedSelector
+                playbackRate={playbackRate}
+                onPlaybackRateChange={onPlaybackRateChange ?? (() => {})}
+                t={t}
+              />
+            )}
             {features.ambientLight && (
               <AmbientLightButton
                 isEnabled={isAmbientLight}
@@ -202,19 +225,35 @@ export function ControlsBar({
                 t={t}
               />
             )}
+            {features.pip && isPipSupported && (
+              <PipButton
+                isPip={isPip}
+                onToggle={onPipToggle ?? (() => {})}
+                t={t}
+              />
+            )}
           </>
         );
       case 'audio':
         return (
-          features.volume && (
-            <VolumeControl
-              volume={volume}
-              isMuted={isMuted}
-              onVolumeChange={onVolumeChange ?? (() => {})}
-              onMuteToggle={onMuteToggle ?? (() => {})}
-              t={t}
-            />
-          )
+          <>
+            {features.volume && (
+              <VolumeControl
+                volume={volume}
+                isMuted={isMuted}
+                onVolumeChange={onVolumeChange ?? (() => {})}
+                onMuteToggle={onMuteToggle ?? (() => {})}
+                t={t}
+              />
+            )}
+            {features.playbackSpeed && (
+              <PlaybackSpeedSelector
+                playbackRate={playbackRate}
+                onPlaybackRateChange={onPlaybackRateChange ?? (() => {})}
+                t={t}
+              />
+            )}
+          </>
         );
       case 'image':
         return (

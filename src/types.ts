@@ -150,6 +150,8 @@ export interface PlayerState {
   activeSourceIndex: number;
   sourceCount: number;
   qualityLevel?: QualityLevel;
+  playbackRate: number;
+  isPip: boolean;
 }
 
 // ============================================================================
@@ -224,6 +226,10 @@ export interface PlayerFeatures {
   zoom?: boolean;
   /** Keyboard shortcuts (video/audio) */
   keyboardShortcuts?: boolean;
+  /** Playback speed selector (video/audio) */
+  playbackSpeed?: boolean;
+  /** Picture-in-Picture button (video) */
+  pip?: boolean;
 }
 
 // ============================================================================
@@ -291,6 +297,7 @@ export interface PlayerEvents {
 
   // Other
   onFullscreenChange?: (isFullscreen: boolean) => void;
+  onPipChange?: (isPip: boolean) => void;
   onFrameCapture?: (capture: FrameCapture) => void;
   onPositionSave?: (position: number) => void;
   onPositionRestore?: (position: number) => void;
@@ -460,7 +467,12 @@ export type TranslationKey =
   | 'zoomIn'
   | 'zoomOut'
   | 'resetZoom'
-  | 'zoomLevel';
+  | 'zoomLevel'
+  // Playback speed
+  | 'playbackSpeed'
+  // PIP
+  | 'pip'
+  | 'exitPip';
 
 export type Translations = Record<TranslationKey, string>;
 
@@ -521,8 +533,10 @@ export interface MediaPlayerImperativeBase {
   getVolume: () => number;
   isMuted: () => boolean;
   isPaused: () => boolean;
+  getPlaybackRate: () => number;
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
+  setPlaybackRate: (rate: number) => void;
   toggleLoop: () => void;
   toggleMute: () => void;
 }
@@ -947,10 +961,12 @@ export interface AudioCoreRef {
   getVolume: () => number;
   isMuted: () => boolean;
   isPaused: () => boolean;
+  getPlaybackRate: () => number;
 
   // State setters
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
+  setPlaybackRate: (rate: number) => void;
 
   // Toggles
   toggleLoop: () => void;
