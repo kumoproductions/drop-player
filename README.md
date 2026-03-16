@@ -96,6 +96,7 @@ Props are organised into four groups to keep the surface area manageable:
 | `className` | `string` | — | CSS class on root container |
 | `crossOrigin` | `'anonymous' \| 'use-credentials'` | `'anonymous'` | CORS for media elements |
 | `poster` | `string` | — | Poster image (video) |
+| `storageKey` | `string` | — | Custom prefix for localStorage keys (default: `drop_player_`, custom: `<storageKey>_`). Muted state is persisted automatically. |
 | `hlsConfig` | `Record<string, unknown>` | — | Custom [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) overrides |
 
 ### `playback` — `PlayerPlaybackConfig`
@@ -107,7 +108,6 @@ Props are organised into four groups to keep the surface area manageable:
 | `muted` | `boolean` | `false` | Start muted |
 | `volume` | `number` | `1` | Initial volume (0–1) |
 | `initialTime` | `number` | `0` | Start position in seconds |
-| `persistenceKey` | `string` | — | localStorage key for position resume |
 
 ### `ui` — `PlayerUiConfig`
 
@@ -156,8 +156,6 @@ Props are organised into four groups to keep the surface area manageable:
 | `onSeekEnd` | `time` | Seek ends |
 | `onFullscreenChange` | `boolean` | Fullscreen toggled |
 | `onFrameCapture` | `FrameCapture` | Frame captured |
-| `onPositionSave` | `position` | Position saved to storage |
-| `onPositionRestore` | `position` | Position restored from storage |
 | `onActiveSourceChange` | `index` | Active source changed |
 | `onQualityLevelChange` | `QualityLevel` | Quality level changed |
 | `onFallback` | `FallbackEvent` | Fell back to original URL |
@@ -284,7 +282,7 @@ Browser environment only. SSR-safe (components are no-ops on the server).
 Planned extensibility (not yet implemented):
 
 - **Translation** — pluggable / swappable i18n so you can supply custom locales or override strings.
-- **Store** — swappable persistence backend (e.g. replace the default `localStorage`-based position/store) for custom storage adapters.
+- **Store** — swappable persistence backend (e.g. replace the default `localStorage` adapter) for custom storage adapters.
 
 ## License
 
