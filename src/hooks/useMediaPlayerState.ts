@@ -405,18 +405,12 @@ export function useMediaPlayerState(
       getVolume: () => mediaRef.current?.volume ?? volume,
       isMuted: () => mediaRef.current?.muted ?? isMuted,
       isPaused: () => mediaRef.current?.paused ?? true,
-      getPlaybackRate: () => mediaRef.current?.playbackRate ?? 1,
       setVolume: handleVolumeChange,
       setMuted: (muted: boolean) => {
         const media = mediaRef.current;
         if (media) {
           media.muted = muted;
           setIsMuted(muted);
-        }
-      },
-      setPlaybackRate: (rate: number) => {
-        if (mediaRef.current) {
-          mediaRef.current.playbackRate = rate;
         }
       },
       toggleLoop: handleLoopToggle,

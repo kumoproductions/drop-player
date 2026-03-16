@@ -16,8 +16,6 @@ export const defaultFeatures: Required<PlayerFeatures> = {
   fullscreen: true,
   zoom: true,
   keyboardShortcuts: true,
-  playbackSpeed: true,
-  pip: true,
 };
 
 /**
@@ -36,8 +34,6 @@ export const noFeatures: Required<PlayerFeatures> = {
   fullscreen: false,
   zoom: false,
   keyboardShortcuts: false,
-  playbackSpeed: false,
-  pip: false,
 };
 
 /**

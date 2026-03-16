@@ -1,17 +1,6 @@
 # Changelog
 
-## 1.0.6
-
-### Features
-
-- Add playback speed selector control
-- Add Picture-in-Picture (PiP) button control
-
-### Bug Fixes
-
-- Fix tooltip position not recalculating when content changes
-
-## 1.0.5
+## 1.0.4
 
 ### Features
 
@@ -22,8 +11,6 @@
 
 - Dynamically import `waveform-data` to reduce initial bundle size
 - Fix tooltip position
-
-## 1.0.4
 
 ### Maintenance
 

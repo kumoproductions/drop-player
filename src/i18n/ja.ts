@@ -36,9 +36,4 @@ export const ja: Translations = {
   zoomOut: 'ズームアウト',
   resetZoom: 'リセット',
   zoomLevel: 'ズーム',
-  // 再生速度
-  playbackSpeed: '再生速度',
-  // PIP
-  pip: 'ピクチャーインピクチャー',
-  exitPip: 'ピクチャーインピクチャー解除',
 };

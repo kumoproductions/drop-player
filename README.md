@@ -194,8 +194,6 @@ import { noFeatures } from 'drop-player';
 | `qualitySelector` | `true` | video (HLS) |
 | `fullscreen` | `true` | all |
 | `zoom` | `true` | image, PDF |
-| `playbackSpeed` | `true` | video, audio |
-| `pip` | `true` | video (browser PiP API required) |
 | `keyboardShortcuts` | `true` | video, audio |
 
 ## Theming
