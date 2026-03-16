@@ -554,7 +554,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
         aria-label="Image viewer"
         // biome-ignore lint/a11y/noNoninteractiveTabindex: role="application" makes this interactive
         tabIndex={0}
-        className="w-full h-full overflow-hidden flex items-center justify-center outline-none"
+        className="drop-player-image-container"
         onFocus={() => {
           isFocusedRef.current = true;
         }}

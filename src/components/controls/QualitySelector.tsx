@@ -26,16 +26,18 @@ export function QualitySelector({
 
   const getButtonColor = (): string => {
     if (isPlayingOriginal) {
-      return 'text-blue-400';
+      return 'drop-player-color-blue';
     }
     const actualHeight =
       currentHlsLevel >= 0 && hlsLevels[currentHlsLevel]
         ? hlsLevels[currentHlsLevel].height
         : null;
     if (actualHeight !== null) {
-      return actualHeight >= 720 ? 'text-green-400' : 'text-yellow-400';
+      return actualHeight >= 720
+        ? 'drop-player-color-green'
+        : 'drop-player-color-yellow';
     }
-    return 'text-green-400';
+    return 'drop-player-color-green';
   };
 
   const getTooltip = (): string => {
@@ -139,12 +141,12 @@ export function QualitySelector({
   const tooltipContent = getTooltip();
 
   return (
-    <div className="relative">
+    <div className="drop-player-relative">
       <Tooltip content={isOpen ? '' : tooltipContent}>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors ${getButtonColor()}`}
+          className={`drop-player-button ${getButtonColor()}`}
           aria-label={t('quality')}
         >
           <Settings2 size={24} />
@@ -155,25 +157,25 @@ export function QualitySelector({
         <>
           {/* biome-ignore lint/a11y/noStaticElementInteractions: Backdrop for closing dropdown */}
           <div
-            className="fixed inset-0 z-40"
+            className="drop-player-backdrop"
             onClick={() => setIsOpen(false)}
             onKeyDown={(e) => {
               if (e.key === 'Escape') setIsOpen(false);
             }}
           />
 
-          <div className="drop-player-dropdown absolute bottom-full right-0 mb-2 z-50">
+          <div className="drop-player-dropdown drop-player-dropdown--quality">
             {options.map((option) => (
               <button
                 key={option.key}
                 type="button"
-                className="drop-player-dropdown-item w-full text-left"
+                className="drop-player-dropdown-item"
                 data-selected={option.key === currentKey}
                 onClick={() => handleSelect(option.mode)}
               >
                 <span>{option.label}</span>
                 {option.key === currentKey && (
-                  <Check size={16} className="text-green-400" />
+                  <Check size={16} className="drop-player-color-green" />
                 )}
               </button>
             ))}

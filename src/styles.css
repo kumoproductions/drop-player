@@ -1,3 +1,7 @@
+/* ============================================================
+   drop-player — Standalone CSS (no Tailwind dependency)
+   ============================================================ */
+
 /* Custom CSS Variables for theming */
 :root {
   --drop-player-primary: #3b82f6;
@@ -7,25 +11,306 @@
   --drop-player-marker-custom: #3b82f6;
 }
 
-/* Player container styles */
+/* ------------------------------------------------------------ */
+/* Player container                                             */
+/* ------------------------------------------------------------ */
 .drop-player {
   --dp-primary: var(--drop-player-primary);
   --dp-success: var(--drop-player-success);
   --dp-warning: var(--drop-player-warning);
+
+  position: relative;
   width: 100%;
   min-width: 100%;
+  height: 100%;
+  background-color: #000;
+  outline: none;
 }
 
-/* Hide Safari native media controls so custom controls are not obscured */
+.drop-player--flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hide Safari native media controls */
 .drop-player video::-webkit-media-controls {
-  display: none !important;
+  display: none;
   -webkit-appearance: none;
 }
 .drop-player video::-webkit-media-controls-enclosure {
-  display: none !important;
+  display: none;
 }
 .drop-player video::-webkit-media-controls-panel {
-  display: none !important;
+  display: none;
+}
+
+/* ------------------------------------------------------------ */
+/* Ambient light effect                                         */
+/* ------------------------------------------------------------ */
+.drop-player-ambient {
+  --drop-player-ambient-shadow: none;
+}
+.drop-player-ambient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: var(--drop-player-ambient-shadow);
+  mix-blend-mode: plus-lighter;
+  transition: box-shadow 0.3s ease-out;
+}
+
+/* ------------------------------------------------------------ */
+/* Overlay (error / loading)                                    */
+/* ------------------------------------------------------------ */
+.drop-player-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  z-index: 10;
+}
+
+/* ------------------------------------------------------------ */
+/* Loading spinner                                              */
+/* ------------------------------------------------------------ */
+@keyframes drop-player-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.drop-player-spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 2px solid #fff;
+  border-top-color: transparent;
+  animation: drop-player-spin 1s linear infinite;
+}
+
+/* ------------------------------------------------------------ */
+/* Error display                                                */
+/* ------------------------------------------------------------ */
+.drop-player-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #999;
+  text-align: center;
+  padding: 16px;
+  max-width: 320px;
+}
+
+.drop-player-error-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.drop-player-error-message {
+  font-size: 12px;
+  color: #666;
+  word-break: break-word;
+}
+
+/* ------------------------------------------------------------ */
+/* Source selector position                                     */
+/* ------------------------------------------------------------ */
+.drop-player-source-position {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 20;
+}
+
+/* ------------------------------------------------------------ */
+/* Overlay slot positions                                       */
+/* ------------------------------------------------------------ */
+.drop-player-slot-top-left {
+  position: absolute;
+  top: 40px;
+  left: 8px;
+  transition: opacity 0.3s;
+}
+
+.drop-player-slot-top-right {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transition: opacity 0.3s;
+}
+
+/* ------------------------------------------------------------ */
+/* Visibility helpers                                           */
+/* ------------------------------------------------------------ */
+.drop-player-visible {
+  opacity: 1;
+}
+
+.drop-player-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------ */
+/* Controls gradient overlay                                    */
+/* ------------------------------------------------------------ */
+.drop-player-controls-gradient {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 8px 16px;
+  width: 100%;
+  min-width: 100%;
+  transition: opacity 0.3s;
+}
+
+/* ------------------------------------------------------------ */
+/* Seekbar overlay slot                                         */
+/* ------------------------------------------------------------ */
+.drop-player-seekbar-overlay-slot {
+  position: absolute;
+  inset-inline: 0;
+  top: -24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 10;
+  margin-inline: 12px;
+}
+
+.drop-player-seekbar-overlay-slot > * {
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------------ */
+/* Controls bar                                                 */
+/* ------------------------------------------------------------ */
+.drop-player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.drop-player-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ------------------------------------------------------------ */
+/* Common button                                                */
+/* ------------------------------------------------------------ */
+.drop-player-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    background-color 0.15s;
+  color: #fff;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.drop-player-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drop-player-button:focus-visible {
+  outline: 2px solid var(--dp-primary);
+  outline-offset: 2px;
+}
+
+.drop-player-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Time display button (wider) */
+.drop-player-button--time {
+  width: auto;
+  padding-inline: 8px;
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+/* Zoom level button */
+.drop-player-button--zoom-level {
+  width: auto;
+  min-width: 56px;
+  padding-inline: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.drop-player-button--zoom-level:disabled {
+  opacity: 0.6;
+}
+
+/* ------------------------------------------------------------ */
+/* Button color variants                                        */
+/* ------------------------------------------------------------ */
+.drop-player-color-white {
+  color: #fff;
+}
+.drop-player-color-blue {
+  color: oklch(70.7% 0.165 254.624);
+}
+.drop-player-color-yellow {
+  color: oklch(85.2% 0.199 91.936);
+}
+.drop-player-color-green {
+  color: oklch(79.2% 0.209 151.711);
+}
+.drop-player-color-red {
+  color: oklch(70.4% 0.191 22.216);
+}
+.drop-player-color-muted {
+  color: oklch(55.2% 0.016 285.938);
+}
+
+/* ------------------------------------------------------------ */
+/* Responsive hide (hidden on small, contents on sm+)           */
+/* ------------------------------------------------------------ */
+.drop-player-responsive-hide {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .drop-player-responsive-hide {
+    display: contents;
+  }
+}
+
+/* ------------------------------------------------------------ */
+/* Volume slider                                                */
+/* ------------------------------------------------------------ */
+.drop-player-volume-slider {
+  width: 96px;
+  height: 4px;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .drop-player-volume-slider {
+    display: block;
+  }
 }
 
 /* Slider thumb styles */
@@ -37,7 +322,7 @@
   background: white;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  margin-top: -4px; /* Center thumb on track: (thumb_height - track_height) / 2 */
+  margin-top: -4px;
 }
 
 .drop-player-slider::-moz-range-thumb {
@@ -69,18 +354,120 @@
   border-radius: 2px;
 }
 
-/* Button styles */
-.drop-player-button {
+/* ------------------------------------------------------------ */
+/* Source selector                                              */
+/* ------------------------------------------------------------ */
+.drop-player-source-selector {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.3s;
+}
+
+.drop-player-source-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #fff;
   cursor: pointer;
+  transition: background-color 0.15s;
+  max-width: 240px;
+  background: none;
+  border: none;
 }
 
-/* Focus styles */
-.drop-player-button:focus-visible {
-  outline: 2px solid var(--dp-primary);
-  outline-offset: 2px;
+.drop-player-source-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Tooltip styles */
+.drop-player-source-label {
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drop-player-source-dropdown {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 140px;
+  max-width: 280px;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  z-index: 50;
+}
+
+/* ------------------------------------------------------------ */
+/* Dropdown (shared)                                            */
+/* ------------------------------------------------------------ */
+.drop-player-dropdown {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 8px;
+  padding: 4px;
+  min-width: 120px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.drop-player-dropdown--quality {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 8px;
+  z-index: 50;
+}
+
+.drop-player-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  text-align: left;
+  background: none;
+  border: none;
+}
+
+.drop-player-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.drop-player-dropdown-item[data-selected="true"] {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ------------------------------------------------------------ */
+/* Backdrop (for closing dropdowns)                             */
+/* ------------------------------------------------------------ */
+.drop-player-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+/* ------------------------------------------------------------ */
+/* Tooltip                                                      */
+/* ------------------------------------------------------------ */
+.drop-player-tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
 .drop-player-tooltip {
   position: absolute;
   background: rgba(0, 0, 0, 0.8);
@@ -93,105 +480,206 @@
   z-index: 50;
 }
 
-/* Controls gradient overlay */
-.drop-player-controls-gradient {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  width: 100%;
-  min-width: 100%;
+.drop-player-tooltip--top {
+  bottom: 100%;
+  margin-bottom: 8px;
 }
 
-/* Ambient light effect: glow on pseudo-element with additive blend so it does not obscure content below (e.g. page title) */
-.drop-player-ambient {
-  --drop-player-ambient-shadow: none;
+.drop-player-tooltip--bottom {
+  top: 100%;
+  margin-top: 8px;
 }
-.drop-player-ambient::after {
-  content: "";
+
+/* ------------------------------------------------------------ */
+/* Chevron (dropdown arrow)                                     */
+/* ------------------------------------------------------------ */
+.drop-player-chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.drop-player-chevron--open {
+  transform: rotate(180deg);
+}
+
+/* ------------------------------------------------------------ */
+/* Text helpers                                                 */
+/* ------------------------------------------------------------ */
+.drop-player-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drop-player-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------ */
+/* Relative wrapper                                             */
+/* ------------------------------------------------------------ */
+.drop-player-relative {
+  position: relative;
+}
+
+/* ------------------------------------------------------------ */
+/* SeekBar                                                      */
+/* ------------------------------------------------------------ */
+.drop-player-seekbar {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.drop-player-seekbar-markers {
   position: absolute;
-  inset: 0;
+  inset-inline: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 12px;
   pointer-events: none;
-  box-shadow: var(--drop-player-ambient-shadow);
-  mix-blend-mode: plus-lighter;
-  transition: box-shadow 0.3s ease-out;
+  z-index: 10;
 }
 
-/* Animation for loading spinner */
-@keyframes drop-player-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.drop-player-seekbar-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.drop-player-spinner {
-  animation: drop-player-spin 1s linear infinite;
+.drop-player-seekbar-marker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  opacity: 0.7;
 }
 
-/* Dropdown/Popover styles */
-.drop-player-dropdown {
-  background: rgba(30, 30, 30, 0.95);
-  border-radius: 8px;
-  padding: 4px;
-  min-width: 120px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-}
-
-.drop-player-dropdown-item {
+.drop-player-seekbar-track {
+  position: relative;
+  height: 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: 4px;
   cursor: pointer;
-  color: white;
-  font-size: 14px;
+  touch-action: none;
 }
 
-.drop-player-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+.drop-player-seekbar-track-bg {
+  position: absolute;
+  inset-inline: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 9999px;
 }
 
-.drop-player-dropdown-item[data-selected="true"] {
-  background: rgba(255, 255, 255, 0.15);
+.drop-player-seekbar-progress {
+  position: absolute;
+  height: 100%;
+  background: #fff;
+  border-radius: 9999px;
 }
 
-/* Error display */
-.drop-player-error {
+.drop-player-seekbar-thumb {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 9999px;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.drop-player-seekbar-track:hover .drop-player-seekbar-thumb {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------ */
+/* VideoCore                                                    */
+/* ------------------------------------------------------------ */
+.drop-player-video {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+/* ------------------------------------------------------------ */
+/* AudioCore                                                    */
+/* ------------------------------------------------------------ */
+.drop-player-audio-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  color: #999;
-  text-align: center;
-  padding: 16px;
-  max-width: 320px;
+  justify-content: center;
+  background-color: oklch(27.4% 0.006 286.033);
+  border-radius: 4px;
 }
 
-.drop-player-error-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #ccc;
+.drop-player-audio-waveform-area {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  padding-inline: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.drop-player-error-message {
-  font-size: 12px;
-  color: #666;
-  word-break: break-word;
+.drop-player-audio-fallback {
+  color: oklch(55.2% 0.016 285.938);
+  font-size: 0.875rem;
+  flex-shrink: 0;
 }
 
-/* Source Selector (top-left overlay) */
-.drop-player-source-selector {
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+.drop-player-audio-icon {
+  color: oklch(55.2% 0.016 285.938);
+  flex-shrink: 0;
 }
 
-.drop-player-source-dropdown {
-  background: rgba(30, 30, 30, 0.95);
-  border-radius: 8px;
-  padding: 4px;
-  min-width: 140px;
-  max-width: 280px;
-  max-height: 240px;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+/* ------------------------------------------------------------ */
+/* ImageCore                                                    */
+/* ------------------------------------------------------------ */
+.drop-player-image-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+/* ------------------------------------------------------------ */
+/* PdfCore                                                      */
+/* ------------------------------------------------------------ */
+.drop-player-pdf-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.drop-player-pdf-container--empty {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* ------------------------------------------------------------ */
+/* WaveformCanvas                                               */
+/* ------------------------------------------------------------ */
+.drop-player-waveform {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.drop-player-waveform-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
 }

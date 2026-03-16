@@ -15,14 +15,12 @@ export function AmbientLightButton({
 }: AmbientLightButtonProps) {
   const label = t('ambientLight');
   return (
-    <div className="hidden sm:contents">
+    <div className="drop-player-responsive-hide">
       <Tooltip content={label}>
         <button
           type="button"
           onClick={onToggle}
-          className={`drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors ${
-            isEnabled ? 'text-yellow-400' : 'text-white'
-          }`}
+          className={`drop-player-button ${isEnabled ? 'drop-player-color-yellow' : ''}`}
           aria-label={label}
         >
           <Sun size={20} />

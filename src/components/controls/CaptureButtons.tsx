@@ -64,9 +64,9 @@ function CopyIcon({ state }: { state: FeedbackState }) {
 }
 
 const feedbackColor: Record<FeedbackState, string> = {
-  idle: 'text-white',
-  success: 'text-green-400',
-  error: 'text-red-400',
+  idle: '',
+  success: 'drop-player-color-green',
+  error: 'drop-player-color-red',
 };
 
 export function CaptureButtons({ onSave, onCopy, t }: CaptureButtonsProps) {
@@ -77,12 +77,12 @@ export function CaptureButtons({ onSave, onCopy, t }: CaptureButtonsProps) {
   const copy = useFeedback();
 
   return (
-    <div className="hidden sm:contents">
+    <div className="drop-player-responsive-hide">
       <Tooltip content={saveLabel}>
         <button
           type="button"
           onClick={() => save.trigger(onSave)}
-          className={`drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors ${feedbackColor[save.state]}`}
+          className={`drop-player-button ${feedbackColor[save.state]}`}
           aria-label={saveLabel}
         >
           <SaveIcon state={save.state} />
@@ -93,7 +93,7 @@ export function CaptureButtons({ onSave, onCopy, t }: CaptureButtonsProps) {
         <button
           type="button"
           onClick={() => copy.trigger(onCopy)}
-          className={`drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors ${feedbackColor[copy.state]}`}
+          className={`drop-player-button ${feedbackColor[copy.state]}`}
           aria-label={copyLabel}
         >
           <CopyIcon state={copy.state} />

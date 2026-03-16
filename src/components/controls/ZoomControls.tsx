@@ -35,7 +35,7 @@ export function ZoomControls({
           type="button"
           onClick={onZoomOut}
           disabled={!canZoomOut}
-          className="drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors text-white disabled:opacity-40 disabled:cursor-not-allowed"
+          className="drop-player-button"
           aria-label={t('zoomOut')}
         >
           <Minus size={20} />
@@ -48,7 +48,7 @@ export function ZoomControls({
           type="button"
           onClick={onResetZoom}
           disabled={!canReset}
-          className="drop-player-button flex items-center justify-center min-w-14 h-10 px-2 rounded-md hover:bg-white/10 transition-colors text-white text-sm font-medium disabled:opacity-60"
+          className="drop-player-button drop-player-button--zoom-level"
           aria-label={t('resetZoom')}
         >
           {zoomPercent}%
@@ -61,7 +61,7 @@ export function ZoomControls({
           type="button"
           onClick={onZoomIn}
           disabled={!canZoomIn}
-          className="drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors text-white disabled:opacity-40 disabled:cursor-not-allowed"
+          className="drop-player-button"
           aria-label={t('zoomIn')}
         >
           <Plus size={20} />
@@ -74,7 +74,7 @@ export function ZoomControls({
           <button
             type="button"
             onClick={onResetZoom}
-            className="drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors text-white"
+            className="drop-player-button"
             aria-label={t('resetZoom')}
           >
             <RotateCcw size={18} />

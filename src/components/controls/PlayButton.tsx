@@ -15,7 +15,7 @@ export function PlayButton({ isPlaying, onToggle, t }: PlayButtonProps) {
       <button
         type="button"
         onClick={onToggle}
-        className="drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors text-white"
+        className="drop-player-button"
         aria-label={label}
       >
         {isPlaying ? <Pause size={24} /> : <Play size={24} />}

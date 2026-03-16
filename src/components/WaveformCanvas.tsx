@@ -281,13 +281,13 @@ export function WaveformCanvas({
       aria-valuemax={duration}
       aria-valuenow={displayTime}
       tabIndex={0}
-      className="w-full h-full cursor-pointer touch-none"
+      className="drop-player-waveform"
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
     >
       <canvas
         ref={canvasRef}
-        className="w-full h-full"
+        className="drop-player-waveform-canvas"
         style={{ display: 'block' }}
       />
     </div>

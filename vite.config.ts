@@ -10,7 +10,8 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [
       react(),
-      tailwindcss(),
+      // Tailwind is only used by the demo app (dev mode), not the library build
+      ...(!isBuild ? [tailwindcss()] : []),
       ...(isBuild
         ? [
             dts({

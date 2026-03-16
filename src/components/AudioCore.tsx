@@ -140,10 +140,11 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
           audioContextRef.current = new AudioContext();
         }
 
+        const audioContext = audioContextRef.current;
         return new Promise<WaveformData>((resolve, reject) => {
           WaveformData.createFromAudio(
             {
-              audio_context: audioContextRef.current!,
+              audio_context: audioContext,
               array_buffer: arrayBuffer,
               scale: waveformScale,
             },
@@ -214,12 +215,12 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
     );
 
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-800 rounded-sm">
+      <div className="drop-player-audio-container">
         <audio ref={audioRef} autoPlay={autoPlay} style={{ display: 'none' }}>
           <track kind="captions" />
         </audio>
 
-        <div className="w-full flex-1 min-h-0 px-2 flex items-center justify-center">
+        <div className="drop-player-audio-waveform-area">
           {waveformReady ? (
             <WaveformCanvas
               waveformData={waveformData}
@@ -235,18 +236,17 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
               onClick={handlers.togglePlayPause}
             />
           ) : waveformFailedFallback ? (
-            // biome-ignore lint/a11y/useSemanticElements: status message for "waveform unavailable", not form output
             <div
               role="status"
               aria-live="polite"
-              className="text-zinc-500 text-sm shrink-0"
+              className="drop-player-audio-fallback"
             >
               Waveform unavailable
             </div>
           ) : (
             <Music
               size={32}
-              className="text-zinc-500 shrink-0"
+              className="drop-player-audio-icon"
               aria-hidden="true"
             />
           )}

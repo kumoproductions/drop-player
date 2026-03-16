@@ -49,12 +49,12 @@ export function VolumeControl({
   const muteLabel = isMuted ? t('unmute') : t('mute');
 
   return (
-    <div ref={containerRef} className="flex items-center gap-1">
+    <div ref={containerRef} className="drop-player-controls-group">
       <Tooltip content={muteLabel}>
         <button
           type="button"
           onClick={onMuteToggle}
-          className="drop-player-button flex items-center justify-center w-10 h-10 rounded-md hover:bg-white/10 transition-colors text-white"
+          className="drop-player-button"
           aria-label={muteLabel}
         >
           {isMuted || volume === 0 ? (
@@ -73,7 +73,7 @@ export function VolumeControl({
         step={0.01}
         value={displayVolume}
         onChange={handleSliderChange}
-        className="drop-player-slider w-24 h-1 hidden sm:block"
+        className="drop-player-slider drop-player-volume-slider"
         aria-label={t('volume')}
       />
     </div>

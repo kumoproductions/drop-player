@@ -240,21 +240,21 @@ export function SeekBar({
   );
 
   return (
-    <div className="relative mb-2">
+    <div className="drop-player-seekbar">
       {/* Scene markers */}
       {sceneMarkers.length > 0 && duration > 0 && (
-        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-3 pointer-events-none z-10">
-          {sceneMarkers.map((marker, index) => {
+        <div className="drop-player-seekbar-markers">
+          {sceneMarkers.map((marker) => {
             const left = (marker.time / duration) * 100;
             return (
               <div
-                key={`scene-${index}-${marker.time}`}
-                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+                key={`scene-${marker.time}`}
+                className="drop-player-seekbar-marker"
                 style={{ left: `${left}%` }}
                 aria-hidden="true"
               >
                 <div
-                  className="w-1.5 h-1.5 rounded-full opacity-70"
+                  className="drop-player-seekbar-marker-dot"
                   style={{
                     backgroundColor:
                       marker.color ??
@@ -270,7 +270,7 @@ export function SeekBar({
       {/* Slider track */}
       <div
         ref={sliderRef}
-        className="relative h-5 flex items-center cursor-pointer group touch-none"
+        className="drop-player-seekbar-track"
         role="slider"
         aria-label={t('seek')}
         aria-valuemin={0}
@@ -284,17 +284,17 @@ export function SeekBar({
         onTouchStart={handleTouchStart}
       >
         {/* Track background */}
-        <div className="absolute inset-x-0 h-1 bg-white/30 rounded-full">
+        <div className="drop-player-seekbar-track-bg">
           {/* Progress */}
           <div
-            className="absolute h-full bg-white rounded-full"
+            className="drop-player-seekbar-progress"
             style={{ width: `${progress}%` }}
           />
         </div>
 
         {/* Thumb */}
         <div
-          className="absolute w-3 h-3 bg-white rounded-full shadow-md transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="drop-player-seekbar-thumb"
           style={{ left: `${progress}%` }}
         />
 

@@ -231,13 +231,13 @@ export function ControlsBar({
   };
 
   return (
-    <div className="drop-player-controls flex items-center justify-between mt-1">
-      <div className="flex items-center gap-1">
+    <div className="drop-player-controls">
+      <div className="drop-player-controls-group">
         {renderLeftControls()}
         {controlsStart}
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="drop-player-controls-group">
         {renderRightControls()}
         {controlsEnd}
         {features.fullscreen && (

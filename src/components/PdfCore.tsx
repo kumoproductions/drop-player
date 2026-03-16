@@ -62,7 +62,7 @@ export function PdfCore(props: PdfCoreProps) {
     return (
       <div
         ref={wrapperRef}
-        className="w-full h-full flex items-center justify-center bg-black/20"
+        className="drop-player-pdf-container drop-player-pdf-container--empty"
         role="application"
         aria-label="PDF viewer"
       />
@@ -74,7 +74,7 @@ export function PdfCore(props: PdfCoreProps) {
       ref={wrapperRef}
       role="application"
       aria-label="PDF viewer"
-      className="w-full h-full flex items-center justify-center overflow-hidden"
+      className="drop-player-pdf-container"
     >
       <object
         data={pdfSrc}

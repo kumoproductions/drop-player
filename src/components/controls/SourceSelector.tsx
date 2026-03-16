@@ -51,23 +51,23 @@ export function SourceSelector({
 
   return (
     <div
-      className={`drop-player-source-selector transition-opacity duration-300 ${
-        showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      className={`drop-player-source-selector ${
+        showControls ? 'drop-player-visible' : 'drop-player-hidden'
       }`}
     >
       {hasMultiple ? (
-        <div className="relative">
+        <div className="drop-player-relative">
           <button
             type="button"
             onClick={() => setIsOpen(!isOpen)}
             aria-expanded={isOpen}
             aria-controls={SOURCE_DROPDOWN_ID}
-            className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-medium text-white hover:bg-white/10 transition-colors max-w-[240px]"
+            className="drop-player-source-button"
           >
-            <span className="truncate">{activeLabel}</span>
+            <span className="drop-player-truncate">{activeLabel}</span>
             <ChevronDown
               size={14}
-              className={`shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              className={`drop-player-chevron ${isOpen ? 'drop-player-chevron--open' : ''}`}
             />
           </button>
 
@@ -75,7 +75,7 @@ export function SourceSelector({
             <>
               {/* biome-ignore lint/a11y/noStaticElementInteractions: Backdrop for closing dropdown */}
               <div
-                className="fixed inset-0 z-40"
+                className="drop-player-backdrop"
                 onClick={() => setIsOpen(false)}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') setIsOpen(false);
@@ -84,19 +84,22 @@ export function SourceSelector({
 
               <div
                 id={SOURCE_DROPDOWN_ID}
-                className="drop-player-source-dropdown absolute top-full left-0 mt-1 z-50"
+                className="drop-player-source-dropdown"
               >
                 {sources.map((source, index) => (
                   <button
-                    key={`${index}-${source.url}`}
+                    key={source.url}
                     type="button"
-                    className="drop-player-dropdown-item w-full text-left"
+                    className="drop-player-dropdown-item"
                     data-selected={index === activeSourceIndex}
                     onClick={() => handleSelect(index)}
                   >
-                    <span className="truncate">{source.label}</span>
+                    <span className="drop-player-truncate">{source.label}</span>
                     {index === activeSourceIndex && (
-                      <Check size={16} className="shrink-0 text-green-400" />
+                      <Check
+                        size={16}
+                        className="drop-player-shrink-0 drop-player-color-green"
+                      />
                     )}
                   </button>
                 ))}
@@ -105,9 +108,7 @@ export function SourceSelector({
           )}
         </div>
       ) : (
-        <div className="px-2 py-1 text-sm font-medium text-white/80 truncate max-w-[240px]">
-          {activeLabel}
-        </div>
+        <div className="drop-player-source-label">{activeLabel}</div>
       )}
     </div>
   );

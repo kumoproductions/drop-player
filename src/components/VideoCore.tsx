@@ -718,7 +718,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
     return (
       <video
         ref={videoRef}
-        className="w-full h-full touch-none"
+        className="drop-player-video"
         crossOrigin={crossOrigin}
         playsInline
         poster={poster}

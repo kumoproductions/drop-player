@@ -54,9 +54,9 @@ export type {
   PlayerRef,
   // Slots
   PlayerSlots,
-  PlayerUiConfig,
   // State types
   PlayerState,
+  PlayerUiConfig,
   QualityLevel,
   SourceEntry,
   SourceType,

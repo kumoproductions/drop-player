@@ -133,8 +133,7 @@ function formatSeconds(s: number): string {
   return `${m}:${sec.toString().padStart(2, '0')}`;
 }
 
-const sectionClass =
-  'rounded-lg border border-zinc-800/80 bg-zinc-900/40 p-4';
+const sectionClass = 'rounded-lg border border-zinc-800/80 bg-zinc-900/40 p-4';
 const sectionTitleClass =
   'text-[11px] font-semibold uppercase tracking-wider text-zinc-500 mb-3';
 const btnClass =
@@ -476,9 +475,7 @@ export function App() {
             {/* onStateChange output */}
             {hasPlayback && playerState && (
               <section className={sectionClass}>
-                <h3 className={sectionTitleClass}>
-                  events.onStateChange
-                </h3>
+                <h3 className={sectionTitleClass}>events.onStateChange</h3>
                 <div className="grid grid-cols-2 gap-x-6 gap-y-0.5 text-[11px] font-mono tabular-nums">
                   <span className="text-zinc-500">
                     currentTime{' '}

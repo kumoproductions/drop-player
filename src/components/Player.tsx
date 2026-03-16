@@ -46,6 +46,7 @@ const UI_DEFAULTS = {
   locale: 'en' as const,
   frameRate: 30,
 };
+
 import { normalizeSources } from '../utils/sources';
 import { AudioCore } from './AudioCore';
 import { ControlsBar } from './ControlsBar';
@@ -64,8 +65,13 @@ const DEFAULT_MAX_ZOOM = 5;
 
 export const Player = forwardRef<PlayerRef, PlayerProps>(
   function Player(props, ref) {
-    const { sources, className, crossOrigin = 'anonymous', poster, slots } =
-      props;
+    const {
+      sources,
+      className,
+      crossOrigin = 'anonymous',
+      poster,
+      slots,
+    } = props;
 
     // -- Playback group --
     const {
@@ -801,7 +807,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       });
       return (
         <div
-          className={`drop-player relative w-full h-full bg-black flex items-center justify-center ${className ?? ''}`}
+          className={`drop-player drop-player--flex-center ${className ?? ''}`}
         >
           {slots?.errorDisplay ? (
             slots.errorDisplay(noSourceError)
@@ -944,7 +950,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         ref={containerRef}
         role="application"
         aria-label={ariaLabel}
-        className={`drop-player relative w-full h-full bg-black group outline-none ${mediaMode === 'video' ? 'drop-player-ambient' : ''} ${className ?? ''}`}
+        className={`drop-player ${mediaMode === 'video' ? 'drop-player-ambient' : ''} ${className ?? ''}`}
         style={{
           ['--drop-player-ambient-shadow' as string]:
             mediaMode === 'video' && videoState.isAmbientLight
@@ -970,7 +976,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
         {/* Error overlay */}
         {lastError && !isReady && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black z-10">
+          <div className="drop-player-overlay">
             {slots?.errorDisplay ? (
               slots.errorDisplay(lastError)
             ) : (
@@ -989,26 +995,20 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
         {/* Loading overlay */}
         {!isReady && !lastError && mediaMode !== 'pdf' && (
-          <>
-            {/* biome-ignore lint/a11y/useSemanticElements: status is correct for loading indicator */}
-            <div
-              role="status"
-              aria-label="Loading"
-              className="absolute inset-0 flex items-center justify-center bg-black z-10"
-            >
-              {slots?.loadingIndicator ?? (
-                <div
-                  className="drop-player-spinner w-10 h-10 rounded-full border-2 border-white border-t-transparent"
-                  aria-hidden
-                />
-              )}
-            </div>
-          </>
+          <div
+            role="status"
+            aria-label="Loading"
+            className="drop-player-overlay"
+          >
+            {slots?.loadingIndicator ?? (
+              <div className="drop-player-spinner" aria-hidden />
+            )}
+          </div>
         )}
 
         {/* Source Selector (top-left, YouTube title style) */}
         {showTitle && (
-          <div className="absolute top-2 left-2 z-20">
+          <div className="drop-player-source-position">
             <SourceSelector
               sources={entries}
               activeSourceIndex={activeSourceIndex}
@@ -1021,8 +1021,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         {/* Top left overlay slot (after source selector) */}
         {slots?.topLeftOverlay && (
           <div
-            className={`absolute top-10 left-2 transition-opacity duration-300 ${
-              controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            className={`drop-player-slot-top-left ${
+              controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
             }`}
           >
             {slots.topLeftOverlay}
@@ -1032,8 +1032,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         {/* Top right overlay */}
         {slots?.topRightOverlay && (
           <div
-            className={`absolute top-2 right-2 transition-opacity duration-300 ${
-              controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            className={`drop-player-slot-top-right ${
+              controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
             }`}
           >
             {slots.topRightOverlay}
@@ -1043,13 +1043,13 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         {/* Controls overlay (hidden for PDF) */}
         {showControlsProp && mediaMode !== 'pdf' && (
           <div
-            className={`absolute inset-x-0 bottom-0 drop-player-controls-gradient py-2 px-4 transition-opacity duration-300 ${
-              controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            className={`drop-player-controls-gradient ${
+              controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
             }`}
           >
             {(mediaMode === 'video' || mediaMode === 'audio') &&
               slots?.seekbarOverlay && (
-                <div className="absolute inset-x-0 -top-6 h-6 pointer-events-none z-10 mx-3 [&>*]:pointer-events-auto">
+                <div className="drop-player-seekbar-overlay-slot">
                   {slots.seekbarOverlay(playerState)}
                 </div>
               )}

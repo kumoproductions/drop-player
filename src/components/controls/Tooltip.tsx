@@ -78,7 +78,7 @@ export function Tooltip({
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: Tooltip wrapper for mouse events
     <div
-      className="relative inline-flex"
+      className="drop-player-tooltip-wrapper"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
@@ -91,7 +91,9 @@ export function Tooltip({
           id={tooltipId}
           role="tooltip"
           className={`drop-player-tooltip ${
-            position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+            position === 'top'
+              ? 'drop-player-tooltip--top'
+              : 'drop-player-tooltip--bottom'
           }`}
           style={{
             left: '50%',

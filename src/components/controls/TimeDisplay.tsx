@@ -64,7 +64,7 @@ export function TimeDisplay({
     <button
       type="button"
       onClick={cycleFormat}
-      className="drop-player-button px-2 h-10 text-white text-sm tabular-nums font-normal hover:bg-white/10 rounded-md transition-colors"
+      className="drop-player-button drop-player-button--time"
       aria-label={t('toggleTimeDisplay')}
     >
       {getDisplayText()}
