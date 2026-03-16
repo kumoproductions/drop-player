@@ -295,7 +295,7 @@
 
 @media (min-width: 640px) {
   .drop-player-responsive-hide {
-    display: contents;
+    display: block;
   }
 }
 

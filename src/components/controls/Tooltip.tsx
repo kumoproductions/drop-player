@@ -86,7 +86,7 @@ export function Tooltip({
 
     tooltip.style.left = `${left}px`;
     tooltip.style.transform = 'none';
-  }, [isVisible, containerRef]);
+  }, [isVisible, content, containerRef]);
 
   // Handle Escape key to close tooltip
   useEffect(() => {
