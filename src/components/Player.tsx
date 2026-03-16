@@ -223,6 +223,12 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     // Playback speed state
     const [playbackRate, setPlaybackRate] = useState(1);
 
+    // Reset playback rate when sources or media mode change
+    // biome-ignore lint/correctness/useExhaustiveDependencies: reset rate on source/mode change
+    useEffect(() => {
+      setPlaybackRate(1);
+    }, [entries, activeSourceIndex, mediaMode]);
+
     // PIP state
     const [isPip, setIsPip] = useState(false);
     const isPipSupported =
@@ -503,16 +509,18 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         switch (mediaMode) {
           case 'video':
             videoCoreRef.current?.setPlaybackRate(rate);
+            setPlaybackRate(rate);
+            // onPlaybackRateChange is fired by VideoCore's ratechange handler
             break;
           case 'audio':
             audioCoreRef.current?.setPlaybackRate(rate);
+            setPlaybackRate(rate);
+            onPlaybackRateChange?.(rate);
             break;
           case 'image':
           case 'pdf':
-            break;
+            return;
         }
-        setPlaybackRate(rate);
-        onPlaybackRateChange?.(rate);
       },
       [mediaMode, onPlaybackRateChange]
     );

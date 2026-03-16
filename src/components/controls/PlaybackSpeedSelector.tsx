@@ -55,6 +55,9 @@ export function PlaybackSpeedSelector({
           onClick={() => setIsOpen(!isOpen)}
           className={`drop-player-button drop-player-button--speed ${playbackRate !== 1 ? 'drop-player-color-blue' : ''}`}
           aria-label={t('playbackSpeed')}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+          aria-controls="drop-player-speed-menu"
         >
           <Gauge size={20} />
         </button>
@@ -66,16 +69,18 @@ export function PlaybackSpeedSelector({
           <div
             className="drop-player-backdrop"
             onClick={() => setIsOpen(false)}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') setIsOpen(false);
-            }}
           />
 
-          <div className="drop-player-dropdown drop-player-dropdown--speed">
+          <div
+            id="drop-player-speed-menu"
+            role="menu"
+            className="drop-player-dropdown drop-player-dropdown--speed"
+          >
             {SPEED_OPTIONS.map((rate) => (
               <button
                 key={rate}
                 type="button"
+                role="menuitem"
                 className="drop-player-dropdown-item"
                 data-selected={rate === playbackRate}
                 onClick={() => handleSelect(rate)}
