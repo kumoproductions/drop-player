@@ -299,8 +299,6 @@ export interface PlayerEvents {
   onFullscreenChange?: (isFullscreen: boolean) => void;
   onPipChange?: (isPip: boolean) => void;
   onFrameCapture?: (capture: FrameCapture) => void;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
 
   // Source/Quality
   onActiveSourceChange?: (index: number) => void;
@@ -330,8 +328,6 @@ export interface PlayerPlaybackConfig {
   volume?: number;
   /** Start time in seconds. Default: 0 */
   initialTime?: number;
-  /** localStorage key for position persistence */
-  persistenceKey?: string;
 }
 
 /**
@@ -368,6 +364,13 @@ export interface PlayerProps {
   crossOrigin?: 'anonymous' | 'use-credentials';
   /** Poster image for video */
   poster?: string;
+
+  /**
+   * Custom prefix for localStorage keys.
+   * Default: 'drop_player' → keys are stored as `drop_player_<key>`.
+   * When set, keys are stored as `<storageKey>_<key>`.
+   */
+  storageKey?: string;
 
   /** Playback behaviour */
   playback?: PlayerPlaybackConfig;
@@ -494,13 +497,11 @@ export interface StorageAdapter {
  * Options for useMediaPlayerState hook (shared by AudioCore / VideoCore)
  */
 export interface UseMediaPlayerStateOptions {
+  storageKey?: string;
   initialVolume?: number;
   initialMuted?: boolean;
   initialLoop?: boolean;
   initialTime?: number;
-  persistenceKey?: string;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
   onPlay?: () => void;
   onPause?: () => void;
   onEnded?: () => void;
@@ -575,9 +576,6 @@ export interface UseMediaPlayerStateReturn {
     autoPlay?: boolean
   ) => void;
   storage: {
-    savePosition: (position: number, force?: boolean) => void;
-    loadPosition: () => number | null;
-    clearPosition: () => void;
     getStoredValue: <T>(key: string, defaultValue: T) => T;
     setStoredValue: <T>(key: string, value: T) => void;
   };
@@ -645,8 +643,8 @@ export interface VideoCoreProps {
   // Timecode
   frameRate?: number;
 
-  // Persistence
-  persistenceKey?: string;
+  // Storage
+  storageKey?: string;
 
   // Seekbar markers
   markers?: Marker[];
@@ -682,8 +680,6 @@ export interface VideoCoreProps {
   onSeeking?: (time: number) => void;
   onSeekEnd?: (time: number) => void;
   onFrameCapture?: (capture: FrameCapture) => void;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
   onQualityLevelChange?: (level: QualityLevel) => void;
   onFallback?: (event: FallbackEvent) => void;
 
@@ -901,8 +897,8 @@ export interface AudioCoreProps {
   initialVolume?: number;
   initialTime?: number;
 
-  // Persistence
-  persistenceKey?: string;
+  // Storage
+  storageKey?: string;
 
   // Waveform
   waveColor?: string;
@@ -931,8 +927,6 @@ export interface AudioCoreProps {
   onSeekStart?: (time: number) => void;
   onSeeking?: (time: number) => void;
   onSeekEnd?: (time: number) => void;
-  onPositionSave?: (position: number) => void;
-  onPositionRestore?: (position: number) => void;
   onWaveformReady?: () => void;
 }
 
