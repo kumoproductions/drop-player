@@ -102,6 +102,8 @@ const FEATURE_LABELS: Record<keyof Required<PlayerFeatures>, string> = {
   qualitySelector: 'Quality Selector',
   fullscreen: 'Fullscreen',
   zoom: 'Zoom',
+  playbackSpeed: 'Playback Speed',
+  pip: 'Picture in Picture',
   keyboardShortcuts: 'Keyboard Shortcuts',
 };
 

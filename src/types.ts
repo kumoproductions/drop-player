@@ -342,7 +342,12 @@ export interface PlayerUiConfig {
   /** Feature flags for individual controls. Default: `defaultFeatures` */
   features?: PlayerFeatures;
   /** Display locale. Default: 'en' */
-  locale?: 'en' | 'ja';
+  locale?: string;
+  /**
+   * Custom translation overrides, merged on top of the locale's built-in strings.
+   * Supply a partial record to override specific keys, or a full record for a new locale.
+   */
+  translations?: Partial<Translations>;
   /** Frame rate for timecode display (video). Default: 30 */
   frameRate?: number;
   /** Seekbar markers */
@@ -371,6 +376,13 @@ export interface PlayerProps {
    * When set, keys are stored as `<storageKey>_<key>`.
    */
   storageKey?: string;
+
+  /**
+   * Custom storage adapter. Replaces localStorage for all persisted preferences.
+   * Must implement getItem, setItem, and removeItem.
+   * When omitted, uses localStorage (SSR-safe no-op when window is undefined).
+   */
+  storage?: StorageAdapter;
 
   /** Playback behaviour */
   playback?: PlayerPlaybackConfig;
@@ -498,6 +510,7 @@ export interface StorageAdapter {
  */
 export interface UseMediaPlayerStateOptions {
   storageKey?: string;
+  storage?: StorageAdapter;
   initialVolume?: number;
   initialMuted?: boolean;
   initialLoop?: boolean;
@@ -645,6 +658,7 @@ export interface VideoCoreProps {
 
   // Storage
   storageKey?: string;
+  storage?: StorageAdapter;
 
   // Seekbar markers
   markers?: Marker[];
@@ -653,7 +667,7 @@ export interface VideoCoreProps {
   hlsConfig?: Record<string, unknown>;
 
   // i18n
-  locale?: 'en' | 'ja';
+  locale?: string;
 
   // Container ref for drag-to-seek calculations
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -764,7 +778,7 @@ export interface ImageCoreProps {
   zoomStep?: number;
 
   // i18n
-  locale?: 'en' | 'ja';
+  locale?: string;
 
   // Container ref for calculations
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -899,6 +913,7 @@ export interface AudioCoreProps {
 
   // Storage
   storageKey?: string;
+  storage?: StorageAdapter;
 
   // Waveform
   waveColor?: string;
@@ -906,7 +921,7 @@ export interface AudioCoreProps {
   waveformScale?: number;
 
   // i18n
-  locale?: 'en' | 'ja';
+  locale?: string;
 
   // Container ref for calculations
   containerRef: React.RefObject<HTMLDivElement | null>;

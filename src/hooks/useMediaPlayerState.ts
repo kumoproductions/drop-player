@@ -53,6 +53,7 @@ export function useMediaPlayerState(
 ): UseMediaPlayerStateReturn {
   const {
     storageKey,
+    storage: storageAdapter,
     initialVolume = 1,
     initialMuted = false,
     initialLoop = false,
@@ -74,6 +75,7 @@ export function useMediaPlayerState(
 
   const storage = usePlayerStorage({
     storageKey,
+    storage: storageAdapter,
   });
 
   const [currentTime, setCurrentTime] = useState(0);

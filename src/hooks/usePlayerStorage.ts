@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import type { StorageAdapter } from '../types';
 
 // Storage key prefix
@@ -39,26 +39,28 @@ export function usePlayerStorage(
   options: UsePlayerStorageOptions = {}
 ): UsePlayerStorageReturn {
   const { storageKey, storage = defaultStorage } = options;
+  const storageRef = useRef(storage);
+  storageRef.current = storage;
 
   const prefix = storageKey ? `${storageKey}_` : STORAGE_PREFIX;
 
   const getStoredValue = useCallback(
     <T>(key: string, defaultValue: T): T => {
       const fullKey = `${prefix}${key}`;
-      const saved = storage.getItem(fullKey);
+      const saved = storageRef.current.getItem(fullKey);
       if (!saved) return defaultValue;
 
       return JSON.parse(saved) as T;
     },
-    [storage, prefix]
+    [prefix]
   );
 
   const setStoredValue = useCallback(
     <T>(key: string, value: T) => {
       const fullKey = `${prefix}${key}`;
-      storage.setItem(fullKey, JSON.stringify(value));
+      storageRef.current.setItem(fullKey, JSON.stringify(value));
     },
-    [storage, prefix]
+    [prefix]
   );
 
   return useMemo(
