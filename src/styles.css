@@ -556,6 +556,12 @@
   margin-bottom: 4px;
 }
 
+@media (min-width: 640px) {
+  .drop-player-seekbar-start-slot {
+    display: none;
+  }
+}
+
 .drop-player-seekbar-start-slot .drop-player-button--time {
   padding: 5px 12px;
   font-size: 13px;

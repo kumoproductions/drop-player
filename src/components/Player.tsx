@@ -1239,6 +1239,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                     ? audioState.isMuted
                     : videoState.isMuted
                 }
+                frameRate={frameRate}
+                timeDisplayFormat={timeDisplayFormat}
+                onTimeDisplayFormatChange={handleTimeDisplayFormatChange}
                 playbackRate={playbackRate}
                 onPlaybackRateChange={handlePlaybackRateChange}
                 hlsLevels={videoState.hlsLevels}
