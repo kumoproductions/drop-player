@@ -20,11 +20,22 @@
   --dp-warning: var(--drop-player-warning);
 
   position: relative;
+  isolation: isolate;
   width: 100%;
   min-width: 100%;
   height: 100%;
   background-color: #000;
+  border-radius: var(--drop-player-border-radius, 0);
+  overflow: hidden;
   outline: none;
+}
+
+.drop-player-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
   container-type: size;
 }
 
@@ -50,12 +61,13 @@
 /* Ambient light effect                                         */
 /* ------------------------------------------------------------ */
 .drop-player-ambient {
-  --drop-player-ambient-shadow: none;
+  overflow: visible;
 }
 .drop-player-ambient::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
   box-shadow: var(--drop-player-ambient-shadow);
   mix-blend-mode: plus-lighter;

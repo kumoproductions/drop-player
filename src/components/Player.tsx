@@ -1049,13 +1049,14 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         ref={containerRef}
         role="application"
         aria-label={ariaLabel}
-        className={`drop-player ${mediaMode === 'video' ? 'drop-player-ambient' : ''} ${className ?? ''}`}
-        style={{
-          ['--drop-player-ambient-shadow' as string]:
-            mediaMode === 'video' && videoState.isAmbientLight
-              ? `0 0 240px 60px rgba(${videoState.ambientColor.r}, ${videoState.ambientColor.g}, ${videoState.ambientColor.b}, 0.6)`
-              : 'none',
-        }}
+        className={`drop-player ${mediaMode === 'video' && videoState.isAmbientLight ? 'drop-player-ambient' : ''} ${className ?? ''}`}
+        style={
+          mediaMode === 'video' && videoState.isAmbientLight
+            ? {
+                ['--drop-player-ambient-shadow' as string]: `0 0 240px 60px rgba(${videoState.ambientColor.r}, ${videoState.ambientColor.g}, ${videoState.ambientColor.b}, 0.6)`,
+              }
+            : undefined
+        }
         onPointerDown={() => {
           containerRef.current?.focus({ preventScroll: true });
         }}
@@ -1071,182 +1072,186 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         // biome-ignore lint/a11y/noNoninteractiveTabindex: Media player needs tabIndex for keyboard shortcuts
         tabIndex={0}
       >
-        {renderMediaCore()}
+        <div className="drop-player-inner">
+          {renderMediaCore()}
 
-        {/* Error overlay */}
-        {lastError && !isReady && (
-          <div className="drop-player-overlay">
-            {slots?.errorDisplay ? (
-              slots.errorDisplay(lastError)
-            ) : (
-              <div className="drop-player-error">
-                <AlertCircle size={32} aria-hidden="true" />
-                <span className="drop-player-error-title">{t('error')}</span>
-                <span className="drop-player-error-message">
-                  {lastError.name.startsWith('error')
-                    ? t(lastError.name as TranslationKey)
-                    : lastError.message}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Loading overlay */}
-        {!isReady && !lastError && mediaMode !== 'pdf' && (
-          <div
-            role="status"
-            aria-label="Loading"
-            className="drop-player-overlay"
-          >
-            {slots?.loadingIndicator ?? (
-              <div className="drop-player-spinner" aria-hidden />
-            )}
-          </div>
-        )}
-
-        {/* Source Selector (top-left, YouTube title style) */}
-        {showTitle && (
-          <div className="drop-player-source-position">
-            <SourceSelector
-              sources={entries}
-              activeSourceIndex={activeSourceIndex}
-              onSourceChange={handleSourceChange}
-              showControls={controlsVisible}
-            />
-          </div>
-        )}
-
-        {/* Top left overlay slot (after source selector) */}
-        {slots?.topLeftOverlay && (
-          <div
-            className={`drop-player-slot-top-left ${
-              controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
-            }`}
-          >
-            {slots.topLeftOverlay}
-          </div>
-        )}
-
-        {/* Top right overlay */}
-        {slots?.topRightOverlay && (
-          <div
-            className={`drop-player-slot-top-right ${
-              controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
-            }`}
-          >
-            {slots.topRightOverlay}
-          </div>
-        )}
-
-        {/* Controls overlay (hidden for PDF) */}
-        {showControlsProp && mediaMode !== 'pdf' && (
-          <div
-            className={`drop-player-controls-gradient ${
-              controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
-            }`}
-          >
-            {(mediaMode === 'video' || mediaMode === 'audio') &&
-              slots?.seekbarOverlay && (
-                <div className="drop-player-seekbar-overlay-slot">
-                  {slots.seekbarOverlay(playerState)}
+          {/* Error overlay */}
+          {lastError && !isReady && (
+            <div className="drop-player-overlay">
+              {slots?.errorDisplay ? (
+                slots.errorDisplay(lastError)
+              ) : (
+                <div className="drop-player-error">
+                  <AlertCircle size={32} aria-hidden="true" />
+                  <span className="drop-player-error-title">{t('error')}</span>
+                  <span className="drop-player-error-message">
+                    {lastError.name.startsWith('error')
+                      ? t(lastError.name as TranslationKey)
+                      : lastError.message}
+                  </span>
                 </div>
               )}
+            </div>
+          )}
 
-            {features.seekBar &&
-              (mediaMode === 'video' || mediaMode === 'audio') && (
-                <SeekBar
-                  currentTime={
-                    mediaMode === 'audio'
-                      ? audioState.currentTime
-                      : videoState.currentTime
-                  }
-                  duration={
-                    mediaMode === 'audio'
-                      ? audioState.duration
-                      : videoState.duration
-                  }
-                  isSeeking={
-                    mediaMode === 'audio'
-                      ? audioState.isSeeking
-                      : videoState.isSeeking
-                  }
-                  seekValue={
-                    mediaMode === 'audio'
-                      ? audioState.seekValue
-                      : videoState.seekValue
-                  }
-                  markers={markers}
-                  onSeekStart={handleSeekStart}
-                  onSeekChange={handleSeekChange}
-                  onSeekEnd={handleSeekEnd}
-                  t={t}
-                />
+          {/* Loading overlay */}
+          {!isReady && !lastError && mediaMode !== 'pdf' && (
+            <div
+              role="status"
+              aria-label="Loading"
+              className="drop-player-overlay"
+            >
+              {slots?.loadingIndicator ?? (
+                <div className="drop-player-spinner" aria-hidden />
               )}
+            </div>
+          )}
 
-            <ControlsBar
-              features={features}
-              mediaMode={mediaMode}
-              isPlaying={
-                mediaMode === 'audio'
-                  ? audioState.isPlaying
-                  : videoState.isPlaying
-              }
-              isLoop={
-                mediaMode === 'audio' ? audioState.isLoop : videoState.isLoop
-              }
-              currentTime={
-                mediaMode === 'audio'
-                  ? audioState.currentTime
-                  : videoState.currentTime
-              }
-              duration={
-                mediaMode === 'audio'
-                  ? audioState.duration
-                  : videoState.duration
-              }
-              volume={
-                mediaMode === 'audio' ? audioState.volume : videoState.volume
-              }
-              isMuted={
-                mediaMode === 'audio' ? audioState.isMuted : videoState.isMuted
-              }
-              frameRate={frameRate}
-              timeDisplayFormat={timeDisplayFormat}
-              onTimeDisplayFormatChange={handleTimeDisplayFormatChange}
-              playbackRate={playbackRate}
-              onPlaybackRateChange={handlePlaybackRateChange}
-              hlsLevels={videoState.hlsLevels}
-              currentHlsLevel={videoState.currentHlsLevel}
-              qualityLevel={videoState.qualityLevel}
-              hasOriginal={!!activeEntry?.originalUrl}
-              isPlayingOriginal={videoState.isPlayingOriginal}
-              isAmbientLight={videoState.isAmbientLight}
-              isPip={isPip}
-              isPipSupported={isPipSupported}
-              onPipToggle={handlePipToggle}
-              onPlayToggle={handlePlayToggle}
-              onLoopToggle={handleLoopToggle}
-              onVolumeChange={handleVolumeChange}
-              onMuteToggle={handleMuteToggle}
-              onQualityChange={handleQualityChangeFromUI}
-              onAmbientLightToggle={handleAmbientLightToggle}
-              onSaveCapture={handleSaveCapture}
-              onCopyCapture={handleCopyCapture}
-              zoom={imageState.zoom}
-              minZoom={DEFAULT_MIN_ZOOM}
-              maxZoom={DEFAULT_MAX_ZOOM}
-              onZoomIn={handleZoomIn}
-              onZoomOut={handleZoomOut}
-              onResetZoom={handleResetZoom}
-              isFullscreen={isFullscreen}
-              onFullscreenToggle={toggleFullscreen}
-              t={t}
-              controlsStart={slots?.controlsStart}
-              controlsEnd={slots?.controlsEnd}
-            />
-          </div>
-        )}
+          {/* Source Selector (top-left, YouTube title style) */}
+          {showTitle && (
+            <div className="drop-player-source-position">
+              <SourceSelector
+                sources={entries}
+                activeSourceIndex={activeSourceIndex}
+                onSourceChange={handleSourceChange}
+                showControls={controlsVisible}
+              />
+            </div>
+          )}
+
+          {/* Top left overlay slot (after source selector) */}
+          {slots?.topLeftOverlay && (
+            <div
+              className={`drop-player-slot-top-left ${
+                controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
+              }`}
+            >
+              {slots.topLeftOverlay}
+            </div>
+          )}
+
+          {/* Top right overlay */}
+          {slots?.topRightOverlay && (
+            <div
+              className={`drop-player-slot-top-right ${
+                controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
+              }`}
+            >
+              {slots.topRightOverlay}
+            </div>
+          )}
+
+          {/* Controls overlay (hidden for PDF) */}
+          {showControlsProp && mediaMode !== 'pdf' && (
+            <div
+              className={`drop-player-controls-gradient ${
+                controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
+              }`}
+            >
+              {(mediaMode === 'video' || mediaMode === 'audio') &&
+                slots?.seekbarOverlay && (
+                  <div className="drop-player-seekbar-overlay-slot">
+                    {slots.seekbarOverlay(playerState)}
+                  </div>
+                )}
+
+              {features.seekBar &&
+                (mediaMode === 'video' || mediaMode === 'audio') && (
+                  <SeekBar
+                    currentTime={
+                      mediaMode === 'audio'
+                        ? audioState.currentTime
+                        : videoState.currentTime
+                    }
+                    duration={
+                      mediaMode === 'audio'
+                        ? audioState.duration
+                        : videoState.duration
+                    }
+                    isSeeking={
+                      mediaMode === 'audio'
+                        ? audioState.isSeeking
+                        : videoState.isSeeking
+                    }
+                    seekValue={
+                      mediaMode === 'audio'
+                        ? audioState.seekValue
+                        : videoState.seekValue
+                    }
+                    markers={markers}
+                    onSeekStart={handleSeekStart}
+                    onSeekChange={handleSeekChange}
+                    onSeekEnd={handleSeekEnd}
+                    t={t}
+                  />
+                )}
+
+              <ControlsBar
+                features={features}
+                mediaMode={mediaMode}
+                isPlaying={
+                  mediaMode === 'audio'
+                    ? audioState.isPlaying
+                    : videoState.isPlaying
+                }
+                isLoop={
+                  mediaMode === 'audio' ? audioState.isLoop : videoState.isLoop
+                }
+                currentTime={
+                  mediaMode === 'audio'
+                    ? audioState.currentTime
+                    : videoState.currentTime
+                }
+                duration={
+                  mediaMode === 'audio'
+                    ? audioState.duration
+                    : videoState.duration
+                }
+                volume={
+                  mediaMode === 'audio' ? audioState.volume : videoState.volume
+                }
+                isMuted={
+                  mediaMode === 'audio'
+                    ? audioState.isMuted
+                    : videoState.isMuted
+                }
+                frameRate={frameRate}
+                timeDisplayFormat={timeDisplayFormat}
+                onTimeDisplayFormatChange={handleTimeDisplayFormatChange}
+                playbackRate={playbackRate}
+                onPlaybackRateChange={handlePlaybackRateChange}
+                hlsLevels={videoState.hlsLevels}
+                currentHlsLevel={videoState.currentHlsLevel}
+                qualityLevel={videoState.qualityLevel}
+                hasOriginal={!!activeEntry?.originalUrl}
+                isPlayingOriginal={videoState.isPlayingOriginal}
+                isAmbientLight={videoState.isAmbientLight}
+                isPip={isPip}
+                isPipSupported={isPipSupported}
+                onPipToggle={handlePipToggle}
+                onPlayToggle={handlePlayToggle}
+                onLoopToggle={handleLoopToggle}
+                onVolumeChange={handleVolumeChange}
+                onMuteToggle={handleMuteToggle}
+                onQualityChange={handleQualityChangeFromUI}
+                onAmbientLightToggle={handleAmbientLightToggle}
+                onSaveCapture={handleSaveCapture}
+                onCopyCapture={handleCopyCapture}
+                zoom={imageState.zoom}
+                minZoom={DEFAULT_MIN_ZOOM}
+                maxZoom={DEFAULT_MAX_ZOOM}
+                onZoomIn={handleZoomIn}
+                onZoomOut={handleZoomOut}
+                onResetZoom={handleResetZoom}
+                isFullscreen={isFullscreen}
+                onFullscreenToggle={toggleFullscreen}
+                t={t}
+                controlsStart={slots?.controlsStart}
+                controlsEnd={slots?.controlsEnd}
+              />
+            </div>
+          )}
+        </div>
       </div>
     );
   }

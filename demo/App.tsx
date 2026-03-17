@@ -316,7 +316,7 @@ export function App() {
 
         {/* Player */}
         <div
-          className={`w-full rounded-xl overflow-hidden bg-black ${
+          className={`w-full bg-black ${
             activeTab === 'audio'
               ? 'aspect-video min-h-[120px]'
               : 'aspect-video'
