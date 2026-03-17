@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import type { TranslationKey, Translations } from '../types';
 import { en } from './en';
 import { ja } from './ja';
@@ -22,11 +22,20 @@ export function usePlayerTranslation(
   locale: string = 'en',
   customTranslations?: Partial<Translations>
 ) {
+  const translationsJson = customTranslations
+    ? JSON.stringify(customTranslations)
+    : undefined;
+  const translationsRef = useRef(customTranslations);
+  if (translationsJson !== undefined) {
+    translationsRef.current = customTranslations;
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: translationsJson is the stable serialization of customTranslations
   const mergedTranslations = useMemo(() => {
     const base = getTranslations(locale);
-    if (!customTranslations) return base;
-    return { ...base, ...customTranslations };
-  }, [locale, customTranslations]);
+    if (!translationsRef.current) return base;
+    return { ...base, ...translationsRef.current };
+  }, [locale, translationsJson]);
 
   const t = useMemo(() => {
     return (key: TranslationKey): string => {
