@@ -550,6 +550,24 @@
   margin-bottom: 8px;
 }
 
+.drop-player-seekbar-start-slot {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.drop-player-seekbar-start-slot .drop-player-button--time {
+  padding: 5px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 9999px;
+  height: auto;
+  min-width: 0;
+}
+
 .drop-player-seekbar-markers {
   position: absolute;
   inset-inline: 0;

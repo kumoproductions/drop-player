@@ -51,8 +51,11 @@ import { AudioCore } from './AudioCore';
 import { ControlsBar } from './ControlsBar';
 import { SeekBar } from './controls/SeekBar';
 import { SourceSelector } from './controls/SourceSelector';
-import type { TimeDisplayFormat } from './controls/TimeDisplay';
-import { getNextTimeDisplayFormat } from './controls/TimeDisplay';
+import {
+  getNextTimeDisplayFormat,
+  TimeDisplay,
+  type TimeDisplayFormat,
+} from './controls/TimeDisplay';
 import { ImageCore } from './ImageCore';
 import { PdfCore } from './PdfCore';
 import { VideoCore } from './VideoCore';
@@ -1183,6 +1186,27 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                     onSeekChange={handleSeekChange}
                     onSeekEnd={handleSeekEnd}
                     t={t}
+                    startSlot={
+                      features.timeDisplay ? (
+                        <TimeDisplay
+                          currentTime={
+                            mediaMode === 'audio'
+                              ? audioState.currentTime
+                              : videoState.currentTime
+                          }
+                          duration={
+                            mediaMode === 'audio'
+                              ? audioState.duration
+                              : videoState.duration
+                          }
+                          frameRate={frameRate}
+                          format={timeDisplayFormat}
+                          onFormatChange={handleTimeDisplayFormatChange}
+                          showFrameFormat={mediaMode === 'video'}
+                          t={t}
+                        />
+                      ) : undefined
+                    }
                   />
                 )}
 
@@ -1215,9 +1239,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                     ? audioState.isMuted
                     : videoState.isMuted
                 }
-                frameRate={frameRate}
-                timeDisplayFormat={timeDisplayFormat}
-                onTimeDisplayFormatChange={handleTimeDisplayFormatChange}
                 playbackRate={playbackRate}
                 onPlaybackRateChange={handlePlaybackRateChange}
                 hlsLevels={videoState.hlsLevels}

@@ -14,7 +14,6 @@ import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
 import { QualitySelector } from './controls/QualitySelector';
-import { TimeDisplay, type TimeDisplayFormat } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
 import { VolumeControl } from './controls/VolumeControl';
 import { ZoomControls } from './controls/ZoomControls';
@@ -30,9 +29,6 @@ interface ControlsBarProps {
   duration?: number;
   volume?: number;
   isMuted?: boolean;
-  frameRate?: number;
-  timeDisplayFormat?: TimeDisplayFormat;
-  onTimeDisplayFormatChange?: (format: TimeDisplayFormat) => void;
 
   // Playback speed
   playbackRate?: number;
@@ -94,9 +90,6 @@ export function ControlsBar({
   duration = 0,
   volume = 1,
   isMuted = false,
-  frameRate = 30,
-  timeDisplayFormat = 'elapsed-total',
-  onTimeDisplayFormatChange,
   playbackRate = 1,
   onPlaybackRateChange,
   hlsLevels = [],
@@ -145,17 +138,6 @@ export function ControlsBar({
               <LoopButton
                 isLoop={isLoop}
                 onToggle={onLoopToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.timeDisplay && (
-              <TimeDisplay
-                currentTime={currentTime}
-                duration={duration}
-                frameRate={frameRate}
-                format={timeDisplayFormat}
-                onFormatChange={onTimeDisplayFormatChange ?? (() => {})}
-                showFrameFormat={mediaMode === 'video'}
                 t={t}
               />
             )}

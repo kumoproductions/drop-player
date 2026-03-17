@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useRef, useState } from 'react';
 import type { Marker, TranslationKey } from '../../types';
 import { formatTime } from '../../utils/formatters';
 
@@ -12,6 +12,8 @@ interface SeekBarProps {
   onSeekChange: (time: number) => void;
   onSeekEnd: (time: number) => void;
   t: (key: TranslationKey) => string;
+  /** Slot rendered above the seek bar on the left (e.g. TimeDisplay chip) */
+  startSlot?: ReactNode;
 }
 
 const SNAP_THRESHOLD_PX = 12;
@@ -26,6 +28,7 @@ export function SeekBar({
   onSeekChange,
   onSeekEnd,
   t,
+  startSlot,
 }: SeekBarProps) {
   const sliderRef = useRef<HTMLDivElement>(null);
   const [tooltipPosition, setTooltipPosition] = useState<number | null>(null);
@@ -241,6 +244,11 @@ export function SeekBar({
 
   return (
     <div className="drop-player-seekbar">
+      {/* Start slot (e.g. TimeDisplay) */}
+      {startSlot && (
+        <div className="drop-player-seekbar-start-slot">{startSlot}</div>
+      )}
+
       {/* Scene markers */}
       {sceneMarkers.length > 0 && duration > 0 && (
         <div className="drop-player-seekbar-markers">
