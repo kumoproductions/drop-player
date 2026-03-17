@@ -22,6 +22,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       initialVolume = 1,
       initialTime,
       storageKey,
+      storage: storageAdapter,
       waveColor = '#666',
       progressColor = '#0066ff',
       waveformScale = 512,
@@ -49,6 +50,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       audioRef,
       {
         storageKey,
+        storage: storageAdapter,
         initialVolume,
         initialMuted,
         initialLoop,

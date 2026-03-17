@@ -70,6 +70,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       crossOrigin = 'anonymous',
       poster,
       storageKey,
+      storage: storageAdapter,
       slots,
       hlsConfig,
     } = props;
@@ -89,6 +90,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       showTitle: showTitleProp,
       features: featuresProp,
       locale = UI_DEFAULTS.locale,
+      translations: customTranslations,
       frameRate = UI_DEFAULTS.frameRate,
       markers = [],
     } = props.ui ?? {};
@@ -160,7 +162,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       [onError]
     );
 
-    const { t } = usePlayerTranslation(locale);
+    const { t } = usePlayerTranslation(locale, customTranslations);
 
     const [imageState, setImageState] = useState<ImageState>({
       zoom: 1,
@@ -235,7 +237,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
     const showTitle = showTitleProp !== undefined ? showTitleProp : hasSource;
 
-    const globalStorage = usePlayerStorage({ storageKey });
+    const globalStorage = usePlayerStorage({
+      storageKey,
+      storage: storageAdapter,
+    });
 
     const showFrameFormat = mediaMode === 'video';
     const [timeDisplayFormat, setTimeDisplayFormat] =
@@ -951,6 +956,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               initialTime={initialTime}
               frameRate={frameRate}
               storageKey={storageKey}
+              storage={storageAdapter}
               markers={markers}
               hlsConfig={hlsConfig}
               locale={locale}
@@ -1017,6 +1023,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               initialVolume={initialVolume}
               initialTime={initialTime}
               storageKey={storageKey}
+              storage={storageAdapter}
               locale={locale}
               containerRef={containerRef}
               onStateChange={handleAudioStateChange}
