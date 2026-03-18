@@ -45,7 +45,7 @@ async function importHls(
         error instanceof Error
           ? error
           : new Error('Failed to load hls.js module');
-      console.warn('[@dropmov/player] Failed to load hls.js:', importError);
+      console.warn('[drop-player] Failed to load hls.js:', importError);
       onError?.(importError);
       hlsImportPromise = null;
       throw importError;
@@ -107,7 +107,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
     }
 
     console.warn(
-      `[@dropmov/player] HLS fallback triggered: ${reason}. Falling back to originalUrl.`
+      `[drop-player] HLS fallback triggered: ${reason}. Falling back to originalUrl.`
     );
     onFallbackToOriginalRef.current?.(reason);
   }, []);
@@ -206,7 +206,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
             fallbackToOriginal('manifest-parse-error');
             return;
           }
-          console.error('[@dropmov/player] HLS fatal error:', data);
+          console.error('[drop-player] HLS fatal error:', data);
           switch (data.type) {
             case HlsClass.ErrorTypes.NETWORK_ERROR:
               hls?.startLoad();
