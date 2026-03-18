@@ -97,7 +97,8 @@ Props are organised into four groups to keep the surface area manageable:
 | `crossOrigin` | `'anonymous' \| 'use-credentials'` | `'anonymous'` | CORS for media elements |
 | `poster` | `string` | — | Poster image (video) |
 | `storageKey` | `string` | — | Custom prefix for localStorage keys (default: `drop_player_`, custom: `<storageKey>_`). Muted state is persisted automatically. |
-| `hlsConfig` | `Record<string, unknown>` | — | Custom [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) overrides |
+| `storage` | `StorageAdapter` | — | Custom storage backend (must implement `getItem`, `setItem`, `removeItem`). Defaults to localStorage (SSR-safe). |
+| `hlsConfig` | `Partial<HlsConfig>` | — | Custom [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) overrides |
 
 ### `playback` — `PlayerPlaybackConfig`
 
@@ -116,7 +117,8 @@ Props are organised into four groups to keep the surface area manageable:
 | `showControls` | `boolean` | `true` | Show bottom control bar |
 | `showTitle` | `boolean` | auto | Show source title/selector |
 | `features` | `PlayerFeatures` | `defaultFeatures` | Toggle individual controls |
-| `locale` | `'en' \| 'ja'` | `'en'` | Display language |
+| `locale` | `string` | `'en'` | Display language (built-in: `'en'`, `'ja'`) |
+| `translations` | `Partial<Translations>` | — | Custom translation overrides, merged on top of the locale's built-in strings |
 | `frameRate` | `number` | `30` | Frame rate for timecode display |
 | `markers` | `Marker[]` | `[]` | Seekbar markers |
 
@@ -276,13 +278,6 @@ Built-in UI uses `ui.locale` to localise these. Override with `slots.errorDispla
 | PDF | Browser-native PDF rendering |
 
 Browser environment only. SSR-safe (components are no-ops on the server).
-
-## Future
-
-Planned extensibility (not yet implemented):
-
-- **Translation** — pluggable / swappable i18n so you can supply custom locales or override strings.
-- **Store** — swappable persistence backend (e.g. replace the default `localStorage` adapter) for custom storage adapters.
 
 ## License
 

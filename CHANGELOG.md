@@ -1,5 +1,33 @@
 # Changelog
 
+## 1.1.2
+
+### Bug Fixes
+
+- Unify mouse/touch handling with Pointer Events for consistent drag-to-seek and controls toggle
+- Improve HLS fatal error handling: network errors now trigger fallback, media error recovery limited to one attempt
+- Type `hlsConfig` as `Partial<HlsConfig>` instead of `Record<string, unknown>`
+- Add `network-error` to `FallbackReason` type
+- Rename legacy `@dropmov/player` references to `drop-player` in console warnings
+
+### Styles
+
+- Responsive timestamp position in controls bar
+
+## 1.1.1
+
+### Features
+
+- Add `storage` prop for custom `StorageAdapter` (replaces default localStorage)
+- Add `translations` prop for custom i18n string overrides
+- Widen `locale` type from `'en' | 'ja'` to `string` for custom locales
+- Stabilize React hooks to avoid unnecessary re-renders with object props
+
+### Styles
+
+- Fix ambient light mode rendering
+- Reposition timestamp display
+
 ## 1.1.0
 
 ### Features
