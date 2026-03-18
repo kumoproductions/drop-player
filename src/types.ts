@@ -118,6 +118,7 @@ export type FallbackReason =
   | 'manifest-load-error'
   | 'manifest-parse-error'
   | 'no-levels'
+  | 'network-error'
   | 'playback-error';
 
 /**

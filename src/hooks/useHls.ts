@@ -117,6 +117,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
 
     let hls: Hls | null = null;
     let destroyed = false;
+    let mediaRecoveryAttempted = false;
 
     const setupHls = async () => {
       let HlsClass: typeof Hls | null;
@@ -212,7 +213,12 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
               fallbackToOriginal('network-error');
               break;
             case HlsClass.ErrorTypes.MEDIA_ERROR:
-              hls?.recoverMediaError();
+              if (!mediaRecoveryAttempted) {
+                mediaRecoveryAttempted = true;
+                hls?.recoverMediaError();
+              } else {
+                fallbackToOriginal('playback-error');
+              }
               break;
             default:
               fallbackToOriginal('playback-error');
