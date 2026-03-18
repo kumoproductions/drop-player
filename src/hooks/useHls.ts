@@ -209,7 +209,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
           console.error('[drop-player] HLS fatal error:', data);
           switch (data.type) {
             case HlsClass.ErrorTypes.NETWORK_ERROR:
-              hls?.startLoad();
+              fallbackToOriginal('network-error');
               break;
             case HlsClass.ErrorTypes.MEDIA_ERROR:
               hls?.recoverMediaError();

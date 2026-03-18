@@ -1,3 +1,4 @@
+import type { HlsConfig } from 'hls.js';
 import type { ReactNode } from 'react';
 
 // ============================================================================
@@ -399,7 +400,7 @@ export interface PlayerProps {
    * buffer sizes, or any other hls.js option.
    * @see https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning
    */
-  hlsConfig?: Record<string, unknown>;
+  hlsConfig?: Partial<HlsConfig>;
 }
 
 // ============================================================================
@@ -664,7 +665,7 @@ export interface VideoCoreProps {
   markers?: Marker[];
 
   // hls.js configuration overrides
-  hlsConfig?: Record<string, unknown>;
+  hlsConfig?: Partial<HlsConfig>;
 
   // i18n
   locale?: string;
