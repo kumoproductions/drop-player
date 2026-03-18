@@ -58,6 +58,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       onQualityLevelChange,
       onFallback,
       onFullscreenToggle,
+      onToggleControls,
     } = props;
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,7 +70,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
     const dragStartTimeRef = useRef(0);
     const hasDraggedRef = useRef(false);
     const dragWasPlayingRef = useRef(false);
-    const lastTouchEndTimeRef = useRef(0);
 
     const {
       state,
@@ -363,43 +363,30 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       };
     }, [isAmbientLight, onError]);
 
-    const handleVideoMouseDown = useCallback(
-      (e: React.MouseEvent<HTMLVideoElement>) => {
-        if (Date.now() - lastTouchEndTimeRef.current < 500) return;
+    const pointerTypeRef = useRef<string | null>(null);
 
+    const handleVideoPointerDown = useCallback(
+      (e: React.PointerEvent<HTMLVideoElement>) => {
         const video = videoRef.current;
         if (!video || !duration) return;
 
-        if (e.button !== 0) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
 
+        pointerTypeRef.current = e.pointerType;
         isDraggingToSeekRef.current = true;
         dragStartXRef.current = e.clientX;
         dragStartTimeRef.current = video.currentTime;
         hasDraggedRef.current = false;
 
-        e.preventDefault();
+        if (e.pointerType === 'mouse') {
+          e.preventDefault();
+        }
       },
       [duration]
     );
 
-    const handleVideoTouchStart = useCallback(
-      (e: React.TouchEvent<HTMLVideoElement>) => {
-        const video = videoRef.current;
-        if (!video || !duration) return;
-
-        const touch = e.touches[0];
-        if (!touch) return;
-
-        isDraggingToSeekRef.current = true;
-        dragStartXRef.current = touch.clientX;
-        dragStartTimeRef.current = video.currentTime;
-        hasDraggedRef.current = false;
-      },
-      [duration]
-    );
-
-    const handleContainerMouseMove = useCallback(
-      (e: React.MouseEvent<HTMLElement>) => {
+    const handleContainerPointerMove = useCallback(
+      (e: React.PointerEvent<HTMLElement>) => {
         if (!isDraggingToSeekRef.current) return;
 
         const video = videoRef.current;
@@ -408,8 +395,9 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
 
         const deltaX = e.clientX - dragStartXRef.current;
         const containerWidth = container.clientWidth;
+        const dragThreshold = pointerTypeRef.current === 'touch' ? 10 : 5;
 
-        if (Math.abs(deltaX) > 5 && !hasDraggedRef.current) {
+        if (Math.abs(deltaX) > dragThreshold && !hasDraggedRef.current) {
           hasDraggedRef.current = true;
           dragWasPlayingRef.current = !video.paused;
           video.pause();
@@ -427,122 +415,60 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
           setSeekValue(newTime);
           video.currentTime = newTime;
           setCurrentTime(newTime);
-        }
-      },
-      [duration, containerRef, setSeeking, setSeekValue, setCurrentTime]
-    );
-
-    const handleContainerTouchMove = useCallback(
-      (e: React.TouchEvent<HTMLElement>) => {
-        if (!isDraggingToSeekRef.current) return;
-
-        const touch = e.touches[0];
-        if (!touch) return;
-
-        const video = videoRef.current;
-        const container = containerRef.current;
-        if (!video || !container || !duration) return;
-
-        const deltaX = touch.clientX - dragStartXRef.current;
-        const containerWidth = container.clientWidth;
-
-        if (Math.abs(deltaX) > 10 && !hasDraggedRef.current) {
-          hasDraggedRef.current = true;
-          dragWasPlayingRef.current = !video.paused;
-          video.pause();
-          setSeeking(true);
-          setSeekValue(video.currentTime);
-          e.preventDefault();
-        }
-
-        if (hasDraggedRef.current) {
-          const seekDelta = (deltaX / containerWidth) * duration;
-          const newTime = Math.max(
-            0,
-            Math.min(duration, dragStartTimeRef.current + seekDelta)
-          );
-
-          setSeekValue(newTime);
-          video.currentTime = newTime;
-          setCurrentTime(newTime);
-          e.preventDefault();
         }
       },
       [duration, containerRef, setSeeking, setSeekValue, setCurrentTime]
     );
 
     useEffect(() => {
-      const handleGlobalMouseUp = (e: MouseEvent) => {
-        if (isDraggingToSeekRef.current) {
-          const container = containerRef.current;
-          const isInsideContainer =
-            !!container && container.contains(e.target as Node);
+      const handleGlobalPointerUp = (e: PointerEvent) => {
+        if (!isDraggingToSeekRef.current) return;
 
-          if (isInsideContainer && !hasDraggedRef.current) {
+        const container = containerRef.current;
+        const isInsideContainer =
+          !!container && container.contains(e.target as Node);
+
+        if (isInsideContainer && !hasDraggedRef.current) {
+          if (pointerTypeRef.current === 'touch') {
+            onToggleControls?.();
+          } else {
             handlers.togglePlayPause();
-          } else if (hasDraggedRef.current) {
-            const video = videoRef.current;
-            const finalTime = video?.currentTime ?? 0;
-
-            setSeeking(false);
-            onSeekEnd?.(finalTime);
-
-            if (dragWasPlayingRef.current) {
-              video?.play().catch((error) => {
-                onError?.(
-                  error instanceof Error ? error : new Error(String(error))
-                );
-              });
-            }
           }
-          isDraggingToSeekRef.current = false;
-          hasDraggedRef.current = false;
+        } else if (hasDraggedRef.current) {
+          const video = videoRef.current;
+          const finalTime = video?.currentTime ?? 0;
+
+          setSeeking(false);
+          onSeekEnd?.(finalTime);
+
+          if (dragWasPlayingRef.current) {
+            video?.play().catch((error) => {
+              onError?.(
+                error instanceof Error ? error : new Error(String(error))
+              );
+            });
+          }
         }
+
+        isDraggingToSeekRef.current = false;
+        hasDraggedRef.current = false;
+        pointerTypeRef.current = null;
       };
 
-      const handleGlobalTouchEnd = (e: TouchEvent) => {
-        lastTouchEndTimeRef.current = Date.now();
-
-        if (isDraggingToSeekRef.current) {
-          const container = containerRef.current;
-          const touch = e.changedTouches[0];
-          const targetElement = touch
-            ? document.elementFromPoint(touch.clientX, touch.clientY)
-            : null;
-          const isInsideContainer =
-            !!container && !!targetElement && container.contains(targetElement);
-
-          if (isInsideContainer && !hasDraggedRef.current) {
-            handlers.togglePlayPause();
-          } else if (hasDraggedRef.current) {
-            const video = videoRef.current;
-            const finalTime = video?.currentTime ?? 0;
-
-            setSeeking(false);
-            onSeekEnd?.(finalTime);
-
-            if (dragWasPlayingRef.current) {
-              video?.play().catch((error) => {
-                onError?.(
-                  error instanceof Error ? error : new Error(String(error))
-                );
-              });
-            }
-          }
-          isDraggingToSeekRef.current = false;
-          hasDraggedRef.current = false;
-        }
-      };
-
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-      document.addEventListener('touchend', handleGlobalTouchEnd);
-      document.addEventListener('touchcancel', handleGlobalTouchEnd);
+      document.addEventListener('pointerup', handleGlobalPointerUp);
+      document.addEventListener('pointercancel', handleGlobalPointerUp);
       return () => {
-        document.removeEventListener('mouseup', handleGlobalMouseUp);
-        document.removeEventListener('touchend', handleGlobalTouchEnd);
-        document.removeEventListener('touchcancel', handleGlobalTouchEnd);
+        document.removeEventListener('pointerup', handleGlobalPointerUp);
+        document.removeEventListener('pointercancel', handleGlobalPointerUp);
       };
-    }, [handlers, setSeeking, onError, onSeekEnd, containerRef]);
+    }, [
+      handlers,
+      setSeeking,
+      onError,
+      onSeekEnd,
+      containerRef,
+      onToggleControls,
+    ]);
 
     const handleDoubleClick = useCallback(
       (e: React.MouseEvent<HTMLVideoElement>) => {
@@ -724,11 +650,9 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
         poster={poster}
         autoPlay={autoPlay}
         muted={initialMuted}
-        onMouseDown={handleVideoMouseDown}
+        onPointerDown={handleVideoPointerDown}
         onDoubleClick={handleDoubleClick}
-        onMouseMove={handleContainerMouseMove}
-        onTouchStart={handleVideoTouchStart}
-        onTouchMove={handleContainerTouchMove}
+        onPointerMove={handleContainerPointerMove}
         onContextMenu={(e) => e.preventDefault()}
         style={{ outline: 'none' }}
       >

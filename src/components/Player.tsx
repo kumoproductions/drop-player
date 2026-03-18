@@ -328,33 +328,53 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           ? audioState.isEnded
           : true;
 
-    const resetHideControlsTimer = useCallback(() => {
-      setControlsVisible(true);
-      if (hideControlsTimeoutRef.current) {
-        clearTimeout(hideControlsTimeoutRef.current);
-      }
-      if (!isEnded) {
-        hideControlsTimeoutRef.current = setTimeout(() => {
-          setControlsVisible(false);
-        }, 3000);
-      }
-    }, [isEnded]);
-
-    const handleMouseLeave = useCallback(() => {
-      if (hideControlsTimeoutRef.current) {
-        clearTimeout(hideControlsTimeoutRef.current);
-      }
-      if (!isEnded) {
-        setControlsVisible(false);
-      }
-    }, [isEnded]);
-
-    useEffect(() => {
-      if (isEnded) {
+    const resetHideControlsTimer = useCallback(
+      (e: React.PointerEvent) => {
+        if (e.pointerType !== 'mouse') return;
         setControlsVisible(true);
         if (hideControlsTimeoutRef.current) {
           clearTimeout(hideControlsTimeoutRef.current);
         }
+        if (!isEnded) {
+          hideControlsTimeoutRef.current = setTimeout(() => {
+            setControlsVisible(false);
+          }, 3000);
+        }
+      },
+      [isEnded]
+    );
+
+    const handlePointerLeave = useCallback(
+      (e: React.PointerEvent) => {
+        if (e.pointerType !== 'mouse') return;
+        if (hideControlsTimeoutRef.current) {
+          clearTimeout(hideControlsTimeoutRef.current);
+        }
+        if (!isEnded) {
+          setControlsVisible(false);
+        }
+      },
+      [isEnded]
+    );
+
+    const toggleControls = useCallback(() => {
+      setControlsVisible((prev) => !prev);
+    }, []);
+
+    useEffect(() => {
+      if (hideControlsTimeoutRef.current) {
+        clearTimeout(hideControlsTimeoutRef.current);
+      }
+      if (controlsVisible && !isEnded) {
+        hideControlsTimeoutRef.current = setTimeout(() => {
+          setControlsVisible(false);
+        }, 3000);
+      }
+    }, [controlsVisible, isEnded]);
+
+    useEffect(() => {
+      if (isEnded) {
+        setControlsVisible(true);
       }
     }, [isEnded]);
 
@@ -986,6 +1006,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               onQualityLevelChange={onQualityLevelChange}
               onFallback={onFallback}
               onFullscreenToggle={toggleFullscreen}
+              onToggleControls={
+                showControlsProp ? toggleControls : handlePlayToggle
+              }
             />
           );
         case 'image':
@@ -1069,9 +1092,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             ? handleKeyDown
             : undefined
         }
-        onMouseMove={resetHideControlsTimer}
-        onMouseEnter={resetHideControlsTimer}
-        onMouseLeave={handleMouseLeave}
+        onPointerMove={resetHideControlsTimer}
+        onPointerEnter={resetHideControlsTimer}
+        onPointerLeave={handlePointerLeave}
         // biome-ignore lint/a11y/noNoninteractiveTabindex: Media player needs tabIndex for keyboard shortcuts
         tabIndex={0}
       >

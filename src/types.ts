@@ -701,6 +701,9 @@ export interface VideoCoreProps {
 
   /** Called on double-click to toggle fullscreen */
   onFullscreenToggle?: () => void;
+
+  /** Called on touch tap (without drag) to toggle controls overlay visibility */
+  onToggleControls?: () => void;
 }
 
 /**
