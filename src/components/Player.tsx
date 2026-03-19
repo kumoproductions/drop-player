@@ -233,10 +233,14 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
     // PIP state
     const [isPip, setIsPip] = useState(false);
-    const isPipSupported =
-      typeof document !== 'undefined' &&
-      'pictureInPictureEnabled' in document &&
-      document.pictureInPictureEnabled;
+    const [isPipSupported, setIsPipSupported] = useState(false);
+
+    useEffect(() => {
+      setIsPipSupported(
+        'pictureInPictureEnabled' in document &&
+          document.pictureInPictureEnabled
+      );
+    }, []);
 
     const showTitle = showTitleProp !== undefined ? showTitleProp : hasSource;
 
