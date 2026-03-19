@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+### Bug Fixes
+
+- Fix hydration mismatch caused by PiP support detection running during SSR
+
 ## 1.1.2
 
 ### Bug Fixes
