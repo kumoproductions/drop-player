@@ -51,6 +51,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "lint:fix:unsafe": "biome check --write --unsafe .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "npm run build",
     "prepare": "node -e \"try{require('fs').statSync('.husky')}catch{process.exit(1)}\" && npx husky || true"
   },
@@ -94,6 +96,7 @@
     "typescript": "^5.9.3",
     "vite": "^8.0.0",
     "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.0",
     "waveform-data": "^4.5.2"
   }
 }

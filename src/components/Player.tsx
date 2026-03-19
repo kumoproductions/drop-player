@@ -76,6 +76,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       storage: storageAdapter,
       slots,
       hlsConfig,
+      _mediaMode,
     } = props;
 
     // -- Playback group --
@@ -136,7 +137,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const imageCoreRef = useRef<ImageCoreRef>(null);
     const audioCoreRef = useRef<AudioCoreRef>(null);
 
-    const normalized = useMemo(() => normalizeSources(sources), [sources]);
+    const normalized = useMemo(
+      () => normalizeSources(sources, _mediaMode),
+      [sources, _mediaMode]
+    );
 
     const { mediaMode, entries } = normalized;
     const hasSource = entries.length > 0;

@@ -3,37 +3,37 @@ import type { PlayerProps, PlayerRef } from '../types';
 import { Player } from './Player';
 
 /**
- * Video player. Semantic alias for `Player` — source type is still inferred from URL.
+ * Video player. Skips source type inference — all sources are treated as video.
  */
 export const VideoPlayer = forwardRef<PlayerRef, PlayerProps>(
   function VideoPlayer(props, ref) {
-    return <Player ref={ref} {...props} />;
+    return <Player ref={ref} {...props} _mediaMode="video" />;
   }
 );
 
 /**
- * Audio player. Semantic alias for `Player` — source type is still inferred from URL.
+ * Audio player. Skips source type inference — all sources are treated as audio.
  */
 export const AudioPlayer = forwardRef<PlayerRef, PlayerProps>(
   function AudioPlayer(props, ref) {
-    return <Player ref={ref} {...props} />;
+    return <Player ref={ref} {...props} _mediaMode="audio" />;
   }
 );
 
 /**
- * Image viewer. Semantic alias for `Player` — source type is still inferred from URL.
+ * Image viewer. Skips source type inference — all sources are treated as images.
  */
 export const ImageViewer = forwardRef<PlayerRef, PlayerProps>(
   function ImageViewer(props, ref) {
-    return <Player ref={ref} {...props} />;
+    return <Player ref={ref} {...props} _mediaMode="image" />;
   }
 );
 
 /**
- * PDF viewer. Semantic alias for `Player` — source type is still inferred from URL.
+ * PDF viewer. Skips source type inference — all sources are treated as PDF.
  */
 export const PdfViewer = forwardRef<PlayerRef, PlayerProps>(
   function PdfViewer(props, ref) {
-    return <Player ref={ref} {...props} />;
+    return <Player ref={ref} {...props} _mediaMode="pdf" />;
   }
 );
