@@ -31,14 +31,11 @@ export const ja: Translations = {
   clipboardNotSupported: 'クリップボードがサポートされていません',
   toggleTimeDisplay: '時間表示の切替',
   auto: '自動',
-  // Image mode
   zoomIn: 'ズームイン',
   zoomOut: 'ズームアウト',
   resetZoom: 'リセット',
   zoomLevel: 'ズーム',
-  // 再生速度
   playbackSpeed: '再生速度',
-  // PIP
   pip: 'ピクチャーインピクチャー',
   exitPip: 'ピクチャーインピクチャー解除',
 };

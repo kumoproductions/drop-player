@@ -76,6 +76,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       storage: storageAdapter,
       slots,
       hlsConfig,
+      _mediaMode,
     } = props;
 
     // -- Playback group --
@@ -136,7 +137,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const imageCoreRef = useRef<ImageCoreRef>(null);
     const audioCoreRef = useRef<AudioCoreRef>(null);
 
-    const normalized = useMemo(() => normalizeSources(sources), [sources]);
+    const normalized = useMemo(
+      () => normalizeSources(sources, _mediaMode),
+      [sources, _mediaMode]
+    );
 
     const { mediaMode, entries } = normalized;
     const hasSource = entries.length > 0;
@@ -1080,13 +1084,21 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         role="application"
         aria-label={ariaLabel}
         className={`drop-player ${mediaMode === 'video' && videoState.isAmbientLight ? 'drop-player-ambient' : ''} ${className ?? ''}`}
-        style={
-          mediaMode === 'video' && videoState.isAmbientLight
+        style={{
+          ['--drop-player-aspect-ratio' as string]:
+            mediaMode === 'video'
+              ? '16 / 9'
+              : mediaMode === 'audio'
+                ? '32 / 9'
+                : mediaMode === 'image'
+                  ? '4 / 3'
+                  : '1 / 1.414',
+          ...(mediaMode === 'video' && videoState.isAmbientLight
             ? {
                 ['--drop-player-ambient-shadow' as string]: `0 0 240px 60px rgba(${videoState.ambientColor.r}, ${videoState.ambientColor.g}, ${videoState.ambientColor.b}, 0.6)`,
               }
-            : undefined
-        }
+            : undefined),
+        }}
         onPointerDown={() => {
           containerRef.current?.focus({ preventScroll: true });
         }}

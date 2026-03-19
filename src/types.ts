@@ -402,6 +402,12 @@ export interface PlayerProps {
    * @see https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning
    */
   hlsConfig?: Partial<HlsConfig>;
+
+  /**
+   * @internal Override media mode detection. Used by typed wrappers
+   * (VideoPlayer, AudioPlayer, etc.) to skip source type inference.
+   */
+  _mediaMode?: MediaMode;
 }
 
 // ============================================================================

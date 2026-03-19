@@ -31,14 +31,11 @@ export const en: Translations = {
   clipboardNotSupported: 'Clipboard not supported',
   toggleTimeDisplay: 'Toggle time display',
   auto: 'Auto',
-  // Image mode
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
   resetZoom: 'Reset',
   zoomLevel: 'Zoom',
-  // Playback speed
   playbackSpeed: 'Speed',
-  // PIP
   pip: 'Picture in Picture',
   exitPip: 'Exit Picture in Picture',
 };

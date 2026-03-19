@@ -64,6 +64,10 @@ const AUDIO_MIME_TYPES = [
   'audio/x-m4a',
 ];
 
+const VIDEO_EXTENSIONS = ['.mp4', '.webm', '.ogv', '.mov'];
+
+const HLS_EXTENSIONS = ['.m3u8'];
+
 function getPathname(url: string): string {
   try {
     return new URL(url, 'https://dummy').pathname.toLowerCase();
@@ -75,6 +79,18 @@ function getPathname(url: string): string {
 function hasExtension(url: string, extensions: string[]): boolean {
   const pathname = getPathname(url);
   return extensions.some((ext) => pathname.endsWith(ext));
+}
+
+const ALL_KNOWN_EXTENSIONS = [
+  ...VIDEO_EXTENSIONS,
+  ...HLS_EXTENSIONS,
+  ...IMAGE_EXTENSIONS,
+  ...PDF_EXTENSIONS,
+  ...AUDIO_EXTENSIONS,
+];
+
+function hasKnownExtension(url: string): boolean {
+  return hasExtension(url, ALL_KNOWN_EXTENSIONS);
 }
 
 function hasMimeType(mimeType: string | undefined, types: string[]): boolean {
@@ -131,7 +147,33 @@ export function inferSourceType(url: string, mimeType?: string): SourceType {
   if (isImageUrl(url)) return 'image';
   if (isPdfUrl(url)) return 'pdf';
   if (isAudioUrl(url)) return 'audio';
+
+  if (!hasKnownExtension(url)) {
+    console.warn(
+      '[drop-player] Could not detect media type from URL (no recognizable extension). ' +
+        'Please provide a "mimeType" in your source object. ' +
+        'Falling back to video. URL: %s',
+      url
+    );
+  }
+
   return 'progressive';
+}
+
+/**
+ * Map a MediaMode to its default SourceType (inverse of sourceTypeToMediaMode)
+ */
+function mediaModeToSourceType(mode: MediaMode): SourceType {
+  switch (mode) {
+    case 'video':
+      return 'progressive';
+    case 'image':
+      return 'image';
+    case 'pdf':
+      return 'pdf';
+    case 'audio':
+      return 'audio';
+  }
 }
 
 /**
@@ -207,17 +249,41 @@ function toMediaSourceArray(
 /**
  * Normalize sources into { mediaMode, entries }.
  *
- * - MediaMode is determined by sources[0].url
+ * - When `mediaModeOverride` is set, uses that mode directly (no inference).
+ * - Otherwise, MediaMode is determined by sources[0].url
  * - Only entries matching the same MediaMode are included
  * - Labels are auto-generated if omitted
  */
 export function normalizeSources(
-  sources: MediaSource[] | MediaSource | string | null
+  sources: MediaSource[] | MediaSource | string | null,
+  mediaModeOverride?: MediaMode
 ): NormalizedSources {
   const sourceArray = toMediaSourceArray(sources);
 
   if (sourceArray.length === 0) {
-    return { mediaMode: 'video', entries: [] };
+    return { mediaMode: mediaModeOverride ?? 'video', entries: [] };
+  }
+
+  if (mediaModeOverride) {
+    const defaultType = mediaModeToSourceType(mediaModeOverride);
+    const entries: SourceEntry[] = sourceArray.map((source, index) => {
+      // For video mode, distinguish HLS vs progressive; otherwise use default
+      let type = defaultType;
+      if (mediaModeOverride === 'video') {
+        const mimeType = source.mimeType;
+        if (mimeType ? isHlsMimeType(mimeType) : isHlsUrl(source.url)) {
+          type = 'hls';
+        }
+      }
+      return {
+        url: source.url,
+        originalUrl: source.originalUrl,
+        fallbackUrl: source.fallbackUrl,
+        label: source.label ?? autoLabel(type, index, sourceArray.length),
+        sourceType: type,
+      };
+    });
+    return { mediaMode: mediaModeOverride, entries };
   }
 
   const firstType = inferSourceType(
