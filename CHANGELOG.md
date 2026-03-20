@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.5
+
+### Improvements
+
+- Add drag-to-seek on audio waveform (click to seek, drag to scrub)
+- Add accessibility attributes on audio waveform area (`role="slider"`, `aria-valuemin/max/now`)
+- Improve PDF error handling: pre-validate URL reachability, fire `onError` with `errorNetwork` on failure
+- Suppress `AbortError` from play/pause races
+
+### Bug Fixes
+
+- Fix audio player not showing error state when loading fails
+
+### Documentation
+
+- Add CSS variables reference table, feature presets, Translations, Custom storage, Utilities sections to README
+
 ## 1.1.4
 
 ### Improvements

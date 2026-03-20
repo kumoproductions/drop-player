@@ -51,6 +51,17 @@ All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for r
 
 <!-- interactive:demo -->
 
+## Supported media
+
+| Mode | Formats |
+|------|---------|
+| Video | HLS (`.m3u8`), MP4, WebM |
+| Audio | MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus |
+| Image | JPEG, PNG, GIF, WebP, AVIF, SVG |
+| PDF | Browser-native PDF rendering |
+
+Browser environment only. SSR-safe (components are no-ops on the server).
+
 ## Sources
 
 ```tsx
@@ -65,6 +76,9 @@ All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for r
   { url: 'stream.m3u8', label: 'HLS' },
   { url: 'original.mp4', label: 'Original' },
 ]} />
+
+// Explicit MIME type — useful when URL has no extension (e.g. CDN, signed URL)
+<Player sources={{ url: 'https://cdn.example.com/abc123', mimeType: 'video/mp4' }} />
 
 // null — shows error UI
 <VideoPlayer sources={null} />
@@ -368,17 +382,6 @@ parseFrameRate('30000/1001'); // 29.97...
 | `formatTimecode` | `(seconds?, frameRate?) => string` | Format as SMPTE timecode `HH:MM:SS:FF` |
 | `secondsToFrames` | `(seconds?, frameRate?) => number` | Convert seconds to frame number |
 | `parseFrameRate` | `(frameRate?) => number` | Parse frame rate string (e.g. `"30000/1001"`) to number |
-
-## Supported media
-
-| Mode | Formats |
-|------|---------|
-| Video | HLS (`.m3u8`), MP4, WebM |
-| Audio | MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus |
-| Image | JPEG, PNG, GIF, WebP, AVIF, SVG |
-| PDF | Browser-native PDF rendering |
-
-Browser environment only. SSR-safe (components are no-ops on the server).
 
 ## License
 
