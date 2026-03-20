@@ -197,6 +197,23 @@ export interface Marker {
 }
 
 // ============================================================================
+// Time Display
+// ============================================================================
+
+/**
+ * Time display format for the time display control.
+ * - `'elapsed-total'`: Elapsed / total (e.g. `1:23 / 5:00`)
+ * - `'remaining'`: Remaining time (e.g. `-3:37`)
+ * - `'timecode'`: Timecode (e.g. `00:01:23:15`)
+ * - `'frames'`: Frame number / total frames (e.g. `2475 / 9000`)
+ */
+export type TimeDisplayFormat =
+  | 'elapsed-total'
+  | 'remaining'
+  | 'timecode'
+  | 'frames';
+
+// ============================================================================
 // Feature Flags
 // ============================================================================
 
@@ -352,6 +369,13 @@ export interface PlayerUiConfig {
   translations?: Partial<Translations>;
   /** Frame rate for timecode display (video). Default: 30 */
   frameRate?: number;
+  /**
+   * Time display formats to cycle through on click.
+   * Default: `defaultTimeDisplayFormats` (`['elapsed-total', 'timecode']`).
+   * Use `allTimeDisplayFormats` to include frame display.
+   * A single-element array locks the display to that format.
+   */
+  timeDisplayFormats?: TimeDisplayFormat[];
   /** Seekbar markers */
   markers?: Marker[];
 }

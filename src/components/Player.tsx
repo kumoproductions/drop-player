@@ -46,16 +46,14 @@ const UI_DEFAULTS = {
   frameRate: 30,
 };
 
+import { defaultTimeDisplayFormats } from '../features';
+import type { TimeDisplayFormat } from '../types';
 import { normalizeSources } from '../utils/sources';
 import { AudioCore } from './AudioCore';
 import { ControlsBar } from './ControlsBar';
 import { SeekBar } from './controls/SeekBar';
 import { SourceSelector } from './controls/SourceSelector';
-import {
-  getNextTimeDisplayFormat,
-  TimeDisplay,
-  type TimeDisplayFormat,
-} from './controls/TimeDisplay';
+import { getNextTimeDisplayFormat, TimeDisplay } from './controls/TimeDisplay';
 import { ImageCore } from './ImageCore';
 import { PdfCore } from './PdfCore';
 import { VideoCore } from './VideoCore';
@@ -96,6 +94,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       locale = UI_DEFAULTS.locale,
       translations: customTranslations,
       frameRate = UI_DEFAULTS.frameRate,
+      timeDisplayFormats = defaultTimeDisplayFormats,
       markers = [],
     } = props.ui ?? {};
 
@@ -253,7 +252,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       storage: storageAdapter,
     });
 
-    const showFrameFormat = mediaMode === 'video';
     const [timeDisplayFormat, setTimeDisplayFormat] =
       useState<TimeDisplayFormat>('elapsed-total');
 
@@ -266,22 +264,21 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         'elapsed-total'
       );
       if (stored === 'elapsed-total') return;
-      const resolved =
-        stored === 'frames' && !showFrameFormat
-          ? getNextTimeDisplayFormat(stored, showFrameFormat)
-          : stored;
+      const resolved = timeDisplayFormats.includes(stored)
+        ? stored
+        : getNextTimeDisplayFormat(stored, timeDisplayFormats);
       if (resolved !== 'elapsed-total') {
         setTimeDisplayFormat(resolved);
       }
-    }, [globalStorage, showFrameFormat]);
+    }, [globalStorage, timeDisplayFormats]);
 
     useEffect(() => {
-      if (timeDisplayFormat === 'frames' && !showFrameFormat) {
+      if (!timeDisplayFormats.includes(timeDisplayFormat)) {
         setTimeDisplayFormat(
-          getNextTimeDisplayFormat(timeDisplayFormat, showFrameFormat)
+          getNextTimeDisplayFormat(timeDisplayFormat, timeDisplayFormats)
         );
       }
-    }, [showFrameFormat, timeDisplayFormat]);
+    }, [timeDisplayFormats, timeDisplayFormat]);
 
     const handleTimeDisplayFormatChange = useCallback(
       (format: TimeDisplayFormat) => {
@@ -1241,8 +1238,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                           }
                           frameRate={frameRate}
                           format={timeDisplayFormat}
+                          formats={timeDisplayFormats}
                           onFormatChange={handleTimeDisplayFormatChange}
-                          showFrameFormat={mediaMode === 'video'}
                           t={t}
                         />
                       ) : undefined
@@ -1281,6 +1278,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 }
                 frameRate={frameRate}
                 timeDisplayFormat={timeDisplayFormat}
+                timeDisplayFormats={timeDisplayFormats}
                 onTimeDisplayFormatChange={handleTimeDisplayFormatChange}
                 playbackRate={playbackRate}
                 onPlaybackRateChange={handlePlaybackRateChange}

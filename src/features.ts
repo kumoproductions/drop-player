@@ -1,4 +1,4 @@
-import type { PlayerFeatures } from './types';
+import type { PlayerFeatures, TimeDisplayFormat } from './types';
 
 /**
  * Sensible defaults: most controls enabled, heavy options (ambientLight, capture) off.
@@ -39,6 +39,32 @@ export const noFeatures: Required<PlayerFeatures> = {
   playbackSpeed: false,
   pip: false,
 };
+
+// ============================================================================
+// Time Display Format Presets
+// ============================================================================
+
+/**
+ * Default time display formats: elapsed/total and timecode.
+ * Frames format is excluded by default (opt-in via `allTimeDisplayFormats`).
+ */
+export const defaultTimeDisplayFormats: TimeDisplayFormat[] = [
+  'elapsed-total',
+  'remaining',
+  'timecode',
+];
+
+/**
+ * All time display formats including frames.
+ * Use when frame-accurate display is needed:
+ * `ui={{ timeDisplayFormats: allTimeDisplayFormats }}`
+ */
+export const allTimeDisplayFormats: TimeDisplayFormat[] = [
+  'elapsed-total',
+  'remaining',
+  'timecode',
+  'frames',
+];
 
 /**
  * Resolve partial features into a fully-specified object.

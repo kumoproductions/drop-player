@@ -1,26 +1,20 @@
 import { useCallback } from 'react';
-import type { TranslationKey } from '../../types';
+import type { TimeDisplayFormat, TranslationKey } from '../../types';
 import {
   formatTime,
   formatTimecode,
   secondsToFrames,
 } from '../../utils/formatters';
 
-export type TimeDisplayFormat = 'elapsed-total' | 'timecode' | 'frames';
-
-const FORMATS: TimeDisplayFormat[] = ['elapsed-total', 'timecode', 'frames'];
+export type { TimeDisplayFormat };
 
 export function getNextTimeDisplayFormat(
   current: TimeDisplayFormat,
-  showFrameFormat: boolean
+  formats: TimeDisplayFormat[]
 ): TimeDisplayFormat {
-  const idx = FORMATS.indexOf(current);
-  for (let i = 1; i <= FORMATS.length; i++) {
-    const next = FORMATS[(idx + i) % FORMATS.length];
-    if (next === 'frames' && !showFrameFormat) continue;
-    return next;
-  }
-  return 'elapsed-total';
+  const idx = formats.indexOf(current);
+  if (idx === -1) return formats[0] ?? 'elapsed-total';
+  return formats[(idx + 1) % formats.length];
 }
 
 interface TimeDisplayProps {
@@ -28,9 +22,8 @@ interface TimeDisplayProps {
   duration: number;
   frameRate: number;
   format: TimeDisplayFormat;
+  formats: TimeDisplayFormat[];
   onFormatChange: (format: TimeDisplayFormat) => void;
-  /** When false (e.g. audio mode), frame format is not shown in the cycle. Default true. */
-  showFrameFormat?: boolean;
   t: (key: TranslationKey) => string;
 }
 
@@ -39,18 +32,21 @@ export function TimeDisplay({
   duration,
   frameRate,
   format,
+  formats,
   onFormatChange,
-  showFrameFormat = true,
   t,
 }: TimeDisplayProps) {
   const cycleFormat = useCallback(() => {
-    onFormatChange(getNextTimeDisplayFormat(format, showFrameFormat));
-  }, [format, showFrameFormat, onFormatChange]);
+    if (formats.length <= 1) return;
+    onFormatChange(getNextTimeDisplayFormat(format, formats));
+  }, [format, formats, onFormatChange]);
 
   const getDisplayText = () => {
     switch (format) {
       case 'elapsed-total':
         return `${formatTime(currentTime)} / ${formatTime(duration)}`;
+      case 'remaining':
+        return `-${formatTime(Math.max(0, duration - currentTime))}`;
       case 'timecode':
         return formatTimecode(currentTime, frameRate);
       case 'frames':

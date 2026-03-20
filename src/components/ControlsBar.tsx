@@ -4,6 +4,7 @@ import type {
   MediaMode,
   PlayerFeatures,
   QualityLevel,
+  TimeDisplayFormat,
   TranslationKey,
 } from '../types';
 import { AmbientLightButton } from './controls/AmbientLightButton';
@@ -14,7 +15,7 @@ import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
 import { QualitySelector } from './controls/QualitySelector';
-import { TimeDisplay, type TimeDisplayFormat } from './controls/TimeDisplay';
+import { TimeDisplay } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
 import { VolumeControl } from './controls/VolumeControl';
 import { ZoomControls } from './controls/ZoomControls';
@@ -32,6 +33,7 @@ interface ControlsBarProps {
   isMuted?: boolean;
   frameRate?: number;
   timeDisplayFormat?: TimeDisplayFormat;
+  timeDisplayFormats?: TimeDisplayFormat[];
   onTimeDisplayFormatChange?: (format: TimeDisplayFormat) => void;
 
   // Playback speed
@@ -96,6 +98,7 @@ export function ControlsBar({
   isMuted = false,
   frameRate = 30,
   timeDisplayFormat = 'elapsed-total',
+  timeDisplayFormats,
   onTimeDisplayFormatChange,
   playbackRate = 1,
   onPlaybackRateChange,
@@ -155,8 +158,8 @@ export function ControlsBar({
                   duration={duration}
                   frameRate={frameRate}
                   format={timeDisplayFormat}
+                  formats={timeDisplayFormats ?? ['elapsed-total', 'timecode']}
                   onFormatChange={onTimeDisplayFormatChange ?? (() => {})}
-                  showFrameFormat={mediaMode === 'video'}
                   t={t}
                 />
               </div>
