@@ -90,6 +90,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vercel/analytics": "^2.0.1",
     "@vitejs/plugin-react": "^6.0.1",
     "hls.js": "^1.6.15",
     "husky": "^9.1.7",
