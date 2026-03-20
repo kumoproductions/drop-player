@@ -135,7 +135,11 @@ Propsは4つのグループに分かれています:
 | `features` | `PlayerFeatures` | `defaultFeatures` | 個別コントロールの切り替え |
 | `locale` | `string` | `'en'` | 表示言語（組み込み: `'en'`, `'ja'`） |
 | `translations` | `Partial<Translations>` | — | 翻訳の部分上書き。ロケールの組み込み文字列に対して差分を指定 |
-| `frameRate` | `number` | `30` | タイムコード表示用のフレームレート |
+| `frameRate` | `number` | auto / `30` | タイムコード/フレーム表示用のフレームレート。HLSマニフェストから自動検出（利用可能な場合）、フォールバック: `30` |
+| `timeDisplayFormats` | `TimeDisplayFormat[]` | `defaultTimeDisplayFormats` | クリックで切り替える時間表示形式 |
+| `filmGauge` | `number` | `16` | `'feet-frames'` 表示のフィート当たりフレーム数（例: 35mm=`16`, 16mm=`40`） |
+| `bpm` | `number` | `120` | `'bars-beats'` 表示のBPM |
+| `timeSignature` | `string` | `'4/4'` | `'bars-beats'` 表示の拍子記号（例: `'3/4'`, `'6/8'`） |
 | `markers` | `Marker[]` | `[]` | シークバーマーカー |
 
 ### `slots` — `PlayerSlots`
@@ -177,6 +181,7 @@ Propsは4つのグループに分かれています:
 | `onActiveSourceChange` | `index` | アクティブソース変更 |
 | `onQualityLevelChange` | `QualityLevel` | 画質レベル変更 |
 | `onFallback` | `FallbackEvent` | オリジナルURLへフォールバック |
+| `onTimeDisplayFormatChange` | `TimeDisplayFormat` | 時間表示形式の変更 |
 
 ## Features
 
@@ -220,6 +225,53 @@ import { noFeatures } from 'drop-player';
 | `playbackSpeed` | `true` | 動画, 音声 |
 | `pip` | `true` | 動画（ブラウザPiP APIが必要） |
 | `keyboardShortcuts` | `true` | 動画, 音声 |
+
+## 時間表示形式
+
+`ui.timeDisplayFormats` で、時間表示をクリックした際に切り替わる形式を制御します。2つのプリセットをエクスポートしています:
+
+| エクスポート | 形式 |
+|--------|---------|
+| `defaultTimeDisplayFormats` | `['elapsed-total', 'remaining']` |
+| `allTimeDisplayFormats` | `['elapsed-total', 'remaining', 'timecode', 'frames', 'seconds-frames', 'feet-frames', 'bars-beats']` |
+
+```tsx
+import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
+
+// デフォルト — 経過/合計と残り時間
+<VideoPlayer sources={url} />
+
+// タイムコードとフレームを追加
+<VideoPlayer sources={url} ui={{ timeDisplayFormats: allTimeDisplayFormats }} />
+
+// 映像制作向け — フィート+フレーム（35mm）を追加
+<VideoPlayer sources={url} ui={{
+  timeDisplayFormats: [...defaultTimeDisplayFormats, 'timecode', 'feet-frames'],
+  filmGauge: 16,
+}} />
+
+// 音楽向け — 小節:拍を追加
+<AudioPlayer sources={url} ui={{
+  timeDisplayFormats: [...defaultTimeDisplayFormats, 'bars-beats'],
+  bpm: 92,
+  timeSignature: '4/4',
+}} />
+
+// 単一形式に固定（クリックしても変わらない）
+<VideoPlayer sources={url} ui={{ timeDisplayFormats: ['timecode'] }} />
+```
+
+| 形式 | 表示例 | 追加props |
+|--------|---------|-------------|
+| `'elapsed-total'` | `1:23 / 5:00` | — |
+| `'remaining'` | `-3:37` | — |
+| `'timecode'` | `00:01:23:15` | `frameRate` |
+| `'frames'` | `2475 / 9000` | `frameRate` |
+| `'seconds-frames'` | `83+15 / 300+00` | `frameRate` |
+| `'feet-frames'` | `154+11 / 562+08` | `frameRate`, `filmGauge` |
+| `'bars-beats'` | `47:4 / 192:1` | `bpm`, `timeSignature` |
+
+フレームレートはHLSマニフェストから自動検出されます。プログレッシブソースの場合は `ui.frameRate` を明示的に設定してください。
 
 ## テーマ
 
@@ -282,6 +334,8 @@ ref.current?.seek(30);
 | `setVolume(n)` | `void` | |
 | `setMuted(bool)` | `void` | |
 | `setPlaybackRate(rate)` | `void` | |
+| `getTimeDisplayFormat()` | `TimeDisplayFormat` | |
+| `setTimeDisplayFormat(format)` | `void` | |
 | `captureFrame(opts?)` | `Promise<FrameCapture>` | 動画/画像のみ。音声/PDFではエラーをスロー |
 | `requestFullscreen()` | `Promise<void>` | |
 | `exitFullscreen()` | `Promise<void>` | |
@@ -364,16 +418,20 @@ const supabaseStorage = {
 プレーヤー外でも使えるヘルパー関数:
 
 ```tsx
-import { formatTime, formatTimecode, secondsToFrames, parseFrameRate } from 'drop-player';
+import {
+  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
+  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+} from 'drop-player';
 
-formatTime(125);            // "02:05"
-formatTime(3661);           // "01:01:01"
-
-formatTimecode(125.5, 30);  // "00:02:05:15"
-formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
-
-secondsToFrames(10, 24);   // 240
-parseFrameRate('30000/1001'); // 29.97...
+formatTime(125);                    // "02:05"
+formatTime(3661);                   // "01:01:01"
+formatTimecode(125.5, 30);          // "00:02:05:15"
+formatTimecode(125.5, '30000/1001');// "00:02:05:14" (29.97fps)
+secondsToFrames(10, 24);           // 240
+parseFrameRate('30000/1001');       // 29.97...
+formatSecondsFrames(83.5, 30);     // "83+15"
+formatFeetFrames(10, 24, 16);      // "15+00"
+formatBarsBeats(10, 120, '4/4');   // "5:1"
 ```
 
 | 関数 | シグネチャ | 説明 |
@@ -382,6 +440,9 @@ parseFrameRate('30000/1001'); // 29.97...
 | `formatTimecode` | `(seconds?, frameRate?) => string` | SMPTEタイムコード`HH:MM:SS:FF`形式にフォーマット |
 | `secondsToFrames` | `(seconds?, frameRate?) => number` | 秒をフレーム番号に変換 |
 | `parseFrameRate` | `(frameRate?) => number` | フレームレート文字列（例: `"30000/1001"`）を数値にパース |
+| `formatSecondsFrames` | `(seconds?, frameRate?) => string` | 秒+フレーム `S+FF` 形式にフォーマット |
+| `formatFeetFrames` | `(seconds?, frameRate?, filmGauge?) => string` | フィート+フレーム `FFF+FF` 形式にフォーマット |
+| `formatBarsBeats` | `(seconds?, bpm?, timeSignature?) => string` | 小節:拍 `B:b` 形式にフォーマット |
 
 ## ライセンス
 

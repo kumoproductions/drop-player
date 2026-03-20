@@ -32,6 +32,9 @@ interface ControlsBarProps {
   volume?: number;
   isMuted?: boolean;
   frameRate?: number;
+  filmGauge?: number;
+  bpm?: number;
+  timeSignature?: string;
   timeDisplayFormat?: TimeDisplayFormat;
   timeDisplayFormats?: TimeDisplayFormat[];
   onTimeDisplayFormatChange?: (format: TimeDisplayFormat) => void;
@@ -97,6 +100,9 @@ export function ControlsBar({
   volume = 1,
   isMuted = false,
   frameRate = 30,
+  filmGauge = 16,
+  bpm = 120,
+  timeSignature = '4/4',
   timeDisplayFormat = 'elapsed-total',
   timeDisplayFormats,
   onTimeDisplayFormatChange,
@@ -157,8 +163,11 @@ export function ControlsBar({
                   currentTime={currentTime}
                   duration={duration}
                   frameRate={frameRate}
+                  filmGauge={filmGauge}
+                  bpm={bpm}
+                  timeSignature={timeSignature}
                   format={timeDisplayFormat}
-                  formats={timeDisplayFormats ?? ['elapsed-total', 'timecode']}
+                  formats={timeDisplayFormats ?? ['elapsed-total', 'remaining']}
                   onFormatChange={onTimeDisplayFormatChange ?? (() => {})}
                   t={t}
                 />

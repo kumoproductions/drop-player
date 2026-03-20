@@ -91,6 +91,9 @@ export {
 
 // Formatters
 export {
+  formatBarsBeats,
+  formatFeetFrames,
+  formatSecondsFrames,
   formatTime,
   formatTimecode,
   parseFrameRate,

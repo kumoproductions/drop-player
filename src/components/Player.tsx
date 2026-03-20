@@ -95,6 +95,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       translations: customTranslations,
       frameRate: frameRateProp,
       timeDisplayFormats = defaultTimeDisplayFormats,
+      filmGauge = 16,
+      bpm = 120,
+      timeSignature = '4/4',
       markers = [],
     } = props.ui ?? {};
 
@@ -123,6 +126,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       onActiveSourceChange,
       onQualityLevelChange,
       onFallback,
+      onTimeDisplayFormatChange,
       onStateChange,
     } = props.events ?? {};
 
@@ -288,8 +292,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       (format: TimeDisplayFormat) => {
         setTimeDisplayFormat(format);
         globalStorage.setStoredValue('time_display_format', format);
+        onTimeDisplayFormatChange?.(format);
       },
-      [globalStorage]
+      [globalStorage, onTimeDisplayFormatChange]
     );
 
     const mediaElement =
@@ -788,6 +793,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         setPlaybackRate: (rate: number) => {
           handlePlaybackRateChange(rate);
         },
+        getTimeDisplayFormat: () => timeDisplayFormat,
+        setTimeDisplayFormat: (format: TimeDisplayFormat) => {
+          handleTimeDisplayFormatChange(format);
+        },
         captureFrame: async (
           options?: CaptureOptions
         ): Promise<FrameCapture> => {
@@ -842,6 +851,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         toggleFullscreen,
         handleError,
         mediaMode,
+        timeDisplayFormat,
+        handleTimeDisplayFormatChange,
       ]
     );
 
@@ -863,6 +874,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             qualityLevel: videoState.qualityLevel,
             playbackRate,
             isPip,
+            timeDisplayFormat,
           };
         case 'audio':
           return {
@@ -880,6 +892,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             qualityLevel: undefined,
             playbackRate,
             isPip: false,
+            timeDisplayFormat,
           };
         case 'image':
         case 'pdf':
@@ -898,6 +911,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             qualityLevel: undefined,
             playbackRate: 1,
             isPip: false,
+            timeDisplayFormat,
           };
       }
     }, [
@@ -910,6 +924,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       entries.length,
       playbackRate,
       isPip,
+      timeDisplayFormat,
     ]);
 
     useEffect(() => {
@@ -1241,6 +1256,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                               : videoState.duration
                           }
                           frameRate={frameRate}
+                          filmGauge={filmGauge}
+                          bpm={bpm}
+                          timeSignature={timeSignature}
                           format={timeDisplayFormat}
                           formats={timeDisplayFormats}
                           onFormatChange={handleTimeDisplayFormatChange}
@@ -1281,6 +1299,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                     : videoState.isMuted
                 }
                 frameRate={frameRate}
+                filmGauge={filmGauge}
+                bpm={bpm}
+                timeSignature={timeSignature}
                 timeDisplayFormat={timeDisplayFormat}
                 timeDisplayFormats={timeDisplayFormats}
                 onTimeDisplayFormatChange={handleTimeDisplayFormatChange}

@@ -1,8 +1,14 @@
-import { AudioPlayer, ImageViewer, PdfViewer, VideoPlayer } from 'drop-player';
+import {
+  AudioPlayer,
+  defaultTimeDisplayFormats,
+  ImageViewer,
+  PdfViewer,
+  VideoPlayer,
+} from 'drop-player';
 import { DemoCard } from '../components/DemoCard';
 import { MEDIA } from '../data/media';
 
-const VIDEO_CODE = `import { VideoPlayer } from 'drop-player';
+const VIDEO_CODE = `import { VideoPlayer, defaultTimeDisplayFormats } from 'drop-player';
 import 'drop-player/styles.css';
 
 <VideoPlayer
@@ -11,13 +17,28 @@ import 'drop-player/styles.css';
     { url: 'playlist.m3u8', originalUrl: 'source.mp4', label: 'Video 2' },
   ]}
   poster="preview.jpg"
-  ui={{ features: { ambientLight: true } }}
+  ui={{
+    features: { ambientLight: true },
+    timeDisplayFormats: [
+      ...defaultTimeDisplayFormats,
+      'timecode',
+      'frames',
+      'feet-frames',
+    ],
+  }}
 />`;
 
-const AUDIO_CODE = `import { AudioPlayer } from 'drop-player';
+const AUDIO_CODE = `import { AudioPlayer, defaultTimeDisplayFormats } from 'drop-player';
 import 'drop-player/styles.css';
 
-<AudioPlayer sources="sample.mp3" />`;
+<AudioPlayer
+  sources="sample.mp3"
+  ui={{
+    timeDisplayFormats: [...defaultTimeDisplayFormats, 'bars-beats'],
+    bpm: 92,
+    timeSignature: '4/4',
+  }}
+/>`;
 
 const IMAGE_CODE = `import { ImageViewer } from 'drop-player';
 import 'drop-player/styles.css';
@@ -57,7 +78,15 @@ export function InteractiveDemo() {
         <VideoPlayer
           sources={MEDIA.video}
           poster={MEDIA.videoPoster}
-          ui={{ features: { ambientLight: true } }}
+          ui={{
+            features: { ambientLight: true },
+            timeDisplayFormats: [
+              ...defaultTimeDisplayFormats,
+              'timecode',
+              'frames',
+              'feet-frames',
+            ],
+          }}
         />
       </DemoCard>
 
@@ -66,7 +95,14 @@ export function InteractiveDemo() {
         description="With waveform display (when waveform-data is installed)"
         code={AUDIO_CODE}
       >
-        <AudioPlayer sources={MEDIA.audio} />
+        <AudioPlayer
+          sources={MEDIA.audio}
+          ui={{
+            timeDisplayFormats: [...defaultTimeDisplayFormats, 'bars-beats'],
+            bpm: 92,
+            timeSignature: '4/4',
+          }}
+        />
       </DemoCard>
 
       <DemoCard

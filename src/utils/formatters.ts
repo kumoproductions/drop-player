@@ -62,6 +62,86 @@ export function secondsToFrames(
 }
 
 /**
+ * Format timestamp as feet+frames (e.g. `123+04`).
+ * Usable outside the player (e.g. for film-based workflows).
+ * @param seconds - time in seconds
+ * @param frameRate - playback frame rate
+ * @param filmGauge - frames per foot (e.g. 16 for 35mm 4-perf, 40 for 16mm). Default: 16.
+ */
+export function formatFeetFrames(
+  seconds?: number | string,
+  frameRate: number | string | null = 30,
+  filmGauge = 16
+): string {
+  if (seconds === undefined || seconds === null || seconds === '') return 'N/A';
+
+  const normalizedFrameRate = parseFrameRate(frameRate);
+  const duration =
+    typeof seconds === 'string' ? Number.parseFloat(seconds) : seconds;
+  if (Number.isNaN(duration) || duration < 0) return 'N/A';
+
+  const totalFrames = Math.floor(duration * normalizedFrameRate);
+  const fpf = filmGauge > 0 ? filmGauge : 16;
+  const feet = Math.floor(totalFrames / fpf);
+  const remainingFrames = totalFrames % fpf;
+  const padWidth = String(Math.ceil(fpf) - 1).length;
+
+  return `${feet}+${String(remainingFrames).padStart(padWidth, '0')}`;
+}
+
+/**
+ * Format timestamp as seconds+frames (e.g. `1+22`).
+ * Usable outside the player (e.g. for frame-accurate editing).
+ * @param seconds - time in seconds
+ * @param frameRate - playback frame rate
+ */
+export function formatSecondsFrames(
+  seconds?: number | string,
+  frameRate: number | string | null = 30
+): string {
+  if (seconds === undefined || seconds === null || seconds === '') return 'N/A';
+
+  const normalizedFrameRate = parseFrameRate(frameRate);
+  const duration =
+    typeof seconds === 'string' ? Number.parseFloat(seconds) : seconds;
+  if (Number.isNaN(duration) || duration < 0) return 'N/A';
+
+  const wholeSecs = Math.floor(duration);
+  const fractionalFrames = Math.floor((duration % 1) * normalizedFrameRate);
+  const padWidth = String(Math.ceil(normalizedFrameRate) - 1).length;
+
+  return `${wholeSecs}+${String(fractionalFrames).padStart(padWidth, '0')}`;
+}
+
+/**
+ * Format timestamp as bars:beats (e.g. `123:2`).
+ * Usable outside the player (e.g. for music/DAW workflows).
+ * @param seconds - time in seconds
+ * @param bpm - beats per minute
+ * @param timeSignature - time signature string (e.g. `'4/4'`, `'3/4'`). Default: `'4/4'`.
+ */
+export function formatBarsBeats(
+  seconds?: number | string,
+  bpm = 120,
+  timeSignature = '4/4'
+): string {
+  if (seconds === undefined || seconds === null || seconds === '') return 'N/A';
+
+  const duration =
+    typeof seconds === 'string' ? Number.parseFloat(seconds) : seconds;
+  if (Number.isNaN(duration) || duration < 0 || bpm <= 0) return 'N/A';
+
+  const parts = timeSignature.split('/').map(Number);
+  const beatsPerBar = parts.length === 2 && parts[0] > 0 ? parts[0] : 4;
+
+  const totalBeats = (duration / 60) * bpm;
+  const bar = Math.floor(totalBeats / beatsPerBar) + 1;
+  const beat = Math.floor(totalBeats % beatsPerBar) + 1;
+
+  return `${bar}:${beat}`;
+}
+
+/**
  * Parse frame rate string (e.g., "30000/1001" or "30") to number.
  * Usable outside the player (e.g. for timecode or frame calculations).
  */

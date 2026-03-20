@@ -6,14 +6,6 @@
 
 ---
 
-## Why drop-player
-
-- 動画・音声・画像・PDFをひとつのコンポーネントで — URLからメディア種別を自動判定
-- hls.js によるHLSアダプティブストリーミング＋プログレッシブフォールバック
-- スロット・イベント・CSS変数で自由にUIをカスタマイズ
-- Next.js, Remix, Astro などSSRフレームワークで安全に使用可能
-- [drop.mov](https://drop.mov) の本番環境で実際に使用
-
 ## インストール
 
 ```bash
@@ -125,7 +117,11 @@ Propsは4つのグループに分かれています:
 - features: 個別コントロールの切り替え
 - locale: 表示言語（組み込み: 'en', 'ja'）
 - translations: 翻訳の部分上書き。ロケールの組み込み文字列に対して差分を指定
-- frameRate: タイムコード表示用のフレームレート
+- frameRate: タイムコード/フレーム表示用のフレームレート。HLSマニフェストから自動検出（利用可能な場合）、フォールバック: 30
+- timeDisplayFormats: クリックで切り替える時間表示形式
+- filmGauge: 'feet-frames' 表示のフィート当たりフレーム数（例: 35mm=16, 16mm=40）
+- bpm: 'bars-beats' 表示のBPM
+- timeSignature: 'bars-beats' 表示の拍子記号（例: '3/4', '6/8'）
 - markers: シークバーマーカー
 ### `slots` — `PlayerSlots`
 
@@ -161,6 +157,7 @@ Propsは4つのグループに分かれています:
 - onActiveSourceChange: アクティブソース変更
 - onQualityLevelChange: 画質レベル変更
 - onFallback: オリジナルURLへフォールバック
+- onTimeDisplayFormatChange: 時間表示形式の変更
 ## Features
 
 `ui.features` で個別のコントロールをON/OFFできます。省略したキーは `defaultFeatures` を引き継ぎます。
@@ -198,6 +195,47 @@ import { noFeatures } from 'drop-player';
 - playbackSpeed: 動画, 音声
 - pip: 動画（ブラウザPiP APIが必要）
 - keyboardShortcuts: 動画, 音声
+## 時間表示形式
+
+`ui.timeDisplayFormats` で、時間表示をクリックした際に切り替わる形式を制御します。2つのプリセットをエクスポートしています:
+
+- defaultTimeDisplayFormats: ['elapsed-total', 'remaining']
+- allTimeDisplayFormats: ['elapsed-total', 'remaining', 'timecode', 'frames']
+```tsx
+import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
+
+// デフォルト — 経過/合計と残り時間
+<VideoPlayer sources={url} />
+
+// タイムコードとフレームを追加
+<VideoPlayer sources={url} ui={{ timeDisplayFormats: allTimeDisplayFormats }} />
+
+// 映像制作向け — フィート+フレーム（35mm）を追加
+<VideoPlayer sources={url} ui={{
+  timeDisplayFormats: [...defaultTimeDisplayFormats, 'timecode', 'feet-frames'],
+  filmGauge: 16,
+}} />
+
+// 音楽向け — 小節:拍を追加
+<AudioPlayer sources={url} ui={{
+  timeDisplayFormats: [...defaultTimeDisplayFormats, 'bars-beats'],
+  bpm: 92,
+  timeSignature: '4/4',
+}} />
+
+// 単一形式に固定（クリックしても変わらない）
+<VideoPlayer sources={url} ui={{ timeDisplayFormats: ['timecode'] }} />
+```
+
+- 'elapsed-total': —
+- 'remaining': —
+- 'timecode': frameRate
+- 'frames': frameRate
+- 'seconds-frames': frameRate
+- 'feet-frames': frameRate, filmGauge
+- 'bars-beats': bpm, timeSignature
+フレームレートはHLSマニフェストから自動検出されます。プログレッシブソースの場合は `ui.frameRate` を明示的に設定してください。
+
 ## テーマ
 
 `.drop-player` のCSS変数を上書きできます:
@@ -253,6 +291,8 @@ ref.current?.seek(30);
 - setVolume(n): void
 - setMuted(bool): void
 - setPlaybackRate(rate): void
+- getTimeDisplayFormat(): TimeDisplayFormat
+- setTimeDisplayFormat(format): void
 - captureFrame(opts?): 動画/画像のみ。音声/PDFではエラーをスロー
 - requestFullscreen(): Promise<void>
 - exitFullscreen(): Promise<void>
@@ -331,22 +371,29 @@ const supabaseStorage = {
 プレーヤー外でも使えるヘルパー関数:
 
 ```tsx
-import { formatTime, formatTimecode, secondsToFrames, parseFrameRate } from 'drop-player';
+import {
+  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
+  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+} from 'drop-player';
 
-formatTime(125);            // "02:05"
-formatTime(3661);           // "01:01:01"
-
-formatTimecode(125.5, 30);  // "00:02:05:15"
-formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
-
-secondsToFrames(10, 24);   // 240
-parseFrameRate('30000/1001'); // 29.97...
+formatTime(125);                    // "02:05"
+formatTime(3661);                   // "01:01:01"
+formatTimecode(125.5, 30);          // "00:02:05:15"
+formatTimecode(125.5, '30000/1001');// "00:02:05:14" (29.97fps)
+secondsToFrames(10, 24);           // 240
+parseFrameRate('30000/1001');       // 29.97...
+formatSecondsFrames(83.5, 30);     // "83+15"
+formatFeetFrames(10, 24, 16);      // "15+00"
+formatBarsBeats(10, 120, '4/4');   // "5:1"
 ```
 
 - formatTime: MM:SSまたはHH:MM:SS形式にフォーマット
 - formatTimecode: SMPTEタイムコードHH:MM:SS:FF形式にフォーマット
 - secondsToFrames: 秒をフレーム番号に変換
 - parseFrameRate: フレームレート文字列（例: "30000/1001"）を数値にパース
+- formatSecondsFrames: 秒+フレーム S+FF 形式にフォーマット
+- formatFeetFrames: フィート+フレーム FFF+FF 形式にフォーマット
+- formatBarsBeats: 小節:拍 B:b 形式にフォーマット
 ## ライセンス
 
 MIT

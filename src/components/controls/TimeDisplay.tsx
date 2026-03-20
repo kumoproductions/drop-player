@@ -1,6 +1,9 @@
 import { useCallback } from 'react';
 import type { TimeDisplayFormat, TranslationKey } from '../../types';
 import {
+  formatBarsBeats,
+  formatFeetFrames,
+  formatSecondsFrames,
   formatTime,
   formatTimecode,
   secondsToFrames,
@@ -21,6 +24,9 @@ interface TimeDisplayProps {
   currentTime: number;
   duration: number;
   frameRate: number;
+  filmGauge: number;
+  bpm: number;
+  timeSignature: string;
   format: TimeDisplayFormat;
   formats: TimeDisplayFormat[];
   onFormatChange: (format: TimeDisplayFormat) => void;
@@ -31,6 +37,9 @@ export function TimeDisplay({
   currentTime,
   duration,
   frameRate,
+  filmGauge,
+  bpm,
+  timeSignature,
   format,
   formats,
   onFormatChange,
@@ -51,6 +60,12 @@ export function TimeDisplay({
         return formatTimecode(currentTime, frameRate);
       case 'frames':
         return `${secondsToFrames(currentTime, frameRate)} / ${secondsToFrames(duration, frameRate)}`;
+      case 'feet-frames':
+        return `${formatFeetFrames(currentTime, frameRate, filmGauge)} / ${formatFeetFrames(duration, frameRate, filmGauge)}`;
+      case 'seconds-frames':
+        return `${formatSecondsFrames(currentTime, frameRate)} / ${formatSecondsFrames(duration, frameRate)}`;
+      case 'bars-beats':
+        return `${formatBarsBeats(currentTime, bpm, timeSignature)} / ${formatBarsBeats(duration, bpm, timeSignature)}`;
       default:
         return `${formatTime(currentTime)} / ${formatTime(duration)}`;
     }

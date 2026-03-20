@@ -51,12 +51,11 @@ export const noFeatures: Required<PlayerFeatures> = {
 export const defaultTimeDisplayFormats: TimeDisplayFormat[] = [
   'elapsed-total',
   'remaining',
-  'timecode',
 ];
 
 /**
- * All time display formats including frames.
- * Use when frame-accurate display is needed:
+ * All time display formats.
+ * Use when all formats should be available:
  * `ui={{ timeDisplayFormats: allTimeDisplayFormats }}`
  */
 export const allTimeDisplayFormats: TimeDisplayFormat[] = [
@@ -64,6 +63,9 @@ export const allTimeDisplayFormats: TimeDisplayFormat[] = [
   'remaining',
   'timecode',
   'frames',
+  'seconds-frames',
+  'feet-frames',
+  'bars-beats',
 ];
 
 /**

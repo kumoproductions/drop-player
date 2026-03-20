@@ -154,6 +154,7 @@ export interface PlayerState {
   qualityLevel?: QualityLevel;
   playbackRate: number;
   isPip: boolean;
+  timeDisplayFormat: TimeDisplayFormat;
 }
 
 // ============================================================================
@@ -206,12 +207,18 @@ export interface Marker {
  * - `'remaining'`: Remaining time (e.g. `-3:37`)
  * - `'timecode'`: Timecode (e.g. `00:01:23:15`)
  * - `'frames'`: Frame number / total frames (e.g. `2475 / 9000`)
+ * - `'feet-frames'`: Feet+frames (e.g. `123+04`). Requires `filmGauge` (frames per foot).
+ * - `'seconds-frames'`: Seconds+frames (e.g. `1+22`)
+ * - `'bars-beats'`: Bars:beats (e.g. `123:2`). Requires `bpm` and `timeSignature`.
  */
 export type TimeDisplayFormat =
   | 'elapsed-total'
   | 'remaining'
   | 'timecode'
-  | 'frames';
+  | 'frames'
+  | 'feet-frames'
+  | 'seconds-frames'
+  | 'bars-beats';
 
 // ============================================================================
 // Feature Flags
@@ -324,6 +331,9 @@ export interface PlayerEvents {
   onQualityLevelChange?: (level: QualityLevel) => void;
   onFallback?: (event: FallbackEvent) => void;
 
+  // Time display
+  onTimeDisplayFormatChange?: (format: TimeDisplayFormat) => void;
+
   // Aggregated state snapshot (fires on every state change)
   onStateChange?: (state: PlayerState) => void;
 }
@@ -376,6 +386,19 @@ export interface PlayerUiConfig {
    * A single-element array locks the display to that format.
    */
   timeDisplayFormats?: TimeDisplayFormat[];
+  /**
+   * Frames per foot for feet+frames display.
+   * Common values: 16 (35mm 4-perf), 40 (16mm).
+   * Required when `timeDisplayFormats` includes `'feet-frames'`. Default: 16.
+   */
+  filmGauge?: number;
+  /** BPM for bars-beats display. Required when `timeDisplayFormats` includes `'bars-beats'`. */
+  bpm?: number;
+  /**
+   * Time signature for bars-beats display (e.g. `'4/4'`, `'3/4'`).
+   * Default: `'4/4'`.
+   */
+  timeSignature?: string;
   /** Seekbar markers */
   markers?: Marker[];
 }
@@ -462,6 +485,10 @@ export interface PlayerRef {
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
   setPlaybackRate: (rate: number) => void;
+
+  // Time display
+  getTimeDisplayFormat: () => TimeDisplayFormat;
+  setTimeDisplayFormat: (format: TimeDisplayFormat) => void;
 
   // Frame capture
   captureFrame: (options?: CaptureOptions) => Promise<FrameCapture>;

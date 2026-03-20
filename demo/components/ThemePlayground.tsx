@@ -1,4 +1,8 @@
-import type { PlayerFeatures, PlayerUiConfig } from 'drop-player';
+import type {
+  PlayerFeatures,
+  PlayerUiConfig,
+  TimeDisplayFormat,
+} from 'drop-player';
 import { VideoPlayer } from 'drop-player';
 import { useState } from 'react';
 import { MEDIA } from '../data/media';
@@ -38,6 +42,22 @@ const LOCALE_OPTIONS = [
   { value: 'ja', label: '日本語' },
 ];
 
+interface TimeFormatOption {
+  value: TimeDisplayFormat;
+  label: string;
+  defaultOn: boolean;
+}
+
+const TIME_FORMAT_OPTIONS: TimeFormatOption[] = [
+  { value: 'elapsed-total', label: 'Elapsed / Total', defaultOn: true },
+  { value: 'remaining', label: 'Remaining', defaultOn: true },
+  { value: 'timecode', label: 'Timecode', defaultOn: true },
+  { value: 'frames', label: 'Frames', defaultOn: false },
+  { value: 'seconds-frames', label: 'Seconds+Frames', defaultOn: false },
+  { value: 'feet-frames', label: 'Feet+Frames', defaultOn: false },
+  { value: 'bars-beats', label: 'Bars:Beats', defaultOn: false },
+];
+
 export function ThemePlayground() {
   const [vars, setVars] = useState<Record<string, string>>(
     Object.fromEntries(THEME_VARS.map((v) => [v.key, v.default]))
@@ -51,6 +71,23 @@ export function ThemePlayground() {
   const [showTitle, setShowTitle] = useState(true);
   const [locale, setLocale] = useState('en');
 
+  // Time display format state
+  const [enabledFormats, setEnabledFormats] = useState<
+    Record<TimeDisplayFormat, boolean>
+  >(
+    Object.fromEntries(
+      TIME_FORMAT_OPTIONS.map((f) => [f.value, f.defaultOn])
+    ) as Record<TimeDisplayFormat, boolean>
+  );
+  const [frameRate, setFrameRate] = useState(30);
+  const [filmGauge, setFilmGauge] = useState(16);
+  const [bpm, setBpm] = useState(120);
+  const [timeSignature, setTimeSignature] = useState('4/4');
+
+  const timeDisplayFormats = TIME_FORMAT_OPTIONS.filter(
+    (f) => enabledFormats[f.value]
+  ).map((f) => f.value);
+
   const style = Object.fromEntries(
     Object.entries(vars).map(([k, v]) => [k, v])
   ) as React.CSSProperties;
@@ -60,7 +97,19 @@ export function ThemePlayground() {
     showTitle,
     locale,
     features: features as PlayerFeatures,
+    timeDisplayFormats:
+      timeDisplayFormats.length > 0 ? timeDisplayFormats : undefined,
+    frameRate,
+    filmGauge,
+    bpm,
+    timeSignature,
   };
+
+  const needsFrameRate =
+    enabledFormats.timecode ||
+    enabledFormats.frames ||
+    enabledFormats['seconds-frames'] ||
+    enabledFormats['feet-frames'];
 
   return (
     <div className="space-y-6">
@@ -179,6 +228,98 @@ export function ThemePlayground() {
               {f.label}
             </label>
           ))}
+        </div>
+      </div>
+
+      {/* Time Display Formats */}
+      <div>
+        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+          Time Display Formats
+        </h4>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          {TIME_FORMAT_OPTIONS.map((f) => (
+            <label
+              key={f.value}
+              className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={enabledFormats[f.value]}
+                onChange={(e) =>
+                  setEnabledFormats({
+                    ...enabledFormats,
+                    [f.value]: e.target.checked,
+                  })
+                }
+                className="rounded border-zinc-700"
+              />
+              {f.label}
+            </label>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3">
+          {needsFrameRate && (
+            <label className="flex items-center gap-2 text-sm text-zinc-400">
+              <span>frameRate</span>
+              <input
+                type="number"
+                min="1"
+                max="120"
+                value={frameRate}
+                onChange={(e) =>
+                  setFrameRate(Math.max(1, Number(e.target.value) || 30))
+                }
+                className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+              />
+            </label>
+          )}
+          {enabledFormats['feet-frames'] && (
+            <label className="flex items-center gap-2 text-sm text-zinc-400">
+              <span>filmGauge</span>
+              <input
+                type="number"
+                min="1"
+                value={filmGauge}
+                onChange={(e) =>
+                  setFilmGauge(Math.max(1, Number(e.target.value) || 16))
+                }
+                className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+              />
+              <span className="text-xs text-zinc-600">fpf</span>
+            </label>
+          )}
+          {enabledFormats['bars-beats'] && (
+            <>
+              <label className="flex items-center gap-2 text-sm text-zinc-400">
+                <span>bpm</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="999"
+                  value={bpm}
+                  onChange={(e) =>
+                    setBpm(Math.max(1, Number(e.target.value) || 120))
+                  }
+                  className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+                />
+              </label>
+              <label className="flex items-center gap-2 text-sm text-zinc-400">
+                <span>timeSignature</span>
+                <select
+                  value={timeSignature}
+                  onChange={(e) => setTimeSignature(e.target.value)}
+                  className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300"
+                >
+                  <option value="4/4">4/4</option>
+                  <option value="3/4">3/4</option>
+                  <option value="6/8">6/8</option>
+                  <option value="2/4">2/4</option>
+                  <option value="5/4">5/4</option>
+                  <option value="7/8">7/8</option>
+                </select>
+              </label>
+            </>
+          )}
         </div>
       </div>
 

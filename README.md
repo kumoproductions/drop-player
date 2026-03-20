@@ -135,7 +135,11 @@ Props are organised into four groups to keep the surface area manageable:
 | `features` | `PlayerFeatures` | `defaultFeatures` | Toggle individual controls |
 | `locale` | `string` | `'en'` | Display language (built-in: `'en'`, `'ja'`) |
 | `translations` | `Partial<Translations>` | — | Custom translation overrides, merged on top of the locale's built-in strings |
-| `frameRate` | `number` | `30` | Frame rate for timecode display |
+| `frameRate` | `number` | auto / `30` | Frame rate for timecode/frames display. Auto-detected from HLS manifest when available; falls back to `30`. |
+| `timeDisplayFormats` | `TimeDisplayFormat[]` | `defaultTimeDisplayFormats` | Time display formats to cycle through on click |
+| `filmGauge` | `number` | `16` | Frames per foot for `'feet-frames'` display (e.g. `16` for 35mm, `40` for 16mm) |
+| `bpm` | `number` | `120` | BPM for `'bars-beats'` display |
+| `timeSignature` | `string` | `'4/4'` | Time signature for `'bars-beats'` display (e.g. `'3/4'`, `'6/8'`) |
 | `markers` | `Marker[]` | `[]` | Seekbar markers |
 
 ### `slots` — `PlayerSlots`
@@ -177,6 +181,7 @@ Props are organised into four groups to keep the surface area manageable:
 | `onActiveSourceChange` | `index` | Active source changed |
 | `onQualityLevelChange` | `QualityLevel` | Quality level changed |
 | `onFallback` | `FallbackEvent` | Fell back to original URL |
+| `onTimeDisplayFormatChange` | `TimeDisplayFormat` | Time display format changed |
 
 ## Features
 
@@ -220,6 +225,53 @@ import { noFeatures } from 'drop-player';
 | `playbackSpeed` | `true` | video, audio |
 | `pip` | `true` | video (browser PiP API required) |
 | `keyboardShortcuts` | `true` | video, audio |
+
+## Time display formats
+
+`ui.timeDisplayFormats` controls which time formats the user can cycle through by clicking the time display. Two presets are exported:
+
+| Export | Formats |
+|--------|---------|
+| `defaultTimeDisplayFormats` | `['elapsed-total', 'remaining']` |
+| `allTimeDisplayFormats` | `['elapsed-total', 'remaining', 'timecode', 'frames', 'seconds-frames', 'feet-frames', 'bars-beats']` |
+
+```tsx
+import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
+
+// Default — elapsed / total and remaining
+<VideoPlayer sources={url} />
+
+// Add timecode and frames
+<VideoPlayer sources={url} ui={{ timeDisplayFormats: allTimeDisplayFormats }} />
+
+// Film workflow — add feet+frames (35mm)
+<VideoPlayer sources={url} ui={{
+  timeDisplayFormats: [...defaultTimeDisplayFormats, 'timecode', 'feet-frames'],
+  filmGauge: 16,
+}} />
+
+// Music — add bars:beats
+<AudioPlayer sources={url} ui={{
+  timeDisplayFormats: [...defaultTimeDisplayFormats, 'bars-beats'],
+  bpm: 92,
+  timeSignature: '4/4',
+}} />
+
+// Lock to single format (no cycling)
+<VideoPlayer sources={url} ui={{ timeDisplayFormats: ['timecode'] }} />
+```
+
+| Format | Display | Extra props |
+|--------|---------|-------------|
+| `'elapsed-total'` | `1:23 / 5:00` | — |
+| `'remaining'` | `-3:37` | — |
+| `'timecode'` | `00:01:23:15` | `frameRate` |
+| `'frames'` | `2475 / 9000` | `frameRate` |
+| `'seconds-frames'` | `83+15 / 300+00` | `frameRate` |
+| `'feet-frames'` | `154+11 / 562+08` | `frameRate`, `filmGauge` |
+| `'bars-beats'` | `47:4 / 192:1` | `bpm`, `timeSignature` |
+
+Frame rate is auto-detected from HLS manifests when available. For progressive sources, set `ui.frameRate` explicitly.
 
 ## Theming
 
@@ -282,6 +334,8 @@ ref.current?.seek(30);
 | `setVolume(n)` | `void` | |
 | `setMuted(bool)` | `void` | |
 | `setPlaybackRate(rate)` | `void` | |
+| `getTimeDisplayFormat()` | `TimeDisplayFormat` | |
+| `setTimeDisplayFormat(format)` | `void` | |
 | `captureFrame(opts?)` | `Promise<FrameCapture>` | Video/image; throws for audio/PDF |
 | `requestFullscreen()` | `Promise<void>` | |
 | `exitFullscreen()` | `Promise<void>` | |
@@ -364,16 +418,20 @@ The `StorageAdapter` interface requires three methods: `getItem`, `setItem`, and
 Helper functions exported for use outside the player (custom UI, playlists, timecode overlays, etc.):
 
 ```tsx
-import { formatTime, formatTimecode, secondsToFrames, parseFrameRate } from 'drop-player';
+import {
+  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
+  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+} from 'drop-player';
 
-formatTime(125);            // "02:05"
-formatTime(3661);           // "01:01:01"
-
-formatTimecode(125.5, 30);  // "00:02:05:15"
-formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
-
-secondsToFrames(10, 24);   // 240
-parseFrameRate('30000/1001'); // 29.97...
+formatTime(125);                    // "02:05"
+formatTime(3661);                   // "01:01:01"
+formatTimecode(125.5, 30);          // "00:02:05:15"
+formatTimecode(125.5, '30000/1001');// "00:02:05:14" (29.97fps)
+secondsToFrames(10, 24);           // 240
+parseFrameRate('30000/1001');       // 29.97...
+formatSecondsFrames(83.5, 30);     // "83+15"
+formatFeetFrames(10, 24, 16);      // "15+00"
+formatBarsBeats(10, 120, '4/4');   // "5:1"
 ```
 
 | Function | Signature | Description |
@@ -382,6 +440,9 @@ parseFrameRate('30000/1001'); // 29.97...
 | `formatTimecode` | `(seconds?, frameRate?) => string` | Format as SMPTE timecode `HH:MM:SS:FF` |
 | `secondsToFrames` | `(seconds?, frameRate?) => number` | Convert seconds to frame number |
 | `parseFrameRate` | `(frameRate?) => number` | Parse frame rate string (e.g. `"30000/1001"`) to number |
+| `formatSecondsFrames` | `(seconds?, frameRate?) => string` | Format as seconds+frames `S+FF` |
+| `formatFeetFrames` | `(seconds?, frameRate?, filmGauge?) => string` | Format as feet+frames `FFF+FF` |
+| `formatBarsBeats` | `(seconds?, bpm?, timeSignature?) => string` | Format as bars:beats `B:b` |
 
 ## License
 
