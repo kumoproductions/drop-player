@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import type WaveformData from 'waveform-data';
+import { useDragToSeek } from '../hooks/useDragToSeek';
 import { useMediaPlayerState } from '../hooks/useMediaPlayerState';
 import type { AudioCoreProps, AudioCoreRef, AudioState } from '../types';
 import { WaveformCanvas } from './WaveformCanvas';
@@ -45,30 +46,39 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
     const audioRef = useRef<HTMLAudioElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
+    const waveformAreaRef = useRef<HTMLDivElement>(null);
 
-    const { state, handlers, getImperativeBase } = useMediaPlayerState(
-      audioRef,
-      {
-        storageKey,
-        storage: storageAdapter,
-        initialVolume,
-        initialMuted,
-        initialLoop,
-        initialTime,
-        onPlay,
-        onPause,
-        onEnded,
-        onTimeUpdate,
-        onDurationChange,
-        onVolumeChange,
-        onError,
-        onLoadStart,
-        onCanPlay,
-        onSeekStart,
-        onSeeking,
-        onSeekEnd,
-      }
-    );
+    const dragWasPlayingRef = useRef(false);
+
+    const {
+      state,
+      handlers,
+      setSeeking,
+      setCurrentTime,
+      setSeekValue,
+      getImperativeBase,
+      play,
+      pause,
+    } = useMediaPlayerState(audioRef, {
+      storageKey,
+      storage: storageAdapter,
+      initialVolume,
+      initialMuted,
+      initialLoop,
+      initialTime,
+      onPlay,
+      onPause,
+      onEnded,
+      onTimeUpdate,
+      onDurationChange,
+      onVolumeChange,
+      onError,
+      onLoadStart,
+      onCanPlay,
+      onSeekStart,
+      onSeeking,
+      onSeekEnd,
+    });
 
     const {
       currentTime,
@@ -214,6 +224,71 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       audio.src = src;
     }, [src]);
 
+    // ── Drag-to-seek ──────────────────────────────────────────────
+
+    const handleDragSeekStart = useCallback(() => {
+      const audio = audioRef.current;
+      if (!audio) return;
+      dragWasPlayingRef.current = !audio.paused;
+      pause();
+      setSeeking(true);
+      setSeekValue(audio.currentTime);
+    }, [pause, setSeeking, setSeekValue]);
+
+    const handleDragSeekMove = useCallback(
+      (time: number) => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        setSeekValue(time);
+        audio.currentTime = time;
+        setCurrentTime(time);
+      },
+      [setSeekValue, setCurrentTime]
+    );
+
+    const handleDragSeekEnd = useCallback(
+      (time: number) => {
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.currentTime = time;
+        setCurrentTime(time);
+        setSeeking(false);
+        onSeekEnd?.(time);
+        if (dragWasPlayingRef.current) {
+          play().catch((error) => {
+            onError?.(
+              error instanceof Error ? error : new Error(String(error))
+            );
+          });
+        }
+      },
+      [setSeeking, setCurrentTime, onSeekEnd, play, onError]
+    );
+
+    const handleClickSeek = useCallback(
+      (time?: number) => {
+        if (time == null) return;
+        const audio = audioRef.current;
+        if (!audio) return;
+        audio.currentTime = time;
+        setCurrentTime(time);
+      },
+      [setCurrentTime]
+    );
+
+    const { handlePointerDown, handlePointerMove } = useDragToSeek({
+      mediaRef: audioRef,
+      areaRef: waveformAreaRef,
+      duration,
+      mode: 'absolute',
+      onDragSeekStart: handleDragSeekStart,
+      onDragSeekMove: handleDragSeekMove,
+      onDragSeekEnd: handleDragSeekEnd,
+      onClick: handleClickSeek,
+    });
+
+    // ── Imperative handle ───────────────────────────────────────
+
     useImperativeHandle(
       ref,
       () => ({
@@ -234,7 +309,12 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
           <track kind="captions" />
         </audio>
 
-        <div className="drop-player-audio-waveform-area">
+        <div
+          ref={waveformAreaRef}
+          className="drop-player-audio-waveform-area"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+        >
           {waveformReady ? (
             <WaveformCanvas
               waveformData={waveformData}
@@ -244,10 +324,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
               seekValue={seekValue}
               waveColor={waveColor}
               progressColor={progressColor}
-              onSeekStart={handlers.handleSeekStart}
-              onSeekChange={handlers.handleSeekChange}
-              onSeekEnd={handlers.handleSeekEnd}
-              onClick={handlers.togglePlayPause}
             />
           ) : waveformFailedFallback ? (
             <div

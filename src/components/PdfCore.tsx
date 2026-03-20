@@ -16,18 +16,55 @@ export function PdfCore(props: PdfCoreProps) {
     onStateChange(state);
   }, [isLoaded, onStateChange]);
 
+  const [srcFailed, setSrcFailed] = useState(false);
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: reset loaded state when src changes
   useEffect(() => {
     setIsLoaded(false);
-  }, [src]);
+    setSrcFailed(false);
+
+    if (!src) return;
+
+    // <object> doesn't reliably fire error events on 404/network failure,
+    // so we pre-validate with a HEAD request.
+    const controller = new AbortController();
+    fetch(src, { method: 'HEAD', signal: controller.signal })
+      .then((res) => {
+        if (!res.ok) {
+          setSrcFailed(true);
+          onError?.(
+            Object.assign(new Error(`Failed to load PDF (${res.status})`), {
+              name: 'errorNetwork',
+            })
+          );
+        }
+      })
+      .catch((err) => {
+        if (controller.signal.aborted) return;
+        setSrcFailed(true);
+        onError?.(
+          Object.assign(new Error('Failed to load PDF'), {
+            name: 'errorNetwork',
+          })
+        );
+      });
+
+    return () => controller.abort();
+  }, [src, onError]);
 
   const handleLoad = useCallback(() => {
-    setIsLoaded(true);
-    onLoad?.();
-  }, [onLoad]);
+    if (!srcFailed) {
+      setIsLoaded(true);
+      onLoad?.();
+    }
+  }, [onLoad, srcFailed]);
 
   const handleError = useCallback(() => {
-    onError?.(new Error('Failed to load PDF'));
+    onError?.(
+      Object.assign(new Error('Failed to load PDF'), {
+        name: 'errorNetwork',
+      })
+    );
   }, [onError]);
 
   // Auto-append #toolbar=0 to hide built-in PDF toolbar (avoids overlap with SourceSelector)

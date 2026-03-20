@@ -97,6 +97,41 @@ export function useMediaPlayerState(
   const wasPlayingBeforeSeekRef = useRef(false);
   const initialPositionRef = useRef<number | null>(null);
   const autoPlayOnNextLoadRef = useRef(false);
+  const playPromiseRef = useRef<Promise<void> | null>(null);
+
+  const play = useCallback((): Promise<void> => {
+    const media = mediaRef.current;
+    if (!media) return Promise.resolve();
+    const promise = media.play();
+    playPromiseRef.current = promise;
+    return promise.then(
+      () => {
+        if (playPromiseRef.current === promise) {
+          playPromiseRef.current = null;
+        }
+      },
+      (error) => {
+        if (playPromiseRef.current === promise) {
+          playPromiseRef.current = null;
+        }
+        // AbortError is expected when pause() interrupts play() — suppress it
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+        throw error;
+      }
+    );
+  }, [mediaRef]);
+
+  const pause = useCallback(() => {
+    const media = mediaRef.current;
+    if (!media) return;
+    if (playPromiseRef.current) {
+      playPromiseRef.current.then(() => media.pause()).catch(() => {});
+    } else {
+      media.pause();
+    }
+  }, [mediaRef]);
 
   useEffect(() => {
     if (initialTime !== undefined) {
@@ -115,7 +150,7 @@ export function useMediaPlayerState(
       }
       if (autoPlayOnNextLoadRef.current) {
         autoPlayOnNextLoadRef.current = false;
-        media.play().catch((err) => {
+        play().catch((err) => {
           onError?.(err instanceof Error ? err : new Error(String(err)));
         });
       }
@@ -127,7 +162,7 @@ export function useMediaPlayerState(
     return () => {
       media.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [mediaRef, onDurationChange, onError]);
+  }, [mediaRef, onDurationChange, onError, play]);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -239,22 +274,22 @@ export function useMediaPlayerState(
     const media = mediaRef.current;
     if (!media) return;
     if (media.paused) {
-      media.play().catch((error) => {
+      play().catch((error) => {
         onError?.(error instanceof Error ? error : new Error(String(error)));
       });
     } else {
-      media.pause();
+      pause();
     }
-  }, [mediaRef, onError]);
+  }, [mediaRef, onError, play, pause]);
 
   const handleSeekStart = useCallback(() => {
     const media = mediaRef.current;
     if (!media) return;
     wasPlayingBeforeSeekRef.current = !media.paused;
-    media.pause();
+    pause();
     setIsSeeking(true);
     onSeekStart?.(media.currentTime);
-  }, [mediaRef, onSeekStart]);
+  }, [mediaRef, onSeekStart, pause]);
 
   const handleSeekChange = useCallback(
     (time: number) => {
@@ -279,14 +314,14 @@ export function useMediaPlayerState(
       setSeekValue(normalized);
       setIsSeeking(false);
       if (wasPlayingBeforeSeekRef.current) {
-        media.play().catch((error) => {
+        play().catch((error) => {
           onError?.(error instanceof Error ? error : new Error(String(error)));
         });
       }
       wasPlayingBeforeSeekRef.current = false;
       onSeekEnd?.(normalized);
     },
-    [mediaRef, normalizeSeekTime, onSeekEnd, onError]
+    [mediaRef, normalizeSeekTime, onSeekEnd, onError, play]
   );
 
   const handleVolumeChange = useCallback(
@@ -343,7 +378,7 @@ export function useMediaPlayerState(
     return {
       play: async () => {
         try {
-          await mediaRef.current?.play();
+          await play();
         } catch (error) {
           const playError =
             error instanceof Error ? error : new Error(String(error));
@@ -351,9 +386,7 @@ export function useMediaPlayerState(
           throw playError;
         }
       },
-      pause: () => {
-        mediaRef.current?.pause();
-      },
+      pause,
       toggle: togglePlayPause,
       seek: (time: number) => {
         const media = mediaRef.current;
@@ -409,6 +442,8 @@ export function useMediaPlayerState(
     handleLoopToggle,
     handleMuteToggle,
     onError,
+    play,
+    pause,
   ]);
 
   return {
@@ -438,5 +473,7 @@ export function useMediaPlayerState(
     setInitialPositionForNextLoad,
     storage,
     getImperativeBase,
+    play,
+    pause,
   };
 }
