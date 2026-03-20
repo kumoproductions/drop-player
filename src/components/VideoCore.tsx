@@ -366,10 +366,11 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       const video = videoRef.current;
       if (!video) return;
       dragWasPlayingRef.current = !video.paused;
+      onSeekStart?.(video.currentTime);
       pause();
       setSeeking(true);
       setSeekValue(video.currentTime);
-    }, [pause, setSeeking, setSeekValue]);
+    }, [pause, setSeeking, setSeekValue, onSeekStart]);
 
     const handleDragSeekMove = useCallback(
       (time: number) => {

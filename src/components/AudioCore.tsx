@@ -230,10 +230,11 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       const audio = audioRef.current;
       if (!audio) return;
       dragWasPlayingRef.current = !audio.paused;
+      onSeekStart?.(audio.currentTime);
       pause();
       setSeeking(true);
       setSeekValue(audio.currentTime);
-    }, [pause, setSeeking, setSeekValue]);
+    }, [pause, setSeeking, setSeekValue, onSeekStart]);
 
     const handleDragSeekMove = useCallback(
       (time: number) => {
@@ -311,6 +312,12 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
         <div
           ref={waveformAreaRef}
+          role="slider"
+          aria-label="Audio progress"
+          aria-valuemin={0}
+          aria-valuemax={duration}
+          aria-valuenow={isSeeking ? seekValue : currentTime}
+          tabIndex={0}
           className="drop-player-audio-waveform-area"
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}

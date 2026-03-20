@@ -131,11 +131,18 @@ export function useDragToSeek({
       pointerTypeRef.current = null;
     };
 
+    const handleGlobalPointerCancel = () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      hasDraggedRef.current = false;
+      pointerTypeRef.current = null;
+    };
+
     document.addEventListener('pointerup', handleGlobalPointerUp);
-    document.addEventListener('pointercancel', handleGlobalPointerUp);
+    document.addEventListener('pointercancel', handleGlobalPointerCancel);
     return () => {
       document.removeEventListener('pointerup', handleGlobalPointerUp);
-      document.removeEventListener('pointercancel', handleGlobalPointerUp);
+      document.removeEventListener('pointercancel', handleGlobalPointerCancel);
     };
   }, [mode, onClick, onTouchTap, onDragSeekEnd, calcTime]);
 
