@@ -1,4 +1,9 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
-  "extends": ["@cumuloworks/configs/biome"]
+  "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
+  "extends": ["@cumuloworks/configs/biome"],
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
 }

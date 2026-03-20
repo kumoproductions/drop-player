@@ -601,6 +601,10 @@ export interface UseMediaPlayerStateReturn {
     setStoredValue: <T>(key: string, value: T) => void;
   };
   getImperativeBase: () => MediaPlayerImperativeBase;
+  /** Play the media element, suppressing AbortError from play/pause races */
+  play: () => Promise<void>;
+  /** Pause the media element, waiting for any pending play() promise */
+  pause: () => void;
 }
 
 // ============================================================================

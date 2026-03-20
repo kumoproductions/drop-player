@@ -925,9 +925,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           return pdfState.isLoaded;
         case 'audio':
           return (
-            audioState.waveformReady ||
-            audioState.duration > 0 ||
-            audioState.waveformFailedFallback
+            (audioState.waveformReady ||
+              audioState.duration > 0 ||
+              audioState.waveformFailedFallback) &&
+            !lastError
           );
       }
     })();

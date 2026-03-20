@@ -49,6 +49,8 @@ The stylesheet is required — it provides `drop-player`-prefixed classes and CS
 
 All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for readability; media mode is always auto-detected.
 
+<!-- interactive:demo -->
+
 ## Sources
 
 ```tsx
@@ -166,6 +168,13 @@ Props are organised into four groups to keep the surface area manageable:
 
 `ui.features` toggles individual controls. Omitted keys inherit from `defaultFeatures`.
 
+Two presets are exported for convenience:
+
+| Export | Description |
+|--------|-------------|
+| `defaultFeatures` | Most controls on, heavy options (`ambientLight`, `capture`) off |
+| `noFeatures` | All controls off — use as a base for minimal builds |
+
 ```tsx
 import { noFeatures } from 'drop-player';
 
@@ -211,8 +220,21 @@ Override CSS variables on `.drop-player`:
   --drop-player-warning: #eab308;
   --drop-player-marker-scene: #eab308;
   --drop-player-marker-custom: #3b82f6;
+  --drop-player-border-radius: 8px;
 }
 ```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `--drop-player-primary` | `#3b82f6` | Accent color (seek bar, active states) |
+| `--drop-player-success` | `#22c55e` | Success states (capture saved) |
+| `--drop-player-warning` | `#eab308` | Warning states |
+| `--drop-player-marker-scene` | `#eab308` | Scene marker color |
+| `--drop-player-marker-custom` | `#3b82f6` | Custom marker color |
+| `--drop-player-border-radius` | `0` | Container border radius |
+| `--drop-player-aspect-ratio` | varies | Aspect ratio (16/9 video, 32/9 audio, 4/3 image, 1/1.414 PDF) |
+
+<!-- interactive:playground -->
 
 ## Ref API
 
@@ -267,6 +289,85 @@ ref.current?.seek(30);
 | `errorUnknown` | Unknown error |
 
 Built-in UI uses `ui.locale` to localise these. Override with `slots.errorDisplay` for custom rendering.
+
+## Translations
+
+Built-in locales: `'en'` and `'ja'`. Set via `ui.locale`.
+
+To add a new locale or override specific strings, use `ui.translations`:
+
+```tsx
+<VideoPlayer
+  sources="video.mp4"
+  ui={{
+    locale: 'en',
+    translations: {
+      play: 'Reproducir',
+      pause: 'Pausar',
+      mute: 'Silenciar',
+      unmute: 'Activar sonido',
+      fullscreen: 'Pantalla completa',
+      exitFullscreen: 'Salir de pantalla completa',
+    },
+  }}
+/>
+```
+
+Translations are merged on top of the base locale — you only need to provide the keys you want to change.
+
+## Custom storage
+
+Player preferences (muted state) are persisted to `localStorage` by default. Use `storageKey` to namespace keys or `storage` to replace the backend entirely.
+
+```tsx
+// Custom namespace
+<VideoPlayer sources="video.mp4" storageKey="my_app" />
+// Keys stored as: my_app_muted, my_app_volume, etc.
+
+// Custom backend (e.g. Supabase)
+const supabaseStorage = {
+  getItem: (key: string) => {
+    // Read from Supabase cache or return null
+    return localStorage.getItem(key);
+  },
+  setItem: (key: string, value: string) => {
+    localStorage.setItem(key, value);
+    supabase.from('preferences').upsert({ key, value });
+  },
+  removeItem: (key: string) => {
+    localStorage.removeItem(key);
+    supabase.from('preferences').delete().eq('key', key);
+  },
+};
+
+<VideoPlayer sources="video.mp4" storage={supabaseStorage} />
+```
+
+The `StorageAdapter` interface requires three methods: `getItem`, `setItem`, and `removeItem`. Operations should be synchronous (return values immediately); use a local cache with async sync for remote backends.
+
+## Utilities
+
+Helper functions exported for use outside the player (custom UI, playlists, timecode overlays, etc.):
+
+```tsx
+import { formatTime, formatTimecode, secondsToFrames, parseFrameRate } from 'drop-player';
+
+formatTime(125);            // "02:05"
+formatTime(3661);           // "01:01:01"
+
+formatTimecode(125.5, 30);  // "00:02:05:15"
+formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
+
+secondsToFrames(10, 24);   // 240
+parseFrameRate('30000/1001'); // 29.97...
+```
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `formatTime` | `(seconds?) => string` | Format as `MM:SS` or `HH:MM:SS` |
+| `formatTimecode` | `(seconds?, frameRate?) => string` | Format as SMPTE timecode `HH:MM:SS:FF` |
+| `secondsToFrames` | `(seconds?, frameRate?) => number` | Convert seconds to frame number |
+| `parseFrameRate` | `(frameRate?) => number` | Parse frame rate string (e.g. `"30000/1001"`) to number |
 
 ## Supported media
 

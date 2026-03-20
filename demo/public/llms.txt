@@ -1,0 +1,341 @@
+# drop-player
+
+> React media player for video (HLS/progressive), audio, image, and PDF.
+> One unified component — media mode is inferred from the source URL.
+> https://github.com/kumoproductions/drop-player
+
+---
+
+## Install
+
+```bash
+npm i drop-player lucide-react
+```
+
+**Required peers:** `react` >=18, `react-dom` >=18, `lucide-react` >=0.300
+
+**Optional peers** (install only when needed):
+
+- hls.js >=1.4: HLS video (.m3u8)
+- waveform-data >=4.5: Audio waveform display
+## Quick start
+
+```tsx
+import { VideoPlayer } from 'drop-player';
+import 'drop-player/styles.css';
+
+function App() {
+  return (
+    <div style={{ width: 640, height: 360 }}>
+      <VideoPlayer sources="https://example.com/video.mp4" />
+    </div>
+  );
+}
+```
+
+The stylesheet is required — it provides `drop-player`-prefixed classes and CSS variables.
+
+## Components
+
+- Player: Generic — mode inferred from URL
+- VideoPlayer: Video
+- AudioPlayer: Audio
+- ImageViewer: Image
+- PdfViewer: PDF
+All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for readability; media mode is always auto-detected.
+
+## Sources
+
+```tsx
+// String — type inferred from extension
+<VideoPlayer sources="https://example.com/video.mp4" />
+
+// Object — HLS with original-quality fallback
+<VideoPlayer sources={{ url: 'stream.m3u8', originalUrl: 'original.mp4' }} />
+
+// Array — source selector shown
+<VideoPlayer sources={[
+  { url: 'stream.m3u8', label: 'HLS' },
+  { url: 'original.mp4', label: 'Original' },
+]} />
+
+// null — shows error UI
+<VideoPlayer sources={null} />
+```
+
+Type is detected from path extension (`.mp4`, `.m3u8`, `.pdf`, `.jpg`, …) or `mimeType`.
+
+## Props
+
+Props are organised into four groups to keep the surface area manageable:
+
+```tsx
+<VideoPlayer
+  sources="video.mp4"
+  className="rounded-lg"
+  crossOrigin="anonymous"
+  poster="poster.jpg"
+
+  playback={{ autoPlay: true, volume: 0.8 }}
+  ui={{ features: { capture: true }, locale: 'ja' }}
+  slots={{ topRightOverlay: <Badge /> }}
+  events={{ onPlay: () => log('playing') }}
+/>
+```
+
+### Top-level
+
+- sources: Media source(s)
+- className: CSS class on root container
+- crossOrigin: CORS for media elements
+- poster: Poster image (video)
+- storageKey: Custom prefix for localStorage keys (default: drop_player_, custom: <storageKey>_). Muted state is persisted automatically.
+- storage: Custom storage backend (must implement getItem, setItem, removeItem). Defaults to localStorage (SSR-safe).
+- hlsConfig: Custom [hls.js config](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning) overrides
+### `playback` — `PlayerPlaybackConfig`
+
+- autoPlay: Start immediately
+- loop: Loop playback
+- muted: Start muted
+- volume: Initial volume (0–1)
+- initialTime: Start position in seconds
+### `ui` — `PlayerUiConfig`
+
+- showControls: Show bottom control bar
+- showTitle: Show source title/selector
+- features: Toggle individual controls
+- locale: Display language (built-in: 'en', 'ja')
+- translations: Custom translation overrides, merged on top of the locale's built-in strings
+- frameRate: Frame rate for timecode display
+- markers: Seekbar markers
+### `slots` — `PlayerSlots`
+
+- controlsStart: Left of control bar
+- controlsEnd: Right of control bar (before fullscreen)
+- seekbarOverlay: Above seekbar
+- topLeftOverlay: Top-left corner
+- topRightOverlay: Top-right corner
+- loadingIndicator: Centre (while loading)
+- errorDisplay: Centre (on error)
+### `events` — `PlayerEvents`
+
+- onStateChange: Any state change (consolidated snapshot)
+- onPlay: Playback starts
+- onPause: Playback pauses
+- onEnded: Playback ends
+- onTimeUpdate: Current time changes
+- onDurationChange: Duration known/changed
+- onVolumeChange: Volume or mute changes
+- onPlaybackRateChange: Playback rate changes
+- onError: Playback error
+- onLoadedMetadata: Video metadata loaded
+- onLoadStart: Loading begins
+- onProgress: Buffering progress
+- onWaiting: Waiting for data
+- onCanPlay: Ready to play
+- onPlaying: Actually playing
+- onSeekStart: Seek begins
+- onSeeking: During seek
+- onSeekEnd: Seek ends
+- onFullscreenChange: Fullscreen toggled
+- onFrameCapture: Frame captured
+- onActiveSourceChange: Active source changed
+- onQualityLevelChange: Quality level changed
+- onFallback: Fell back to original URL
+## Features
+
+`ui.features` toggles individual controls. Omitted keys inherit from `defaultFeatures`.
+
+Two presets are exported for convenience:
+
+- defaultFeatures: Most controls on, heavy options (ambientLight, capture) off
+- noFeatures: All controls off — use as a base for minimal builds
+```tsx
+import { noFeatures } from 'drop-player';
+
+// Default — most controls on
+<VideoPlayer sources={url} />
+
+// Add capture to defaults
+<VideoPlayer sources={url} ui={{ features: { capture: true } }} />
+
+// Remove loop from defaults
+<VideoPlayer sources={url} ui={{ features: { loop: false } }} />
+
+// Build from scratch
+<VideoPlayer sources={url} ui={{ features: { ...noFeatures, playButton: true, fullscreen: true } }} />
+```
+
+- playButton: video, audio
+- loop: video, audio
+- timeDisplay: video, audio
+- seekBar: video, audio
+- volume: video, audio
+- ambientLight: video
+- capture: video, image
+- qualitySelector: video (HLS)
+- fullscreen: all
+- zoom: image, PDF
+- playbackSpeed: video, audio
+- pip: video (browser PiP API required)
+- keyboardShortcuts: video, audio
+## Theming
+
+Override CSS variables on `.drop-player`:
+
+```css
+@import 'drop-player/styles.css';
+
+.drop-player {
+  --drop-player-primary: #3b82f6;
+  --drop-player-success: #22c55e;
+  --drop-player-warning: #eab308;
+  --drop-player-marker-scene: #eab308;
+  --drop-player-marker-custom: #3b82f6;
+  --drop-player-border-radius: 8px;
+}
+```
+
+- --drop-player-primary: Accent color (seek bar, active states)
+- --drop-player-success: Success states (capture saved)
+- --drop-player-warning: Warning states
+- --drop-player-marker-scene: Scene marker color
+- --drop-player-marker-custom: Custom marker color
+- --drop-player-border-radius: Container border radius
+- --drop-player-aspect-ratio: Aspect ratio (16/9 video, 32/9 audio, 4/3 image, 1/1.414 PDF)
+
+## Ref API
+
+Access imperative methods via `PlayerRef`:
+
+```tsx
+const ref = useRef<PlayerRef>(null);
+
+<VideoPlayer ref={ref} sources={url} />
+
+// Later:
+ref.current?.play();
+ref.current?.seek(30);
+```
+
+- play(): Promise<void>
+- pause(): void
+- toggle(): void
+- seek(time): void
+- seekRelative(delta): void
+- seekToFrame(frame): Video only
+- getCurrentTime(): number
+- getDuration(): number
+- getVolume(): number
+- isMuted(): boolean
+- isPaused(): boolean
+- isFullscreen(): boolean
+- getPlaybackRate(): number
+- setVolume(n): void
+- setMuted(bool): void
+- setPlaybackRate(rate): void
+- captureFrame(opts?): Video/image; throws for audio/PDF
+- requestFullscreen(): Promise<void>
+- exitFullscreen(): Promise<void>
+- toggleFullscreen(): void
+- getVideoElement(): null
+- getContainerElement(): null
+## Error handling
+
+`events.onError` and `slots.errorDisplay` receive an `Error` with a typed `name`:
+
+- errorNoSources: sources is null or empty
+- errorAborted: Playback aborted
+- errorNetwork: Network error
+- errorDecode: Decode failure
+- errorNotSupported: Format not supported
+- errorUnknown: Unknown error
+Built-in UI uses `ui.locale` to localise these. Override with `slots.errorDisplay` for custom rendering.
+
+## Translations
+
+Built-in locales: `'en'` and `'ja'`. Set via `ui.locale`.
+
+To add a new locale or override specific strings, use `ui.translations`:
+
+```tsx
+<VideoPlayer
+  sources="video.mp4"
+  ui={{
+    locale: 'en',
+    translations: {
+      play: 'Reproducir',
+      pause: 'Pausar',
+      mute: 'Silenciar',
+      unmute: 'Activar sonido',
+      fullscreen: 'Pantalla completa',
+      exitFullscreen: 'Salir de pantalla completa',
+    },
+  }}
+/>
+```
+
+Translations are merged on top of the base locale — you only need to provide the keys you want to change.
+
+## Custom storage
+
+Player preferences (muted state) are persisted to `localStorage` by default. Use `storageKey` to namespace keys or `storage` to replace the backend entirely.
+
+```tsx
+// Custom namespace
+<VideoPlayer sources="video.mp4" storageKey="my_app" />
+// Keys stored as: my_app_muted, my_app_volume, etc.
+
+// Custom backend (e.g. Supabase)
+const supabaseStorage = {
+  getItem: (key: string) => {
+    // Read from Supabase cache or return null
+    return localStorage.getItem(key);
+  },
+  setItem: (key: string, value: string) => {
+    localStorage.setItem(key, value);
+    supabase.from('preferences').upsert({ key, value });
+  },
+  removeItem: (key: string) => {
+    localStorage.removeItem(key);
+    supabase.from('preferences').delete().eq('key', key);
+  },
+};
+
+<VideoPlayer sources="video.mp4" storage={supabaseStorage} />
+```
+
+The `StorageAdapter` interface requires three methods: `getItem`, `setItem`, and `removeItem`. Operations should be synchronous (return values immediately); use a local cache with async sync for remote backends.
+
+## Utilities
+
+Helper functions exported for use outside the player (custom UI, playlists, timecode overlays, etc.):
+
+```tsx
+import { formatTime, formatTimecode, secondsToFrames, parseFrameRate } from 'drop-player';
+
+formatTime(125);            // "02:05"
+formatTime(3661);           // "01:01:01"
+
+formatTimecode(125.5, 30);  // "00:02:05:15"
+formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
+
+secondsToFrames(10, 24);   // 240
+parseFrameRate('30000/1001'); // 29.97...
+```
+
+- formatTime: Format as MM:SS or HH:MM:SS
+- formatTimecode: Format as SMPTE timecode HH:MM:SS:FF
+- secondsToFrames: Convert seconds to frame number
+- parseFrameRate: Parse frame rate string (e.g. "30000/1001") to number
+## Supported media
+
+- Video: HLS (.m3u8), MP4, WebM
+- Audio: MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus
+- Image: JPEG, PNG, GIF, WebP, AVIF, SVG
+- PDF: Browser-native PDF rendering
+Browser environment only. SSR-safe (components are no-ops on the server).
+
+## License
+
+MIT

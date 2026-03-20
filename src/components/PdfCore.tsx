@@ -16,19 +16,64 @@ export function PdfCore(props: PdfCoreProps) {
     onStateChange(state);
   }, [isLoaded, onStateChange]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset loaded state when src changes
+  const srcFailedRef = useRef(false);
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
+  const onLoadRef = useRef(onLoad);
+  onLoadRef.current = onLoad;
+
   useEffect(() => {
     setIsLoaded(false);
+    srcFailedRef.current = false;
+
+    if (!src) return;
+
+    // <object> doesn't reliably fire error events on 404/network failure,
+    // so we pre-validate the URL is reachable. Use Range GET because HEAD
+    // often fails on CORS-restricted origins.
+    const controller = new AbortController();
+    fetch(src, {
+      method: 'GET',
+      headers: { Range: 'bytes=0-0' },
+      signal: controller.signal,
+    })
+      .then((res) => {
+        if (!res.ok && res.status !== 206) {
+          srcFailedRef.current = true;
+          onErrorRef.current?.(
+            Object.assign(new Error(`Failed to load PDF (${res.status})`), {
+              name: 'errorNetwork',
+            })
+          );
+        }
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        srcFailedRef.current = true;
+        onErrorRef.current?.(
+          Object.assign(new Error('Failed to load PDF'), {
+            name: 'errorNetwork',
+          })
+        );
+      });
+
+    return () => controller.abort();
   }, [src]);
 
   const handleLoad = useCallback(() => {
-    setIsLoaded(true);
-    onLoad?.();
-  }, [onLoad]);
+    if (!srcFailedRef.current) {
+      setIsLoaded(true);
+      onLoadRef.current?.();
+    }
+  }, []);
 
   const handleError = useCallback(() => {
-    onError?.(new Error('Failed to load PDF'));
-  }, [onError]);
+    onErrorRef.current?.(
+      Object.assign(new Error('Failed to load PDF'), {
+        name: 'errorNetwork',
+      })
+    );
+  }, []);
 
   // Auto-append #toolbar=0 to hide built-in PDF toolbar (avoids overlap with SourceSelector)
   const pdfSrc = (() => {
