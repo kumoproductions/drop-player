@@ -20,6 +20,8 @@ interface UseHlsReturn {
   hlsLevels: Level[];
   currentHlsLevel: number;
   isHlsSupported: boolean;
+  /** Frame rate detected from HLS manifest (current level), or undefined if not available */
+  detectedFrameRate: number | undefined;
   setQualityLevel: (level: number | 'auto') => void;
   destroy: () => void;
 }
@@ -74,6 +76,9 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
   const [hlsLevels, setHlsLevels] = useState<Level[]>([]);
   const [currentHlsLevel, setCurrentHlsLevel] = useState<number>(-1);
   const [isHlsSupported, setIsHlsSupported] = useState(false);
+  const [detectedFrameRate, setDetectedFrameRate] = useState<
+    number | undefined
+  >(undefined);
 
   const onFallbackToOriginalRef = useRef(onFallbackToOriginal);
   const onQualityLevelChangeRef = useRef(onQualityLevelChange);
@@ -168,6 +173,11 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
           return;
         }
         setHlsLevels(data.levels);
+        // Detect frame rate from the first level that has it
+        const firstFr = data.levels.find(
+          (l) => l.frameRate && l.frameRate > 0
+        )?.frameRate;
+        if (firstFr) setDetectedFrameRate(firstFr);
         onQualityLevelChangeRef.current?.({ mode: 'auto', label: 'Auto' });
       });
 
@@ -177,6 +187,9 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
 
         const level = hls?.levels?.[data.level];
         if (level) {
+          if (level.frameRate && level.frameRate > 0) {
+            setDetectedFrameRate(level.frameRate);
+          }
           const isAuto = hls?.autoLevelEnabled ?? true;
           onQualityLevelChangeRef.current?.({
             mode: isAuto ? 'auto' : 'manual',
@@ -280,6 +293,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
     hlsLevels,
     currentHlsLevel,
     isHlsSupported,
+    detectedFrameRate,
     setQualityLevel,
     destroy,
   };

@@ -160,6 +160,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
     const {
       hlsLevels,
       currentHlsLevel,
+      detectedFrameRate,
       setQualityLevel: setHlsQualityLevel,
     } = useHls({
       hlsUrl,
@@ -201,6 +202,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
         qualityLevel,
         hlsLevels: hlsLevelInfos,
         currentHlsLevel,
+        detectedFrameRate,
       };
       onStateChange(stateSnapshot);
     }, [
@@ -219,6 +221,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       qualityLevel,
       hlsLevelInfos,
       currentHlsLevel,
+      detectedFrameRate,
       onStateChange,
     ]);
 

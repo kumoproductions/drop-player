@@ -667,6 +667,9 @@ export interface VideoState {
   qualityLevel?: QualityLevel;
   hlsLevels: HlsLevelInfo[];
   currentHlsLevel: number;
+
+  /** Frame rate detected from HLS manifest, or undefined if not available */
+  detectedFrameRate?: number;
 }
 
 /**

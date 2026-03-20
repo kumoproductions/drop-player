@@ -93,7 +93,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       features: featuresProp,
       locale = UI_DEFAULTS.locale,
       translations: customTranslations,
-      frameRate = UI_DEFAULTS.frameRate,
+      frameRate: frameRateProp,
       timeDisplayFormats = defaultTimeDisplayFormats,
       markers = [],
     } = props.ui ?? {};
@@ -219,6 +219,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       hlsLevels: [],
       currentHlsLevel: -1,
     });
+
+    // Effective frame rate: user prop > HLS-detected > default
+    const frameRate =
+      frameRateProp ?? videoState.detectedFrameRate ?? UI_DEFAULTS.frameRate;
 
     const [controlsVisible, setControlsVisible] = useState(true);
     const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
