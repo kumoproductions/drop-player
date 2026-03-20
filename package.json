@@ -1,7 +1,7 @@
 {
   "name": "drop-player",
   "version": "1.1.5",
-  "description": "A comprehensive React media player powering drop.mov.",
+  "description": "A comprehensive, universal, open-source React media player powering drop.mov.",
   "license": "MIT",
   "author": "kumo.productions™",
   "repository": "github:kumoproductions/drop-player",

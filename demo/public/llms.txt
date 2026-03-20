@@ -1,10 +1,18 @@
 # drop-player
 
-> React media player for video (HLS/progressive), audio, image, and PDF.
-> One unified component — media mode is inferred from the source URL.
+> A comprehensive, universal, open-source React media player powering drop.mov.
+> Video (HLS/progressive), audio, image, and PDF — media mode is inferred from the source URL.
 > https://github.com/kumoproductions/drop-player
 
 ---
+
+## Why drop-player
+
+- One component for video, audio, image, and PDF — media type detected from URL
+- HLS adaptive streaming via hls.js, with progressive fallback
+- Customisable UI through slots, events, and CSS variables
+- SSR-safe for Next.js, Remix, Astro, and other frameworks
+- Built for and used in production at [drop.mov](https://drop.mov)
 
 ## Install
 
@@ -21,13 +29,13 @@ npm i drop-player lucide-react
 ## Quick start
 
 ```tsx
-import { VideoPlayer } from 'drop-player';
+import { Player } from 'drop-player';
 import 'drop-player/styles.css';
 
 function App() {
   return (
     <div style={{ width: 640, height: 360 }}>
-      <VideoPlayer sources="https://example.com/video.mp4" />
+      <Player sources="https://example.com/video.mp4" />
     </div>
   );
 }
@@ -42,7 +50,15 @@ The stylesheet is required — it provides `drop-player`-prefixed classes and CS
 - AudioPlayer: Audio
 - ImageViewer: Image
 - PdfViewer: PDF
-All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for readability; media mode is always auto-detected.
+`VideoPlayer`, `AudioPlayer` etc. are aliases for readability — they all share the same `PlayerProps` and `PlayerRef`, and media mode is always auto-detected from the source URL. Use `Player` when the media type is mixed or unknown.
+
+## Supported media
+
+- Video: HLS (.m3u8), MP4, WebM
+- Audio: MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus
+- Image: JPEG, PNG, GIF, WebP, AVIF, SVG
+- PDF: Browser-native PDF rendering
+Browser-only runtime. Safe to import in SSR frameworks (Next.js, Remix, Astro, etc.) — components render nothing on the server and activate on the client.
 
 ## Sources
 
@@ -58,6 +74,9 @@ All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for r
   { url: 'stream.m3u8', label: 'HLS' },
   { url: 'original.mp4', label: 'Original' },
 ]} />
+
+// Explicit MIME type — useful when URL has no extension (e.g. CDN, signed URL)
+<Player sources={{ url: 'https://cdn.example.com/abc123', mimeType: 'video/mp4' }} />
 
 // null — shows error UI
 <VideoPlayer sources={null} />
@@ -328,14 +347,6 @@ parseFrameRate('30000/1001'); // 29.97...
 - formatTimecode: Format as SMPTE timecode HH:MM:SS:FF
 - secondsToFrames: Convert seconds to frame number
 - parseFrameRate: Parse frame rate string (e.g. "30000/1001") to number
-## Supported media
-
-- Video: HLS (.m3u8), MP4, WebM
-- Audio: MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus
-- Image: JPEG, PNG, GIF, WebP, AVIF, SVG
-- PDF: Browser-native PDF rendering
-Browser environment only. SSR-safe (components are no-ops on the server).
-
 ## License
 
 MIT

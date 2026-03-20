@@ -1,4 +1,4 @@
-import { Menu, X } from 'lucide-react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
 import {
   type ReactNode,
   useCallback,
@@ -7,10 +7,27 @@ import {
   useState,
 } from 'react';
 import pkg from '../../package.json';
+import { detectLocale, getLocalePath } from '../utils/locale';
 import { NAV_ITEMS, Sidebar } from './Sidebar';
 
 interface LayoutProps {
   children: ReactNode;
+}
+
+function LanguageSwitcher() {
+  const currentLocale = detectLocale();
+  const otherLocale = currentLocale === 'en' ? 'ja' : 'en';
+  const label = currentLocale === 'en' ? '日本語' : 'English';
+
+  return (
+    <a
+      href={getLocalePath(otherLocale)}
+      className="inline-flex items-center gap-0.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+    >
+      {label}
+      <ArrowUpRight size={12} />
+    </a>
+  );
 }
 
 function SidebarLinks() {
@@ -113,9 +130,10 @@ export function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-zinc-950 text-zinc-300">
       {/* Mobile header */}
       <header className="lg:hidden sticky top-0 z-50 bg-zinc-950/80 backdrop-blur border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
-        <div>
+        <div className="flex items-center gap-3">
           <span className="font-bold text-zinc-100">drop-player</span>
-          <span className="ml-2 text-xs text-zinc-500">v{pkg.version}</span>
+          <span className="text-xs text-zinc-500">v{pkg.version}</span>
+          <LanguageSwitcher />
         </div>
         <button
           type="button"
@@ -154,7 +172,10 @@ export function Layout({ children }: LayoutProps) {
             <a href="#drop-player" className="text-lg font-bold text-zinc-100">
               drop-player
             </a>
-            <div className="text-xs text-zinc-500 mt-1">v{pkg.version}</div>
+            <div className="flex items-center gap-3 mt-1">
+              <span className="text-xs text-zinc-500">v{pkg.version}</span>
+              <LanguageSwitcher />
+            </div>
           </div>
           <Sidebar activeId={activeId} />
           <div className="mt-8 pt-6 border-t border-zinc-800">

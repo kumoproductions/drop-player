@@ -1,4 +1,6 @@
-import readmeRaw from '../../README.md?raw';
+import readmeRawEn from '../../README.md?raw';
+import readmeRawJa from '../../README_JA.md?raw';
+import type { Locale } from './locale';
 
 export interface ReadmeSegment {
   type: 'markdown' | 'interactive';
@@ -14,7 +16,7 @@ export interface NavItem {
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, '')
     .replace(/\s+/g, '-')
     .trim();
 }
@@ -25,11 +27,16 @@ const INTERACTIVE_HEADINGS: Record<string, NavItem> = {
   playground: { id: 'playground', label: 'Playground', indent: false },
 };
 
+function getReadme(locale: Locale): string {
+  return locale === 'ja' ? readmeRawJa : readmeRawEn;
+}
+
 /**
  * Extract nav items from README h2 headings
  * plus headings from interactive components.
  */
-export function extractNavItems(): NavItem[] {
+export function extractNavItems(locale: Locale = 'en'): NavItem[] {
+  const readmeRaw = getReadme(locale);
   const headingRegex = /^(#{2}) (.+)$/gm;
   const interactiveRegex = /<!--\s*interactive:(\S+)\s*-->/g;
 
@@ -67,7 +74,8 @@ function splitByHeadings(md: string): string[] {
   return raw.map((s) => s.trim()).filter(Boolean);
 }
 
-export function parseReadme(): ReadmeSegment[] {
+export function parseReadme(locale: Locale = 'en'): ReadmeSegment[] {
+  const readmeRaw = getReadme(locale);
   const segments: ReadmeSegment[] = [];
   const regex = /<!--\s*interactive:(\S+)\s*-->/g;
   let lastIndex = 0;

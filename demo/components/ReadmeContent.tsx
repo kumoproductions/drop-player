@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { InteractiveDemo } from '../sections/InteractiveDemo';
+import { detectLocale } from '../utils/locale';
 import { parseReadme } from '../utils/readmeParser';
 import { ReadmeMarkdown } from './ReadmeMarkdown';
 import { ThemePlayground } from './ThemePlayground';
@@ -10,7 +11,7 @@ const interactiveComponents: Record<string, React.FC> = {
 };
 
 export function ReadmeContent() {
-  const segments = useMemo(() => parseReadme(), []);
+  const segments = useMemo(() => parseReadme(detectLocale()), []);
 
   return (
     <>

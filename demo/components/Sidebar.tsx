@@ -1,6 +1,7 @@
+import { detectLocale } from '../utils/locale';
 import { extractNavItems, type NavItem } from '../utils/readmeParser';
 
-const NAV_ITEMS: NavItem[] = extractNavItems();
+const NAV_ITEMS: NavItem[] = extractNavItems(detectLocale());
 
 interface SidebarProps {
   activeId: string;

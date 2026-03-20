@@ -1,6 +1,6 @@
 # drop-player
 
-drop-player is a comprehensive React media player powering [drop.mov](https://drop.mov).
+**A comprehensive, universal, open-source React media player powering [drop.mov](https://drop.mov).**
 
 React media player for video (HLS / progressive), audio, image, and PDF.
 One unified component — media mode is inferred from the source URL.
@@ -23,13 +23,13 @@ npm i drop-player lucide-react
 ## Quick start
 
 ```tsx
-import { VideoPlayer } from 'drop-player';
+import { Player } from 'drop-player';
 import 'drop-player/styles.css';
 
 function App() {
   return (
     <div style={{ width: 640, height: 360 }}>
-      <VideoPlayer sources="https://example.com/video.mp4" />
+      <Player sources="https://example.com/video.mp4" />
     </div>
   );
 }
@@ -47,7 +47,7 @@ The stylesheet is required — it provides `drop-player`-prefixed classes and CS
 | `ImageViewer` | Image |
 | `PdfViewer` | PDF |
 
-All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for readability; media mode is always auto-detected.
+`VideoPlayer`, `AudioPlayer` etc. are aliases for readability — they all share the same `PlayerProps` and `PlayerRef`, and media mode is always auto-detected from the source URL. Use `Player` when the media type is mixed or unknown.
 
 <!-- interactive:demo -->
 
@@ -60,7 +60,7 @@ All share the same `PlayerProps` and `PlayerRef`. The aliases exist purely for r
 | Image | JPEG, PNG, GIF, WebP, AVIF, SVG |
 | PDF | Browser-native PDF rendering |
 
-Browser environment only. SSR-safe (components are no-ops on the server).
+Browser-only runtime. Safe to import in SSR frameworks (Next.js, Remix, Astro, etc.) — components render nothing on the server and activate on the client.
 
 ## Sources
 
