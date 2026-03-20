@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.4
+
+### Improvements
+
+- `VideoPlayer`, `AudioPlayer`, `ImageViewer`, `PdfViewer` now set media mode directly, skipping source type inference
+- Add default `aspect-ratio` per media mode (video: 16/9, audio: 32/9, image: 4/3, pdf: 1/1.414), overridable via `--drop-player-aspect-ratio`
+- Warn when URL has no recognizable extension and `mimeType` is not provided
+
+### Bug Fixes
+
+- Fix `min-width: 100%` redundancy on player container
+
 ## 1.1.3
 
 ### Bug Fixes
