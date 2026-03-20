@@ -405,26 +405,24 @@
   white-space: nowrap;
 }
 
-.drop-player-source-dropdown {
-  background: rgba(30, 30, 30, 0.95);
-  border-radius: 8px;
-  padding: 4px;
-  min-width: 140px;
-  max-width: 280px;
-  max-height: 240px;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+.drop-player-dropdown--source {
   position: absolute;
   top: 100%;
   left: 0;
   margin-top: 4px;
   z-index: 50;
+  min-width: 140px;
+  max-width: 280px;
+  max-height: 240px;
 }
 
 /* ------------------------------------------------------------ */
 /* Dropdown (shared)                                            */
 /* ------------------------------------------------------------ */
 .drop-player-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   background: rgba(30, 30, 30, 0.95);
   border-radius: 8px;
   padding: 4px;
@@ -445,6 +443,11 @@
 
 .drop-player-dropdown--speed {
   min-width: 100px;
+}
+
+.drop-player-dropdown--quality .drop-player-dropdown-item,
+.drop-player-dropdown--speed .drop-player-dropdown-item {
+  font-variant-numeric: tabular-nums;
 }
 
 .drop-player-dropdown-item {

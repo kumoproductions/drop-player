@@ -84,7 +84,7 @@ export function SourceSelector({
 
               <div
                 id={SOURCE_DROPDOWN_ID}
-                className="drop-player-source-dropdown"
+                className="drop-player-dropdown drop-player-dropdown--source"
               >
                 {sources.map((source, index) => (
                   <button
