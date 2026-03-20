@@ -52,7 +52,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
     const {
       state,
-      handlers,
       setSeeking,
       setCurrentTime,
       setSeekValue,

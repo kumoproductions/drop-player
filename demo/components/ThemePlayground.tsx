@@ -1,0 +1,191 @@
+import type { PlayerFeatures, PlayerUiConfig } from 'drop-player';
+import { VideoPlayer } from 'drop-player';
+import { useState } from 'react';
+import { MEDIA } from '../data/media';
+
+const THEME_VARS = [
+  { key: '--drop-player-primary', label: 'Primary', default: '#3b82f6' },
+  { key: '--drop-player-success', label: 'Success', default: '#22c55e' },
+  { key: '--drop-player-warning', label: 'Warning', default: '#eab308' },
+  {
+    key: '--drop-player-border-radius',
+    label: 'Border Radius',
+    default: '0px',
+    type: 'range' as const,
+  },
+];
+
+interface FeatureToggle {
+  key: keyof PlayerFeatures;
+  label: string;
+  default: boolean;
+}
+
+const FEATURE_TOGGLES: FeatureToggle[] = [
+  { key: 'ambientLight', label: 'Ambient Light', default: false },
+  { key: 'capture', label: 'Capture', default: false },
+  { key: 'pip', label: 'PiP', default: true },
+  { key: 'playbackSpeed', label: 'Speed', default: true },
+  { key: 'loop', label: 'Loop', default: true },
+  { key: 'volume', label: 'Volume', default: true },
+  { key: 'seekBar', label: 'Seek Bar', default: true },
+  { key: 'timeDisplay', label: 'Time', default: true },
+  { key: 'fullscreen', label: 'Fullscreen', default: true },
+];
+
+const LOCALE_OPTIONS = [
+  { value: 'en', label: 'English' },
+  { value: 'ja', label: '日本語' },
+];
+
+export function ThemePlayground() {
+  const [vars, setVars] = useState<Record<string, string>>(
+    Object.fromEntries(THEME_VARS.map((v) => [v.key, v.default]))
+  );
+
+  const [features, setFeatures] = useState<Record<string, boolean>>(
+    Object.fromEntries(FEATURE_TOGGLES.map((f) => [f.key, f.default]))
+  );
+
+  const [showControls, setShowControls] = useState(true);
+  const [showTitle, setShowTitle] = useState(true);
+  const [locale, setLocale] = useState('en');
+
+  const style = Object.fromEntries(
+    Object.entries(vars).map(([k, v]) => [k, v])
+  ) as React.CSSProperties;
+
+  const ui: PlayerUiConfig = {
+    showControls,
+    showTitle,
+    locale,
+    features: features as PlayerFeatures,
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2
+        id="playground"
+        className="text-2xl font-bold text-zinc-100 mb-6 pb-2 border-b border-zinc-800 scroll-mt-6"
+      >
+        Playground
+      </h2>
+      {/* CSS Variables */}
+      <div>
+        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+          CSS Variables
+        </h4>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {THEME_VARS.map((v) => (
+            // biome-ignore lint/a11y/noLabelWithoutControl: input is nested
+            <label key={v.key} className="space-y-1.5">
+              <span className="block text-xs text-zinc-400">{v.label}</span>
+              {v.type === 'range' ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max="16"
+                    value={Number.parseInt(vars[v.key], 10) || 0}
+                    onChange={(e) =>
+                      setVars({ ...vars, [v.key]: `${e.target.value}px` })
+                    }
+                    className="flex-1"
+                  />
+                  <span className="text-xs text-zinc-500 w-8">
+                    {vars[v.key]}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={vars[v.key]}
+                    onChange={(e) =>
+                      setVars({ ...vars, [v.key]: e.target.value })
+                    }
+                    className="w-8 h-8 rounded border border-zinc-700 cursor-pointer bg-transparent"
+                  />
+                  <span className="text-xs font-mono text-zinc-500">
+                    {vars[v.key]}
+                  </span>
+                </div>
+              )}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* UI Options */}
+      <div>
+        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+          UI Options
+        </h4>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showControls}
+              onChange={(e) => setShowControls(e.target.checked)}
+              className="rounded border-zinc-700"
+            />
+            showControls
+          </label>
+          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showTitle}
+              onChange={(e) => setShowTitle(e.target.checked)}
+              className="rounded border-zinc-700"
+            />
+            showTitle
+          </label>
+          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+            <span>locale</span>
+            <select
+              value={locale}
+              onChange={(e) => setLocale(e.target.value)}
+              className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300"
+            >
+              {LOCALE_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div>
+        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+          Features
+        </h4>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          {FEATURE_TOGGLES.map((f) => (
+            <label
+              key={f.key}
+              className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={features[f.key]}
+                onChange={(e) =>
+                  setFeatures({ ...features, [f.key]: e.target.checked })
+                }
+                className="rounded border-zinc-700"
+              />
+              {f.label}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Preview */}
+      <div style={style}>
+        <VideoPlayer sources={MEDIA.video} poster={MEDIA.videoPoster} ui={ui} />
+      </div>
+    </div>
+  );
+}

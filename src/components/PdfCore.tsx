@@ -16,17 +16,14 @@ export function PdfCore(props: PdfCoreProps) {
     onStateChange(state);
   }, [isLoaded, onStateChange]);
 
-  const [srcFailed, setSrcFailed] = useState(false);
   const srcFailedRef = useRef(false);
   const onErrorRef = useRef(onError);
   onErrorRef.current = onError;
   const onLoadRef = useRef(onLoad);
   onLoadRef.current = onLoad;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: reset loaded state when src changes
   useEffect(() => {
     setIsLoaded(false);
-    setSrcFailed(false);
     srcFailedRef.current = false;
 
     if (!src) return;
@@ -42,7 +39,6 @@ export function PdfCore(props: PdfCoreProps) {
     })
       .then((res) => {
         if (!res.ok && res.status !== 206) {
-          setSrcFailed(true);
           srcFailedRef.current = true;
           onErrorRef.current?.(
             Object.assign(new Error(`Failed to load PDF (${res.status})`), {
@@ -53,7 +49,6 @@ export function PdfCore(props: PdfCoreProps) {
       })
       .catch(() => {
         if (controller.signal.aborted) return;
-        setSrcFailed(true);
         srcFailedRef.current = true;
         onErrorRef.current?.(
           Object.assign(new Error('Failed to load PDF'), {
