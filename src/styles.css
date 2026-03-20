@@ -347,11 +347,11 @@
   border: none;
 }
 
-/* Slider track styles */
 .drop-player-slider {
   appearance: none;
   background: transparent;
   cursor: pointer;
+  height: 32px;
 }
 
 .drop-player-slider::-webkit-slider-runnable-track {
@@ -632,6 +632,13 @@
   transform: translateX(-50%);
   opacity: 0;
   transition: opacity 0.15s;
+}
+
+.drop-player-seekbar-thumb::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: 9999px;
 }
 
 .drop-player-seekbar-track:hover .drop-player-seekbar-thumb {

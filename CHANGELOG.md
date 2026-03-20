@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.6
+
+### Improvements
+
+- Expand touch/click target for seekbar and volume slider thumbs without changing visual appearance
+
 ## 1.1.5
 
 ### Improvements
