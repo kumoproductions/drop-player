@@ -192,6 +192,18 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
       []
     );
 
+    // Re-render on container resize (e.g. fullscreen, responsive layout)
+    useEffect(() => {
+      const container = containerRef.current;
+      if (!container || !pdfDocument || !docLoaded) return;
+
+      const observer = new ResizeObserver(() => {
+        renderPage(pdfDocument, currentPage, zoom);
+      });
+      observer.observe(container);
+      return () => observer.disconnect();
+    }, [containerRef, pdfDocument, docLoaded, currentPage, zoom, renderPage]);
+
     // Render on page change (immediate, at current zoom)
     // biome-ignore lint/correctness/useExhaustiveDependencies: zoom changes handled by debounced effect below
     useEffect(() => {

@@ -15,27 +15,37 @@ export function getTranslations(locale: string): Translations {
   return translations[locale] ?? translations.en;
 }
 
+function shallowEqual(
+  a: Partial<Translations> | undefined,
+  b: Partial<Translations> | undefined
+): boolean {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const keysA = Object.keys(a) as TranslationKey[];
+  const keysB = Object.keys(b) as TranslationKey[];
+  if (keysA.length !== keysB.length) return false;
+  return keysA.every((k) => a[k] === b[k]);
+}
+
 /**
- * Hook to get translation function
+ * Hook to get translation function.
+ * Pass a stable reference for `customTranslations` (e.g. via useMemo) to avoid unnecessary recalculations.
  */
 export function usePlayerTranslation(
   locale: string = 'en',
   customTranslations?: Partial<Translations>
 ) {
-  const translationsJson = customTranslations
-    ? JSON.stringify(customTranslations)
-    : undefined;
-  const translationsRef = useRef(customTranslations);
-  if (translationsJson !== undefined) {
-    translationsRef.current = customTranslations;
+  const prevRef = useRef(customTranslations);
+  if (!shallowEqual(prevRef.current, customTranslations)) {
+    prevRef.current = customTranslations;
   }
+  const stableCustom = prevRef.current;
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: translationsJson is the stable serialization of customTranslations
   const mergedTranslations = useMemo(() => {
     const base = getTranslations(locale);
-    if (!translationsRef.current) return base;
-    return { ...base, ...translationsRef.current };
-  }, [locale, translationsJson]);
+    if (!stableCustom) return base;
+    return { ...base, ...stableCustom };
+  }, [locale, stableCustom]);
 
   const t = useMemo(() => {
     return (key: TranslationKey): string => {

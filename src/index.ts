@@ -23,10 +23,6 @@ export {
 
 // Types
 export type {
-  // AudioCore types
-  AudioCoreProps,
-  AudioCoreRef,
-  AudioState,
   CaptureOptions,
   FallbackEvent,
   FallbackReason,
@@ -34,21 +30,12 @@ export type {
   FrameCapture,
   // Quality types
   HlsLevelInfo,
-  // ImageCore types
-  ImageCoreProps,
-  ImageCoreRef,
-  ImageState,
   // Marker types
   Marker,
   // Media mode
   MediaMode,
   // Source types
   MediaSource,
-  NormalizedSources,
-  // PdfCore types
-  PdfCoreProps,
-  PdfCoreRef,
-  PdfState,
   // Events
   PlayerEvents,
   // Feature flags
@@ -64,8 +51,6 @@ export type {
   PlayerState,
   PlayerUiConfig,
   QualityLevel,
-  SourceEntry,
-  SourceType,
   // Storage
   StorageAdapter,
   // Time Display
@@ -74,10 +59,7 @@ export type {
   TranslationKey,
   Translations,
   // VideoCore types
-  VideoCoreProps,
-  VideoCoreRef,
   VideoMetadata,
-  VideoState,
 } from './types';
 
 // Utils
