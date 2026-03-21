@@ -255,7 +255,7 @@
 
 .drop-player-button:disabled {
   opacity: 0.4;
-  cursor: not-allowed;
+  cursor: default;
 }
 
 /* Time display button (wider) */
@@ -435,6 +435,21 @@
   max-height: calc(100cqb - 80px);
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+.drop-player-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.drop-player-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.drop-player-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.drop-player-dropdown::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .drop-player-dropdown--quality,
@@ -710,6 +725,24 @@
   align-items: center;
   justify-content: center;
   outline: none;
+}
+
+/* ------------------------------------------------------------ */
+/* Source navigation                                             */
+/* ------------------------------------------------------------ */
+.drop-player-source-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.drop-player-source-nav-indicator {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 40px;
+  text-align: center;
+  user-select: none;
 }
 
 /* ------------------------------------------------------------ */

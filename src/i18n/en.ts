@@ -38,4 +38,6 @@ export const en: Translations = {
   playbackSpeed: 'Speed',
   pip: 'Picture in Picture',
   exitPip: 'Exit Picture in Picture',
+  previous: 'Previous',
+  next: 'Next',
 };

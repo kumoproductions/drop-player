@@ -38,4 +38,6 @@ export const ja: Translations = {
   playbackSpeed: '再生速度',
   pip: 'ピクチャーインピクチャー',
   exitPip: 'ピクチャーインピクチャー解除',
+  previous: '前へ',
+  next: '次へ',
 };

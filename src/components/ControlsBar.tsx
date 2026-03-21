@@ -15,6 +15,7 @@ import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
 import { QualitySelector } from './controls/QualitySelector';
+import { SourceNavigation } from './controls/SourceNavigation';
 import { TimeDisplay } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
 import { VolumeControl } from './controls/VolumeControl';
@@ -85,6 +86,12 @@ interface ControlsBarProps {
   // i18n
   t: (key: TranslationKey) => string;
 
+  // Source navigation
+  activeSourceIndex?: number;
+  sourceCount?: number;
+  onPrevSource?: () => void;
+  onNextSource?: () => void;
+
   // Slots
   controlsStart?: ReactNode;
   controlsEnd?: ReactNode;
@@ -134,6 +141,10 @@ export function ControlsBar({
   isFullscreen,
   onFullscreenToggle,
   t,
+  activeSourceIndex = 0,
+  sourceCount = 1,
+  onPrevSource,
+  onNextSource,
   controlsStart,
   controlsEnd,
 }: ControlsBarProps) {
@@ -150,6 +161,18 @@ export function ControlsBar({
                 t={t}
               />
             )}
+            {features.sourceNavigation &&
+              sourceCount > 1 &&
+              onPrevSource &&
+              onNextSource && (
+                <SourceNavigation
+                  activeIndex={activeSourceIndex}
+                  sourceCount={sourceCount}
+                  onPrev={onPrevSource}
+                  onNext={onNextSource}
+                  t={t}
+                />
+              )}
             {features.loop && (
               <LoopButton
                 isLoop={isLoop}
@@ -178,17 +201,31 @@ export function ControlsBar({
       case 'image':
       case 'pdf':
         return (
-          features.zoom && (
-            <ZoomControls
-              zoom={zoom}
-              minZoom={minZoom}
-              maxZoom={maxZoom}
-              onZoomIn={onZoomIn ?? (() => {})}
-              onZoomOut={onZoomOut ?? (() => {})}
-              onResetZoom={onResetZoom ?? (() => {})}
-              t={t}
-            />
-          )
+          <>
+            {features.sourceNavigation &&
+              sourceCount > 1 &&
+              onPrevSource &&
+              onNextSource && (
+                <SourceNavigation
+                  activeIndex={activeSourceIndex}
+                  sourceCount={sourceCount}
+                  onPrev={onPrevSource}
+                  onNext={onNextSource}
+                  t={t}
+                />
+              )}
+            {features.zoom && (
+              <ZoomControls
+                zoom={zoom}
+                minZoom={minZoom}
+                maxZoom={maxZoom}
+                onZoomIn={onZoomIn ?? (() => {})}
+                onZoomOut={onZoomOut ?? (() => {})}
+                onResetZoom={onResetZoom ?? (() => {})}
+                t={t}
+              />
+            )}
+          </>
         );
     }
   };

@@ -12,6 +12,7 @@ import { resolveFeatures } from '../features';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { usePlayerStorage } from '../hooks/usePlayerStorage';
+import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { usePlayerTranslation } from '../i18n';
 import type {
   AudioCoreRef,
@@ -424,6 +425,63 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       [onActiveSourceChange]
     );
 
+    const handlePrevSource = useCallback(() => {
+      if (activeSourceIndex > 0) {
+        handleSourceChange(activeSourceIndex - 1);
+      }
+    }, [activeSourceIndex, handleSourceChange]);
+
+    const handleNextSource = useCallback(() => {
+      if (activeSourceIndex < entries.length - 1) {
+        handleSourceChange(activeSourceIndex + 1);
+      }
+    }, [activeSourceIndex, entries.length, handleSourceChange]);
+
+    const isSwipeDisabled =
+      mediaMode === 'pdf' ||
+      (mediaMode === 'image' && imageState.zoom > 1) ||
+      entries.length < 2;
+
+    const {
+      onTouchStart: handleSwipeTouchStart,
+      onTouchEnd: handleSwipeTouchEnd,
+      onTouchCancel: handleSwipeTouchCancel,
+    } = useSwipeNavigation({
+      onPrev: handlePrevSource,
+      onNext: handleNextSource,
+      disabled: isSwipeDisabled,
+    });
+
+    // Keyboard navigation for image mode (ArrowLeft/Right)
+    useEffect(() => {
+      if (mediaMode !== 'image' || entries.length < 2) return;
+      const container = containerRef.current;
+      if (!container) return;
+
+      const handleImageKeyDown = (e: KeyboardEvent) => {
+        const target = e.target as HTMLElement;
+        if (
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable ||
+          target.closest('button,[role="button"],select,[role="slider"]')
+        ) {
+          return;
+        }
+
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          handlePrevSource();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          handleNextSource();
+        }
+      };
+
+      container.addEventListener('keydown', handleImageKeyDown);
+      return () => container.removeEventListener('keydown', handleImageKeyDown);
+    }, [mediaMode, entries.length, handlePrevSource, handleNextSource]);
+
     const handleZoomIn = useCallback(() => {
       if (mediaMode === 'image') imageCoreRef.current?.zoomIn();
     }, [mediaMode]);
@@ -835,6 +893,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           }
         },
         toggleFullscreen,
+        prev: handlePrevSource,
+        next: handleNextSource,
         getVideoElement: () => videoCoreRef.current?.getVideoElement() ?? null,
         getContainerElement: () => containerRef.current,
       }),
@@ -853,6 +913,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         mediaMode,
         timeDisplayFormat,
         handleTimeDisplayFormatChange,
+        handlePrevSource,
+        handleNextSource,
       ]
     );
 
@@ -1128,6 +1190,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         onPointerMove={resetHideControlsTimer}
         onPointerEnter={resetHideControlsTimer}
         onPointerLeave={handlePointerLeave}
+        onTouchStart={handleSwipeTouchStart}
+        onTouchEnd={handleSwipeTouchEnd}
+        onTouchCancel={handleSwipeTouchCancel}
         // biome-ignore lint/a11y/noNoninteractiveTabindex: Media player needs tabIndex for keyboard shortcuts
         tabIndex={0}
       >
@@ -1330,6 +1395,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 onZoomIn={handleZoomIn}
                 onZoomOut={handleZoomOut}
                 onResetZoom={handleResetZoom}
+                activeSourceIndex={activeSourceIndex}
+                sourceCount={entries.length}
+                onPrevSource={handlePrevSource}
+                onNextSource={handleNextSource}
                 isFullscreen={isFullscreen}
                 onFullscreenToggle={toggleFullscreen}
                 t={t}

@@ -18,7 +18,6 @@ import 'drop-player/styles.css';
   ]}
   poster="preview.jpg"
   ui={{
-    features: { ambientLight: true },
     timeDisplayFormats: [
       ...defaultTimeDisplayFormats,
       'timecode',
@@ -79,7 +78,6 @@ export function InteractiveDemo() {
           sources={MEDIA.video}
           poster={MEDIA.videoPoster}
           ui={{
-            features: { ambientLight: true },
             timeDisplayFormats: [
               ...defaultTimeDisplayFormats,
               'timecode',

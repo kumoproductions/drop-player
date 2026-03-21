@@ -1,4 +1,4 @@
-import { Minus, Plus, RotateCcw } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import type { TranslationKey } from '../../types';
 import { Tooltip } from './Tooltip';
 
@@ -67,20 +67,6 @@ export function ZoomControls({
           <Plus size={20} />
         </button>
       </Tooltip>
-
-      {/* Reset button (only show if zoomed) */}
-      {canReset && (
-        <Tooltip content={t('resetZoom')}>
-          <button
-            type="button"
-            onClick={onResetZoom}
-            className="drop-player-button"
-            aria-label={t('resetZoom')}
-          >
-            <RotateCcw size={18} />
-          </button>
-        </Tooltip>
-      )}
     </>
   );
 }

@@ -256,6 +256,8 @@ export interface PlayerFeatures {
   playbackSpeed?: boolean;
   /** Picture-in-Picture button (video) */
   pip?: boolean;
+  /** Source navigation (prev/next) buttons (multi-source) */
+  sourceNavigation?: boolean;
 }
 
 // ============================================================================
@@ -493,6 +495,10 @@ export interface PlayerRef {
   // Frame capture
   captureFrame: (options?: CaptureOptions) => Promise<FrameCapture>;
 
+  // Source navigation
+  prev: () => void;
+  next: () => void;
+
   // Fullscreen
   requestFullscreen: () => Promise<void>;
   exitFullscreen: () => Promise<void>;
@@ -546,7 +552,10 @@ export type TranslationKey =
   | 'playbackSpeed'
   // PIP
   | 'pip'
-  | 'exitPip';
+  | 'exitPip'
+  // Source navigation
+  | 'previous'
+  | 'next';
 
 export type Translations = Record<TranslationKey, string>;
 
