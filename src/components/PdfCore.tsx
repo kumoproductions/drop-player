@@ -633,7 +633,7 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
                 ? 'grabbing'
                 : 'grab'
               : 'default',
-          touchAction: 'none',
+          touchAction: zoom > 1 ? 'none' : 'pan-y',
         }}
       >
         <canvas

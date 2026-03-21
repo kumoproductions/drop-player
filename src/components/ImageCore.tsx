@@ -602,7 +602,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
                 ? 'grabbing'
                 : 'grab'
               : 'default',
-          touchAction: 'none',
+          touchAction: zoom > 1 ? 'none' : 'pan-y',
         }}
       >
         <img

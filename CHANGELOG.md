@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - Fix controls overlay not recoverable on mobile for Image, PDF, and Audio modes — tapping the content area now toggles controls visibility, matching Video behavior
+- Fix player blocking page scroll on mobile — allow vertical scrolling (`pan-y`) for all media types; only block scroll when Image/PDF is zoomed in
 
 ## 1.2.0
 
