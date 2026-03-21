@@ -18,6 +18,7 @@ npm i drop-player lucide-react
 | パッケージ | 用途 |
 |---------|------|
 | `hls.js` >=1.4 | HLS動画 (`.m3u8`) |
+| `pdfjs-dist` >=4.0 | PDFキャンバスレンダリング（ズーム、パン、ページ送り） |
 | `waveform-data` >=4.5 | 音声波形表示 |
 
 ## クイックスタート
@@ -58,7 +59,7 @@ function App() {
 | 動画 | HLS (`.m3u8`), MP4, WebM |
 | 音声 | MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus |
 | 画像 | JPEG, PNG, GIF, WebP, AVIF, SVG |
-| PDF | ブラウザ標準のPDF表示 |
+| PDF | pdf.jsによるキャンバスレンダリング（ズーム、パン、ページ送り）。`pdfjs-dist` 未インストール時はブラウザ標準の `<object>` にフォールバック |
 
 ブラウザ専用のランタイムです。SSRフレームワーク（Next.js, Remix, Astro 等）での import は安全で、サーバー上では何も描画せず、クライアントで有効化されます。
 

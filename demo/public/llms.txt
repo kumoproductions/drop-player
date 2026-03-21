@@ -17,6 +17,7 @@ npm i drop-player lucide-react
 **Optional peers** (install only when needed):
 
 - hls.js >=1.4: HLS video (.m3u8)
+- pdfjs-dist >=4.0: PDF canvas rendering (zoom, pan, page navigation)
 - waveform-data >=4.5: Audio waveform display
 ## Quick start
 
@@ -49,7 +50,7 @@ The stylesheet is required — it provides `drop-player`-prefixed classes and CS
 - Video: HLS (.m3u8), MP4, WebM
 - Audio: MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus
 - Image: JPEG, PNG, GIF, WebP, AVIF, SVG
-- PDF: Browser-native PDF rendering
+- PDF: Canvas rendering via pdf.js (zoom, pan, page navigation); falls back to browser-native <object> when pdfjs-dist is not installed
 Browser-only runtime. Safe to import in SSR frameworks (Next.js, Remix, Astro, etc.) — components render nothing on the server and activate on the client.
 
 ## Sources
@@ -193,7 +194,8 @@ import { noFeatures } from 'drop-player';
 - capture: video, image
 - qualitySelector: video (HLS)
 - fullscreen: all
-- zoom: image, PDF
+- zoom: image, PDF (requires pdfjs-dist)
+- sourceNavigation: all (when multiple sources)
 - playbackSpeed: video, audio
 - pip: video (browser PiP API required)
 - keyboardShortcuts: video, audio

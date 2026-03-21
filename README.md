@@ -18,6 +18,7 @@ npm i drop-player lucide-react
 | Package | When |
 |---------|------|
 | `hls.js` >=1.4 | HLS video (`.m3u8`) |
+| `pdfjs-dist` >=4.0 | PDF canvas rendering (zoom, pan, page navigation) |
 | `waveform-data` >=4.5 | Audio waveform display |
 
 ## Quick start
@@ -58,7 +59,7 @@ The stylesheet is required — it provides `drop-player`-prefixed classes and CS
 | Video | HLS (`.m3u8`), MP4, WebM |
 | Audio | MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus |
 | Image | JPEG, PNG, GIF, WebP, AVIF, SVG |
-| PDF | Browser-native PDF rendering |
+| PDF | Canvas rendering via pdf.js (zoom, pan, page navigation); falls back to browser-native `<object>` when `pdfjs-dist` is not installed |
 
 Browser-only runtime. Safe to import in SSR frameworks (Next.js, Remix, Astro, etc.) — components render nothing on the server and activate on the client.
 
@@ -223,7 +224,8 @@ import { noFeatures } from 'drop-player';
 | `capture` | `false` | video, image |
 | `qualitySelector` | `true` | video (HLS) |
 | `fullscreen` | `true` | all |
-| `zoom` | `true` | image, PDF |
+| `zoom` | `true` | image, PDF (requires `pdfjs-dist`) |
+| `sourceNavigation` | `true` | all (when multiple sources) |
 | `playbackSpeed` | `true` | video, audio |
 | `pip` | `true` | video (browser PiP API required) |
 | `keyboardShortcuts` | `true` | video, audio |
