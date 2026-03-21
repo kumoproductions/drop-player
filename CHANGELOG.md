@@ -2,9 +2,18 @@
 
 ## 1.1.6
 
+### Features
+
+- Add multi-source navigation (prev/next buttons, swipe gesture, keyboard navigation)
+- Add `sourceNavigation` feature flag to show/hide prev/next buttons
+- Add time display formats: `seconds-frames`, `feet-frames`, `bars-beats`
+- Auto-detect frame rate from HLS level metadata
+- Add CSS color variables for easier theme customization
+
 ### Improvements
 
 - Expand touch/click target for seekbar and volume slider thumbs without changing visual appearance
+- Style dropdown scrollbar to match player theme
 
 ## 1.1.5
 
