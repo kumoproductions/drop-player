@@ -28,15 +28,19 @@ interface FeatureToggle {
 }
 
 const FEATURE_TOGGLES: FeatureToggle[] = [
-  { key: 'ambientLight', label: 'Ambient Light', default: false },
-  { key: 'capture', label: 'Capture', default: false },
-  { key: 'pip', label: 'PiP', default: true },
-  { key: 'playbackSpeed', label: 'Speed', default: true },
-  { key: 'loop', label: 'Loop', default: true },
-  { key: 'volume', label: 'Volume', default: true },
-  { key: 'seekBar', label: 'Seek Bar', default: true },
-  { key: 'timeDisplay', label: 'Time', default: true },
-  { key: 'fullscreen', label: 'Fullscreen', default: true },
+  { key: 'playButton', label: 'playButton', default: true },
+  { key: 'sourceNavigation', label: 'sourceNavigation', default: true },
+  { key: 'loop', label: 'loop', default: true },
+  { key: 'seekBar', label: 'seekBar', default: true },
+  { key: 'timeDisplay', label: 'timeDisplay', default: true },
+  { key: 'volume', label: 'volume', default: true },
+  { key: 'playbackSpeed', label: 'playbackSpeed', default: true },
+  { key: 'ambientLight', label: 'ambientLight', default: false },
+  { key: 'capture', label: 'capture', default: false },
+  { key: 'qualitySelector', label: 'qualitySelector', default: true },
+  { key: 'pip', label: 'pip', default: true },
+  { key: 'keyboardShortcuts', label: 'keyboardShortcuts', default: true },
+  { key: 'fullscreen', label: 'fullscreen', default: true },
 ];
 
 const LOCALE_OPTIONS = [
