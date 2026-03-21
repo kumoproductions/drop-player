@@ -199,6 +199,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       panX: 0,
       panY: 0,
       isLoaded: false,
+      currentPage: 0,
+      totalPages: 0,
     });
 
     const [audioState, setAudioState] = useState<AudioState>({

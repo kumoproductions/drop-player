@@ -40,6 +40,8 @@ export const en: Translations = {
   exitPip: 'Exit Picture in Picture',
   previous: 'Previous',
   next: 'Next',
+  previousPage: 'Previous page',
+  nextPage: 'Next page',
   seekBackward: 'Seek backward',
   seekForward: 'Seek forward',
   muted: 'Muted',

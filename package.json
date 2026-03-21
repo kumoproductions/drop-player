@@ -69,10 +69,14 @@
     "lucide-react": ">=0.300.0 <1.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
+    "pdfjs-dist": "^4.0.0",
     "waveform-data": "^4.5.0"
   },
   "peerDependenciesMeta": {
     "hls.js": {
+      "optional": true
+    },
+    "pdfjs-dist": {
       "optional": true
     },
     "waveform-data": {
@@ -96,6 +100,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "lucide-react": "^0.577.0",
+    "pdfjs-dist": "^5.5.207",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-markdown": "^10.1.0",

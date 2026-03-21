@@ -47,6 +47,7 @@ export type {
   NormalizedSources,
   // PdfCore types
   PdfCoreProps,
+  PdfCoreRef,
   PdfState,
   // Events
   PlayerEvents,

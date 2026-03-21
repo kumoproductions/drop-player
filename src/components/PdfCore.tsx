@@ -12,7 +12,14 @@ export function PdfCore(props: PdfCoreProps) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const state: PdfState = { zoom: 1, panX: 0, panY: 0, isLoaded };
+    const state: PdfState = {
+      zoom: 1,
+      panX: 0,
+      panY: 0,
+      isLoaded,
+      currentPage: 0,
+      totalPages: 0,
+    };
     onStateChange(state);
   }, [isLoaded, onStateChange]);
 
