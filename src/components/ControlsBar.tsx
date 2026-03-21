@@ -15,6 +15,7 @@ import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
 import { QualitySelector } from './controls/QualitySelector';
+import { SeekStepButtons } from './controls/SeekStepButtons';
 import { SourceNavigation } from './controls/SourceNavigation';
 import { TimeDisplay } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
@@ -86,6 +87,11 @@ interface ControlsBarProps {
   // i18n
   t: (key: TranslationKey) => string;
 
+  // Seek step
+  seekStep?: number;
+  onSeekBackward?: () => void;
+  onSeekForward?: () => void;
+
   // Source navigation
   activeSourceIndex?: number;
   sourceCount?: number;
@@ -141,6 +147,9 @@ export function ControlsBar({
   isFullscreen,
   onFullscreenToggle,
   t,
+  seekStep = 10,
+  onSeekBackward,
+  onSeekForward,
   activeSourceIndex = 0,
   sourceCount = 1,
   onPrevSource,
@@ -158,6 +167,14 @@ export function ControlsBar({
               <PlayButton
                 isPlaying={isPlaying}
                 onToggle={onPlayToggle ?? (() => {})}
+                t={t}
+              />
+            )}
+            {features.seekStepButtons && onSeekBackward && onSeekForward && (
+              <SeekStepButtons
+                seekStep={seekStep}
+                onSeekBackward={onSeekBackward}
+                onSeekForward={onSeekForward}
                 t={t}
               />
             )}

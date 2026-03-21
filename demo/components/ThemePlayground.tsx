@@ -30,6 +30,7 @@ interface FeatureToggle {
 
 const FEATURE_TOGGLES: FeatureToggle[] = [
   { key: 'playButton', label: 'playButton', default: true },
+  { key: 'seekStepButtons', label: 'seekStepButtons', default: false },
   { key: 'sourceNavigation', label: 'sourceNavigation', default: true },
   { key: 'loop', label: 'loop', default: true },
   { key: 'seekBar', label: 'seekBar', default: true },
@@ -76,6 +77,7 @@ export function ThemePlayground() {
 
   const [showControls, setShowControls] = useState(true);
   const [showTitle, setShowTitle] = useState(true);
+  const [showStatusOverlay, setShowStatusOverlay] = useState(false);
   const [locale, setLocale] = useState('en');
 
   // Time display format state
@@ -107,6 +109,7 @@ export function ThemePlayground() {
   const ui: PlayerUiConfig = {
     showControls,
     showTitle,
+    showStatusOverlay,
     locale,
     features: features as PlayerFeatures,
     timeDisplayFormats:
@@ -223,6 +226,15 @@ export function ThemePlayground() {
               className="rounded border-zinc-700"
             />
             showTitle
+          </label>
+          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showStatusOverlay}
+              onChange={(e) => setShowStatusOverlay(e.target.checked)}
+              className="rounded border-zinc-700"
+            />
+            showStatusOverlay
           </label>
           <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
             <span>locale</span>

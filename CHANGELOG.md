@@ -5,6 +5,8 @@
 ### Features
 
 - Add `seekStep` playback option to configure arrow key skip duration in seconds (default: 10)
+- Add `seekStepButtons` feature flag for skip forward/backward buttons
+- Add `showStatusOverlay` UI option — pill-style overlay showing player actions (play/pause, seek, volume, speed, quality, zoom, loop)
 
 ## 1.1.6
 

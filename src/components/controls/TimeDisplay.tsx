@@ -11,6 +11,46 @@ import {
 
 export type { TimeDisplayFormat };
 
+export interface FormatTimeDisplayOptions {
+  currentTime: number;
+  duration: number;
+  frameRate: number;
+  filmGauge: number;
+  bpm: number;
+  timeSignature: string;
+  format: TimeDisplayFormat;
+}
+
+export function formatTimeDisplay(opts: FormatTimeDisplayOptions): string {
+  const {
+    currentTime,
+    duration,
+    frameRate,
+    filmGauge,
+    bpm,
+    timeSignature,
+    format,
+  } = opts;
+  switch (format) {
+    case 'elapsed-total':
+      return `${formatTime(currentTime)} / ${formatTime(duration)}`;
+    case 'remaining':
+      return `-${formatTime(Math.max(0, duration - currentTime))}`;
+    case 'timecode':
+      return formatTimecode(currentTime, frameRate);
+    case 'frames':
+      return `${secondsToFrames(currentTime, frameRate)} / ${secondsToFrames(duration, frameRate)}`;
+    case 'feet-frames':
+      return `${formatFeetFrames(currentTime, frameRate, filmGauge)} / ${formatFeetFrames(duration, frameRate, filmGauge)}`;
+    case 'seconds-frames':
+      return `${formatSecondsFrames(currentTime, frameRate)} / ${formatSecondsFrames(duration, frameRate)}`;
+    case 'bars-beats':
+      return `${formatBarsBeats(currentTime, bpm, timeSignature)} / ${formatBarsBeats(duration, bpm, timeSignature)}`;
+    default:
+      return `${formatTime(currentTime)} / ${formatTime(duration)}`;
+  }
+}
+
 export function getNextTimeDisplayFormat(
   current: TimeDisplayFormat,
   formats: TimeDisplayFormat[]
@@ -50,26 +90,16 @@ export function TimeDisplay({
     onFormatChange(getNextTimeDisplayFormat(format, formats));
   }, [format, formats, onFormatChange]);
 
-  const getDisplayText = () => {
-    switch (format) {
-      case 'elapsed-total':
-        return `${formatTime(currentTime)} / ${formatTime(duration)}`;
-      case 'remaining':
-        return `-${formatTime(Math.max(0, duration - currentTime))}`;
-      case 'timecode':
-        return formatTimecode(currentTime, frameRate);
-      case 'frames':
-        return `${secondsToFrames(currentTime, frameRate)} / ${secondsToFrames(duration, frameRate)}`;
-      case 'feet-frames':
-        return `${formatFeetFrames(currentTime, frameRate, filmGauge)} / ${formatFeetFrames(duration, frameRate, filmGauge)}`;
-      case 'seconds-frames':
-        return `${formatSecondsFrames(currentTime, frameRate)} / ${formatSecondsFrames(duration, frameRate)}`;
-      case 'bars-beats':
-        return `${formatBarsBeats(currentTime, bpm, timeSignature)} / ${formatBarsBeats(duration, bpm, timeSignature)}`;
-      default:
-        return `${formatTime(currentTime)} / ${formatTime(duration)}`;
-    }
-  };
+  const getDisplayText = () =>
+    formatTimeDisplay({
+      currentTime,
+      duration,
+      frameRate,
+      filmGauge,
+      bpm,
+      timeSignature,
+      format,
+    });
 
   return (
     <button

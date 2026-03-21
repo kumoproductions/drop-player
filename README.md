@@ -133,6 +133,7 @@ Props are organised into four groups to keep the surface area manageable:
 |-----|------|---------|-------------|
 | `showControls` | `boolean` | `true` | Show bottom control bar |
 | `showTitle` | `boolean` | auto | Show source title/selector |
+| `showStatusOverlay` | `boolean` | `false` | Show status pill overlay on player actions (play, seek, volume, etc.) |
 | `features` | `PlayerFeatures` | `defaultFeatures` | Toggle individual controls |
 | `locale` | `string` | `'en'` | Display language (built-in: `'en'`, `'ja'`) |
 | `translations` | `Partial<Translations>` | — | Custom translation overrides, merged on top of the locale's built-in strings |

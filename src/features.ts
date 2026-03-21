@@ -18,6 +18,7 @@ export const defaultFeatures: Required<PlayerFeatures> = {
   keyboardShortcuts: true,
   playbackSpeed: true,
   pip: true,
+  seekStepButtons: false,
   sourceNavigation: true,
 };
 
@@ -39,6 +40,7 @@ export const noFeatures: Required<PlayerFeatures> = {
   keyboardShortcuts: false,
   playbackSpeed: false,
   pip: false,
+  seekStepButtons: false,
   sourceNavigation: false,
 };
 

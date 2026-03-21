@@ -40,4 +40,11 @@ export const ja: Translations = {
   exitPip: 'ピクチャーインピクチャー解除',
   previous: '前へ',
   next: '次へ',
+  seekBackward: '巻き戻し',
+  seekForward: '早送り',
+  muted: 'ミュート',
+  unmuted: 'ミュート解除',
+  loopOn: 'ループ ON',
+  loopOff: 'ループ OFF',
+  speed: '速度',
 };

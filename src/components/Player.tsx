@@ -12,6 +12,7 @@ import { resolveFeatures } from '../features';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { usePlayerStorage } from '../hooks/usePlayerStorage';
+import { useStatusOverlay } from '../hooks/useStatusOverlay';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { usePlayerTranslation } from '../i18n';
 import type {
@@ -54,9 +55,14 @@ import { AudioCore } from './AudioCore';
 import { ControlsBar } from './ControlsBar';
 import { SeekBar } from './controls/SeekBar';
 import { SourceSelector } from './controls/SourceSelector';
-import { getNextTimeDisplayFormat, TimeDisplay } from './controls/TimeDisplay';
+import {
+  formatTimeDisplay,
+  getNextTimeDisplayFormat,
+  TimeDisplay,
+} from './controls/TimeDisplay';
 import { ImageCore } from './ImageCore';
 import { PdfCore } from './PdfCore';
+import { StatusOverlay } from './StatusOverlay';
 import { VideoCore } from './VideoCore';
 
 import '../styles.css';
@@ -92,6 +98,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const {
       showControls: showControlsProp = UI_DEFAULTS.showControls,
       showTitle: showTitleProp,
+      showStatusOverlay = false,
       features: featuresProp,
       locale = UI_DEFAULTS.locale,
       translations: customTranslations,
@@ -136,6 +143,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       () => resolveFeatures(featuresProp),
       [featuresProp]
     );
+
+    const statusOverlay = useStatusOverlay();
 
     const containerRef = useRef<HTMLDivElement>(null);
     const videoCoreRef = useRef<VideoCoreRef>(null);
@@ -407,6 +416,147 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       setVideoState(state);
     }, []);
 
+    // ---- Status overlay: react to state changes (not user actions) ----
+    const prevOverlayRef = useRef<{
+      isPlaying?: boolean;
+      isMuted?: boolean;
+      isLoop?: boolean;
+      volume?: number;
+      isSeeking?: boolean;
+      seekValue?: number;
+      duration?: number;
+      playbackRate?: number;
+      zoom?: number;
+      qualityLabel?: string;
+    }>({});
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: overlay driven by state diffs
+    useEffect(() => {
+      if (!showStatusOverlay) return;
+
+      const prev = prevOverlayRef.current;
+      const vs = mediaMode === 'video' ? videoState : undefined;
+      const as_ = mediaMode === 'audio' ? audioState : undefined;
+      const is_ = mediaMode === 'image' ? imageState : undefined;
+
+      // Unified current values
+      const isPlaying = vs?.isPlaying ?? as_?.isPlaying;
+      const isMuted = vs?.isMuted ?? as_?.isMuted;
+      const isLoop = vs?.isLoop ?? as_?.isLoop;
+      const volume = vs?.volume ?? as_?.volume;
+      const isSeeking = vs?.isSeeking ?? as_?.isSeeking;
+      const seekValue = vs?.seekValue ?? as_?.seekValue;
+      const duration = vs?.duration ?? as_?.duration;
+      const zoom = is_?.zoom;
+      const qualityLabel = vs?.qualityLevel?.label;
+
+      // Play / Pause
+      if (
+        prev.isPlaying !== undefined &&
+        isPlaying !== undefined &&
+        prev.isPlaying !== isPlaying
+      ) {
+        statusOverlay.show(
+          isPlaying ? 'play' : 'pause',
+          t(isPlaying ? 'play' : 'pause')
+        );
+      }
+
+      // Mute / Unmute
+      if (
+        prev.isMuted !== undefined &&
+        isMuted !== undefined &&
+        prev.isMuted !== isMuted
+      ) {
+        statusOverlay.show(
+          isMuted ? 'volumeX' : 'volume',
+          t(isMuted ? 'muted' : 'unmuted')
+        );
+      }
+
+      // Volume (only when not mute toggle — check mute didn't change)
+      if (
+        prev.volume !== undefined &&
+        volume !== undefined &&
+        prev.volume !== volume &&
+        prev.isMuted === isMuted
+      ) {
+        statusOverlay.show(
+          'volume',
+          `${t('volume')} ${Math.round(volume * 100)}%`
+        );
+      }
+
+      // Loop
+      if (
+        prev.isLoop !== undefined &&
+        isLoop !== undefined &&
+        prev.isLoop !== isLoop
+      ) {
+        statusOverlay.show('repeat', t(isLoop ? 'loopOn' : 'loopOff'));
+      }
+
+      // Seeking (drag)
+      if (isSeeking && seekValue !== undefined) {
+        const seekText = formatTimeDisplay({
+          currentTime: seekValue,
+          duration: duration ?? 0,
+          frameRate,
+          filmGauge,
+          bpm,
+          timeSignature,
+          format: timeDisplayFormat,
+        });
+        statusOverlay.show('', seekText, true);
+      } else if (prev.isSeeking && !isSeeking) {
+        statusOverlay.dismiss();
+      }
+
+      // Playback rate
+      if (
+        prev.playbackRate !== undefined &&
+        prev.playbackRate !== playbackRate
+      ) {
+        statusOverlay.show('gauge', `${t('speed')} ${playbackRate}x`);
+      }
+
+      // Zoom (image)
+      if (prev.zoom !== undefined && zoom !== undefined && prev.zoom !== zoom) {
+        const icon = zoom > prev.zoom ? 'zoomIn' : 'zoomOut';
+        statusOverlay.show(icon, `${Math.round(zoom * 100)}%`);
+      }
+
+      // Quality
+      if (
+        prev.qualityLabel !== undefined &&
+        qualityLabel &&
+        prev.qualityLabel !== qualityLabel
+      ) {
+        statusOverlay.show('settings', `${t('quality')} ${qualityLabel}`);
+      }
+
+      // Update prev
+      prevOverlayRef.current = {
+        isPlaying,
+        isMuted,
+        isLoop,
+        volume,
+        isSeeking,
+        seekValue,
+        duration,
+        playbackRate,
+        zoom,
+        qualityLabel,
+      };
+    }, [
+      showStatusOverlay,
+      mediaMode,
+      videoState,
+      audioState,
+      imageState,
+      playbackRate,
+    ]);
+
     const handleImageStateChange = useCallback((state: ImageState) => {
       setImageState(state);
     }, []);
@@ -495,6 +645,24 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const handleResetZoom = useCallback(() => {
       if (mediaMode === 'image') imageCoreRef.current?.resetZoom();
     }, [mediaMode]);
+
+    const resolvedSeekStep = seekStep ?? 10;
+
+    const handleSeekBackward = useCallback(() => {
+      if (!mediaElement) return;
+      mediaElement.currentTime = Math.max(
+        0,
+        mediaElement.currentTime - resolvedSeekStep
+      );
+    }, [mediaElement, resolvedSeekStep]);
+
+    const handleSeekForward = useCallback(() => {
+      if (!mediaElement) return;
+      mediaElement.currentTime = Math.min(
+        mediaElement.duration || 0,
+        mediaElement.currentTime + resolvedSeekStep
+      );
+    }, [mediaElement, resolvedSeekStep]);
 
     const handlePlayToggle = useCallback(() => {
       switch (mediaMode) {
@@ -1267,6 +1435,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
             </div>
           )}
 
+          {/* Status overlay (pill) */}
+          {showStatusOverlay && <StatusOverlay state={statusOverlay.state} />}
+
           {/* Controls overlay (hidden for PDF) */}
           {showControlsProp && mediaMode !== 'pdf' && (
             <div
@@ -1383,6 +1554,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 isPip={isPip}
                 isPipSupported={isPipSupported}
                 onPipToggle={handlePipToggle}
+                seekStep={resolvedSeekStep}
+                onSeekBackward={handleSeekBackward}
+                onSeekForward={handleSeekForward}
                 onPlayToggle={handlePlayToggle}
                 onLoopToggle={handleLoopToggle}
                 onVolumeChange={handleVolumeChange}

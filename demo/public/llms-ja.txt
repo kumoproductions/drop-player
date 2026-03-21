@@ -115,6 +115,7 @@ Propsは4つのグループに分かれています:
 
 - showControls: 下部コントロールバーを表示
 - showTitle: ソースタイトル/セレクターを表示
+- showStatusOverlay: 操作時にステータスPillオーバーレイを表示（再生、シーク、音量など）
 - features: 個別コントロールの切り替え
 - locale: 表示言語（組み込み: 'en', 'ja'）
 - translations: 翻訳の部分上書き。ロケールの組み込み文字列に対して差分を指定

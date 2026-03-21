@@ -133,6 +133,7 @@ Propsは4つのグループに分かれています:
 |-----|------|---------|-------------|
 | `showControls` | `boolean` | `true` | 下部コントロールバーを表示 |
 | `showTitle` | `boolean` | auto | ソースタイトル/セレクターを表示 |
+| `showStatusOverlay` | `boolean` | `false` | 操作時にステータスPillオーバーレイを表示（再生、シーク、音量など） |
 | `features` | `PlayerFeatures` | `defaultFeatures` | 個別コントロールの切り替え |
 | `locale` | `string` | `'en'` | 表示言語（組み込み: `'en'`, `'ja'`） |
 | `translations` | `Partial<Translations>` | — | 翻訳の部分上書き。ロケールの組み込み文字列に対して差分を指定 |

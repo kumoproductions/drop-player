@@ -256,6 +256,8 @@ export interface PlayerFeatures {
   playbackSpeed?: boolean;
   /** Picture-in-Picture button (video) */
   pip?: boolean;
+  /** Seek step buttons (skip forward/backward by seekStep seconds) */
+  seekStepButtons?: boolean;
   /** Source navigation (prev/next) buttons (multi-source) */
   sourceNavigation?: boolean;
 }
@@ -372,6 +374,8 @@ export interface PlayerUiConfig {
   showControls?: boolean;
   /** Show the source title/selector in the top-left. Default: true when sources >= 1 */
   showTitle?: boolean;
+  /** Show status overlay pill on player actions (play, seek, volume, etc.). Default: false */
+  showStatusOverlay?: boolean;
   /** Feature flags for individual controls. Default: `defaultFeatures` */
   features?: PlayerFeatures;
   /** Display locale. Default: 'en' */
@@ -557,7 +561,15 @@ export type TranslationKey =
   | 'exitPip'
   // Source navigation
   | 'previous'
-  | 'next';
+  | 'next'
+  | 'seekBackward'
+  | 'seekForward'
+  // Status overlay
+  | 'muted'
+  | 'unmuted'
+  | 'loopOn'
+  | 'loopOff'
+  | 'speed';
 
 export type Translations = Record<TranslationKey, string>;
 

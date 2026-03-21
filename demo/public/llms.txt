@@ -115,6 +115,7 @@ Props are organised into four groups to keep the surface area manageable:
 
 - showControls: Show bottom control bar
 - showTitle: Show source title/selector
+- showStatusOverlay: Show status pill overlay on player actions (play, seek, volume, etc.)
 - features: Toggle individual controls
 - locale: Display language (built-in: 'en', 'ja')
 - translations: Custom translation overrides, merged on top of the locale's built-in strings

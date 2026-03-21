@@ -40,4 +40,11 @@ export const en: Translations = {
   exitPip: 'Exit Picture in Picture',
   previous: 'Previous',
   next: 'Next',
+  seekBackward: 'Seek backward',
+  seekForward: 'Seek forward',
+  muted: 'Muted',
+  unmuted: 'Unmuted',
+  loopOn: 'Loop ON',
+  loopOff: 'Loop OFF',
+  speed: 'Speed',
 };

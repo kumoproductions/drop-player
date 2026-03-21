@@ -438,11 +438,15 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
           setInitialPositionForNextLoad(video.currentTime, !video.paused);
         }
         setIsPlayingOriginal(playing);
-        if (!playing) {
+        if (playing) {
+          const level: QualityLevel = { mode: 'manual', label: 'Original' };
+          setQualityLevel(level);
+          onQualityLevelChange?.(level);
+        } else {
           setQualityLevel(undefined);
         }
       },
-      [setInitialPositionForNextLoad]
+      [setInitialPositionForNextLoad, onQualityLevelChange]
     );
 
     const handleQualityChangeFromUI = useCallback(
