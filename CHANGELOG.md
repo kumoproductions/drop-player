@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2
+
+### Bug Fixes
+
+- Fix controls overlay not recoverable on mobile for Image, PDF, and Audio modes — tapping the content area now toggles controls visibility, matching Video behavior
+
 ## 1.2.0
 
 ### Features
