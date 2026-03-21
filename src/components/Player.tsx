@@ -356,7 +356,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         ? videoState.isEnded
         : mediaMode === 'audio'
           ? audioState.isEnded
-          : true;
+          : false;
 
     const resetHideControlsTimer = useCallback(
       (e: React.PointerEvent) => {
@@ -576,6 +576,11 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const handleSourceChange = useCallback(
       (index: number) => {
         setActiveSourceIndex(index);
+        setControlsVisible(true);
+        // Reset readiness so the loading overlay covers the stale frame
+        setVideoState((prev) => ({ ...prev, duration: 0 }));
+        setImageState((prev) => ({ ...prev, isLoaded: false }));
+        setPdfState((prev) => ({ ...prev, isLoaded: false }));
         onActiveSourceChange?.(index);
       },
       [onActiveSourceChange]
@@ -1452,7 +1457,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           )}
 
           {/* Loading overlay */}
-          {!isReady && !lastError && mediaMode !== 'pdf' && (
+          {!isReady && !lastError && (
             <div
               role="status"
               aria-label="Loading"

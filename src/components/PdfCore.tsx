@@ -50,8 +50,6 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     const [panX, setPanX] = useState(0);
     const [panY, setPanY] = useState(0);
 
-    // For debounced rendering: track the "committed" zoom that we've actually rendered
-    const [renderedZoom, setRenderedZoom] = useState(1);
     const renderDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
       null
     );
@@ -110,12 +108,17 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     useEffect(() => {
       setCurrentPage(1);
       setZoom(1);
-      setRenderedZoom(1);
+
       setPanX(0);
       setPanY(0);
     }, [src]);
 
     // ── Canvas rendering ──
+    // Renders at zoom * dpr resolution for crisp output.
+    // Canvas CSS size is always BASE size (scale=1) — visual zoom is via CSS transform.
+    // This means the canvas has zoom*dpr pixels displayed in base CSS size, then
+    // CSS transform: scale(zoom) expands it => effective pixel density = dpr (crisp).
+    // biome-ignore lint/correctness/useExhaustiveDependencies: containerRef is a stable ref
     const renderPage = useCallback(
       async (doc: PDFDocumentProxy, pageNum: number, scale: number) => {
         const canvas = canvasRef.current;
@@ -135,20 +138,38 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
         try {
           page = await doc.getPage(pageNum);
         } catch {
-          return; // Page may not exist or document destroyed
+          return;
         }
 
         const dpr = window.devicePixelRatio || 1;
-        const viewport = page.getViewport({ scale: scale * dpr });
+        const baseViewport = page.getViewport({ scale: 1 });
 
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        canvas.style.width = `${viewport.width / dpr}px`;
-        canvas.style.height = `${viewport.height / dpr}px`;
+        // Calculate scale so that the page fits the container at zoom=1
+        const container = containerRef.current;
+        let fitScale = 1;
+        if (container) {
+          const containerRect = container.getBoundingClientRect();
+          const scaleX = containerRect.width / baseViewport.width;
+          const scaleY = containerRect.height / baseViewport.height;
+          fitScale = Math.min(scaleX, scaleY);
+        }
+
+        const cssWidth = baseViewport.width * fitScale;
+        const cssHeight = baseViewport.height * fitScale;
+        const renderViewport = page.getViewport({
+          scale: fitScale * scale * dpr,
+        });
+
+        // High-res pixel buffer
+        canvas.width = renderViewport.width;
+        canvas.height = renderViewport.height;
+        // CSS size = fitted base size (zoom is handled by CSS transform)
+        canvas.style.width = `${cssWidth}px`;
+        canvas.style.height = `${cssHeight}px`;
 
         canvasSizeRef.current = {
-          width: viewport.width / dpr,
-          height: viewport.height / dpr,
+          width: cssWidth,
+          height: cssHeight,
         };
 
         const ctx = canvas.getContext('2d');
@@ -157,13 +178,13 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
         try {
           const task = page.render({
             canvasContext: ctx,
-            viewport,
+            viewport: renderViewport,
             canvas: canvas,
           });
           renderTaskRef.current = task;
           await task.promise;
           renderTaskRef.current = null;
-          setRenderedZoom(scale);
+          page.cleanup();
         } catch {
           // Render cancelled or failed
         }
@@ -171,14 +192,15 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
       []
     );
 
-    // Render on page change (immediate) — zoom is intentionally excluded (handled by debounce effect below)
-    // biome-ignore lint/correctness/useExhaustiveDependencies: zoom handled by debounced effect below
+    // Render on page change (immediate, at current zoom)
+    // biome-ignore lint/correctness/useExhaustiveDependencies: zoom changes handled by debounced effect below
     useEffect(() => {
       if (!pdfDocument || !docLoaded) return;
       renderPage(pdfDocument, currentPage, zoom);
     }, [pdfDocument, docLoaded, currentPage, renderPage]);
 
-    // Debounced render on zoom change
+    // Debounced re-render on zoom change only (for crisp text at new zoom level)
+    // biome-ignore lint/correctness/useExhaustiveDependencies: currentPage handled by immediate render effect above
     useEffect(() => {
       if (!pdfDocument || !docLoaded) return;
 
@@ -196,7 +218,7 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
           clearTimeout(renderDebounceRef.current);
         }
       };
-    }, [zoom, pdfDocument, docLoaded, currentPage, renderPage]);
+    }, [zoom, pdfDocument, docLoaded, renderPage]);
 
     // ── Zoom methods ──
     const zoomIn = useCallback(() => {
@@ -247,34 +269,28 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
       [clampZoom, clampPan, panX, panY]
     );
 
-    // ── Page methods ──
-    const nextPage = useCallback(() => {
-      setCurrentPage((prev) => {
-        if (prev >= totalPages) return prev;
-        setPanX(0);
-        setPanY(0);
-        return prev + 1;
-      });
-    }, [totalPages]);
-
-    const prevPage = useCallback(() => {
-      setCurrentPage((prev) => {
-        if (prev <= 1) return prev;
-        setPanX(0);
-        setPanY(0);
-        return prev - 1;
-      });
-    }, []);
-
+    // ── Page methods (reset zoom + pan on page change) ──
     const goToPage = useCallback(
       (page: number) => {
         const clamped = Math.max(1, Math.min(totalPages, page));
         setCurrentPage(clamped);
+        setZoom(1);
+
         setPanX(0);
         setPanY(0);
       },
       [totalPages]
     );
+
+    const nextPage = useCallback(() => {
+      if (currentPage >= totalPages) return;
+      goToPage(currentPage + 1);
+    }, [currentPage, totalPages, goToPage]);
+
+    const prevPage = useCallback(() => {
+      if (currentPage <= 1) return;
+      goToPage(currentPage - 1);
+    }, [currentPage, goToPage]);
 
     // ── Mouse/touch interaction (mirrors ImageCore) ──
     const handleWheel = useCallback(
@@ -551,9 +567,6 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
       );
     }
 
-    // ── CSS transform for immediate zoom feedback ──
-    const cssScale = renderedZoom > 0 ? zoom / renderedZoom : 1;
-
     return (
       <div
         ref={wheelTouchContainerRef}
@@ -587,8 +600,8 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
           ref={canvasRef}
           style={{
             transform:
-              cssScale !== 1 || panX !== 0 || panY !== 0
-                ? `scale(${cssScale}) translate(${panX / zoom}px, ${panY / zoom}px)`
+              zoom !== 1 || panX !== 0 || panY !== 0
+                ? `scale(${zoom}) translate(${panX / zoom}px, ${panY / zoom}px)`
                 : undefined,
             transformOrigin: 'center center',
             transition: isDraggingRef.current
@@ -604,15 +617,6 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
 
 // ── Fallback component (browser built-in PDF viewer) ──
 function PdfFallback({ src }: { src: string }) {
-  const [_isLoaded, setIsLoaded] = useState(false);
-  const srcFailedRef = useRef(false);
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: src is intentional trigger for reset
-  useEffect(() => {
-    setIsLoaded(false);
-    srcFailedRef.current = false;
-  }, [src]);
-
   // Auto-append #toolbar=0 to hide built-in PDF toolbar
   const pdfSrc = (() => {
     if (!src) return '';
@@ -652,9 +656,7 @@ function PdfFallback({ src }: { src: string }) {
         type="application/pdf"
         width="100%"
         height="100%"
-        onLoad={() => {
-          if (!srcFailedRef.current) setIsLoaded(true);
-        }}
+        onLoad={() => {}}
         aria-label="PDF document"
       />
     </div>
