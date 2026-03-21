@@ -98,6 +98,12 @@ interface ControlsBarProps {
   onPrevSource?: () => void;
   onNextSource?: () => void;
 
+  // Page navigation (PDF)
+  currentPage?: number;
+  totalPages?: number;
+  onPrevPage?: () => void;
+  onNextPage?: () => void;
+
   // Slots
   controlsStart?: ReactNode;
   controlsEnd?: ReactNode;
@@ -154,6 +160,10 @@ export function ControlsBar({
   sourceCount = 1,
   onPrevSource,
   onNextSource,
+  currentPage: _currentPage,
+  totalPages: _totalPages,
+  onPrevPage: _onPrevPage,
+  onNextPage: _onNextPage,
   controlsStart,
   controlsEnd,
 }: ControlsBarProps) {
