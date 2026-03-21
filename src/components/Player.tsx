@@ -85,6 +85,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       muted: initialMuted = PLAYBACK_DEFAULTS.muted,
       volume: initialVolume = PLAYBACK_DEFAULTS.volume,
       initialTime,
+      seekStep,
     } = props.playback ?? {};
 
     // -- UI group --
@@ -322,6 +323,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       mediaElement,
       containerElement: containerRef.current,
       frameRate: mediaMode === 'audio' ? 1 : frameRate,
+      seekStep,
       onVolumeChange: (vol) => {
         if (mediaMode === 'video') videoCoreRef.current?.setVolume(vol);
         else if (mediaMode === 'audio') audioCoreRef.current?.setVolume(vol);

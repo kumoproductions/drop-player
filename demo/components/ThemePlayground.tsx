@@ -1,5 +1,6 @@
 import type {
   PlayerFeatures,
+  PlayerPlaybackConfig,
   PlayerUiConfig,
   TimeDisplayFormat,
 } from 'drop-player';
@@ -85,6 +86,7 @@ export function ThemePlayground() {
       TIME_FORMAT_OPTIONS.map((f) => [f.value, f.defaultOn])
     ) as Record<TimeDisplayFormat, boolean>
   );
+  const [seekStep, setSeekStep] = useState(10);
   const [frameRate, setFrameRate] = useState(30);
   const [filmGauge, setFilmGauge] = useState(16);
   const [bpm, setBpm] = useState(120);
@@ -97,6 +99,10 @@ export function ThemePlayground() {
   const style = Object.fromEntries(
     Object.entries(vars).map(([k, v]) => [k, v])
   ) as React.CSSProperties;
+
+  const playback: PlayerPlaybackConfig = {
+    seekStep,
+  };
 
   const ui: PlayerUiConfig = {
     showControls,
@@ -168,6 +174,29 @@ export function ThemePlayground() {
               )}
             </label>
           ))}
+        </div>
+      </div>
+
+      {/* Playback Options */}
+      <div>
+        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+          Playback Options
+        </h4>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <label className="flex items-center gap-2 text-sm text-zinc-400">
+            <span>seekStep</span>
+            <input
+              type="number"
+              min="1"
+              max="60"
+              value={seekStep}
+              onChange={(e) =>
+                setSeekStep(Math.max(1, Number(e.target.value) || 10))
+              }
+              className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+            />
+            <span className="text-xs text-zinc-600">sec</span>
+          </label>
         </div>
       </div>
 
@@ -331,7 +360,12 @@ export function ThemePlayground() {
 
       {/* Preview */}
       <div style={style}>
-        <VideoPlayer sources={MEDIA.video} poster={MEDIA.videoPoster} ui={ui} />
+        <VideoPlayer
+          sources={MEDIA.video}
+          poster={MEDIA.videoPoster}
+          playback={playback}
+          ui={ui}
+        />
       </div>
     </div>
   );

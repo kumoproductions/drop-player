@@ -110,6 +110,7 @@ Props are organised into four groups to keep the surface area manageable:
 - muted: Start muted
 - volume: Initial volume (0–1)
 - initialTime: Start position in seconds
+- seekStep: Seconds to skip with arrow left/right keys
 ### `ui` — `PlayerUiConfig`
 
 - showControls: Show bottom control bar

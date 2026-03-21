@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.7
+
+### Features
+
+- Add `seekStep` playback option to configure arrow key skip duration in seconds (default: 10)
+
 ## 1.1.6
 
 ### Features

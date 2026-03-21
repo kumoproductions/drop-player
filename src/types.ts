@@ -359,6 +359,8 @@ export interface PlayerPlaybackConfig {
   volume?: number;
   /** Start time in seconds. Default: 0 */
   initialTime?: number;
+  /** Seconds to skip when pressing arrow left/right. Default: 10 */
+  seekStep?: number;
 }
 
 /**

@@ -6,6 +6,8 @@ interface UseKeyboardShortcutsOptions {
   containerElement: HTMLElement | null;
   /** Seconds per "frame" when using modifier key (e.g. 1/30 for video; 1 for audio) */
   frameRate: number;
+  /** Seconds to skip when pressing arrow left/right. Default: 1 */
+  seekStep?: number;
   onVolumeChange?: (volume: number) => void;
   onMuteToggle?: () => void;
   toggleFullscreen: () => void;
@@ -21,6 +23,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions) {
     mediaElement,
     containerElement,
     frameRate,
+    seekStep = 10,
     onVolumeChange,
     onMuteToggle,
     toggleFullscreen,
@@ -82,14 +85,16 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions) {
         }
         case 'ArrowLeft': {
           e.preventDefault();
-          const stepLeft = e.ctrlKey || e.metaKey || e.altKey ? frameStep : 1;
+          const stepLeft =
+            e.ctrlKey || e.metaKey || e.altKey ? frameStep : seekStep;
           const newTimeLeft = Math.max(0, mediaElement.currentTime - stepLeft);
           mediaElement.currentTime = newTimeLeft;
           break;
         }
         case 'ArrowRight': {
           e.preventDefault();
-          const stepRight = e.ctrlKey || e.metaKey || e.altKey ? frameStep : 1;
+          const stepRight =
+            e.ctrlKey || e.metaKey || e.altKey ? frameStep : seekStep;
           const newTimeRight = Math.min(
             mediaElement.duration || 0,
             mediaElement.currentTime + stepRight
@@ -123,6 +128,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions) {
       mediaElement,
       containerElement,
       frameRate,
+      seekStep,
       onVolumeChange,
       onMuteToggle,
       toggleFullscreen,

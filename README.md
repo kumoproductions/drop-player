@@ -125,6 +125,7 @@ Props are organised into four groups to keep the surface area manageable:
 | `muted` | `boolean` | `false` | Start muted |
 | `volume` | `number` | `1` | Initial volume (0–1) |
 | `initialTime` | `number` | `0` | Start position in seconds |
+| `seekStep` | `number` | `10` | Seconds to skip with arrow left/right keys |
 
 ### `ui` — `PlayerUiConfig`
 

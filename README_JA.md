@@ -125,6 +125,7 @@ Propsは4つのグループに分かれています:
 | `muted` | `boolean` | `false` | ミュート状態で開始 |
 | `volume` | `number` | `1` | 初期音量 (0–1) |
 | `initialTime` | `number` | `0` | 開始位置（秒） |
+| `seekStep` | `number` | `10` | 左右キーでスキップする秒数 |
 
 ### `ui` — `PlayerUiConfig`
 

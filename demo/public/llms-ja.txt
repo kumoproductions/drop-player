@@ -110,6 +110,7 @@ Propsは4つのグループに分かれています:
 - muted: ミュート状態で開始
 - volume: 初期音量 (0–1)
 - initialTime: 開始位置（秒）
+- seekStep: 左右キーでスキップする秒数
 ### `ui` — `PlayerUiConfig`
 
 - showControls: 下部コントロールバーを表示
