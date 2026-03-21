@@ -11,6 +11,7 @@ import { AmbientLightButton } from './controls/AmbientLightButton';
 import { CaptureButtons } from './controls/CaptureButtons';
 import { FullscreenButton } from './controls/FullscreenButton';
 import { LoopButton } from './controls/LoopButton';
+import { PageNavigation } from './controls/PageNavigation';
 import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
@@ -160,10 +161,10 @@ export function ControlsBar({
   sourceCount = 1,
   onPrevSource,
   onNextSource,
-  currentPage: _currentPage,
-  totalPages: _totalPages,
-  onPrevPage: _onPrevPage,
-  onNextPage: _onNextPage,
+  currentPage = 1,
+  totalPages = 0,
+  onPrevPage,
+  onNextPage,
   controlsStart,
   controlsEnd,
 }: ControlsBarProps) {
@@ -241,7 +242,19 @@ export function ControlsBar({
                   t={t}
                 />
               )}
-            {features.zoom && (
+            {mediaMode === 'pdf' &&
+              totalPages >= 2 &&
+              onPrevPage &&
+              onNextPage && (
+                <PageNavigation
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPrev={onPrevPage}
+                  onNext={onNextPage}
+                  t={t}
+                />
+              )}
+            {features.zoom && (mediaMode === 'image' || totalPages > 0) && (
               <ZoomControls
                 zoom={zoom}
                 minZoom={minZoom}
