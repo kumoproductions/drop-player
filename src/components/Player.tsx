@@ -1348,6 +1348,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               onError={handleError}
               onFrameCapture={onFrameCapture}
               onFullscreenToggle={toggleFullscreen}
+              onToggleControls={showControlsProp ? toggleControls : undefined}
             />
           );
         case 'pdf':
@@ -1361,6 +1362,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               onStateChange={handlePdfStateChange}
               onError={handleError}
               onFullscreenToggle={toggleFullscreen}
+              onToggleControls={showControlsProp ? toggleControls : undefined}
             />
           );
         case 'audio':
@@ -1390,6 +1392,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               onSeekStart={onSeekStart}
               onSeeking={onSeeking}
               onSeekEnd={onSeekEnd}
+              onToggleControls={showControlsProp ? toggleControls : undefined}
             />
           );
       }

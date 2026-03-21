@@ -888,6 +888,8 @@ export interface ImageCoreProps {
 
   /** Called on double-click to toggle fullscreen */
   onFullscreenToggle?: () => void;
+  /** Called on single tap (touch) to toggle controls visibility */
+  onToggleControls?: () => void;
 }
 
 /**
@@ -965,6 +967,8 @@ export interface PdfCoreProps {
   workerSrc?: string;
   /** Callback for fullscreen toggle (e.g. on double-click) */
   onFullscreenToggle?: () => void;
+  /** Called on single tap (touch) to toggle controls visibility */
+  onToggleControls?: () => void;
 }
 
 /**
@@ -1071,6 +1075,8 @@ export interface AudioCoreProps {
   onSeeking?: (time: number) => void;
   onSeekEnd?: (time: number) => void;
   onWaveformReady?: () => void;
+  /** Called on single tap (touch) to toggle controls visibility */
+  onToggleControls?: () => void;
 }
 
 /**

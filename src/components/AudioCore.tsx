@@ -42,6 +42,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       onSeeking,
       onSeekEnd,
       onWaveformReady,
+      onToggleControls,
     } = props;
 
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -276,6 +277,10 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       [setCurrentTime]
     );
 
+    const handleTouchTap = useCallback(() => {
+      onToggleControls?.();
+    }, [onToggleControls]);
+
     const { handlePointerDown, handlePointerMove } = useDragToSeek({
       mediaRef: audioRef,
       areaRef: waveformAreaRef,
@@ -285,6 +290,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       onDragSeekMove: handleDragSeekMove,
       onDragSeekEnd: handleDragSeekEnd,
       onClick: handleClickSeek,
+      onTouchTap: handleTouchTap,
     });
 
     // ── Imperative handle ───────────────────────────────────────

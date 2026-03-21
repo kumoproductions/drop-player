@@ -33,6 +33,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
       onLoad,
       onFrameCapture,
       onFullscreenToggle,
+      onToggleControls,
     } = props;
 
     const imageRef = useRef<HTMLImageElement>(null);
@@ -281,10 +282,13 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
 
     const lastTouchDistanceRef = useRef<number | null>(null);
     const lastTouchCenterRef = useRef<{ x: number; y: number } | null>(null);
+    const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+    const wasPinchRef = useRef(false);
 
     const handleTouchStart = useCallback(
       (e: React.TouchEvent) => {
         if (e.touches.length === 2) {
+          wasPinchRef.current = true;
           const touch1 = e.touches[0];
           const touch2 = e.touches[1];
           const distance = Math.hypot(
@@ -296,13 +300,20 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
             x: (touch1.clientX + touch2.clientX) / 2,
             y: (touch1.clientY + touch2.clientY) / 2,
           };
-        } else if (e.touches.length === 1 && zoom > 1) {
-          isDraggingRef.current = true;
-          dragStartRef.current = {
+        } else if (e.touches.length === 1) {
+          wasPinchRef.current = false;
+          touchStartPosRef.current = {
             x: e.touches[0].clientX,
             y: e.touches[0].clientY,
           };
-          panStartRef.current = { x: panX, y: panY };
+          if (zoom > 1) {
+            isDraggingRef.current = true;
+            dragStartRef.current = {
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+            };
+            panStartRef.current = { x: panX, y: panY };
+          }
         }
       },
       [zoom, panX, panY]
@@ -377,11 +388,29 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
       [zoom, panX, panY, clampZoom, clampPan, containerRef]
     );
 
-    const handleTouchEnd = useCallback(() => {
-      lastTouchDistanceRef.current = null;
-      lastTouchCenterRef.current = null;
-      isDraggingRef.current = false;
-    }, []);
+    const handleTouchEnd = useCallback(
+      (e: React.TouchEvent) => {
+        // Detect single tap: no pinch, no significant movement
+        if (
+          onToggleControls &&
+          !wasPinchRef.current &&
+          e.changedTouches.length === 1 &&
+          touchStartPosRef.current
+        ) {
+          const touch = e.changedTouches[0];
+          const dx = touch.clientX - touchStartPosRef.current.x;
+          const dy = touch.clientY - touchStartPosRef.current.y;
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+            onToggleControls();
+          }
+        }
+        lastTouchDistanceRef.current = null;
+        lastTouchCenterRef.current = null;
+        touchStartPosRef.current = null;
+        isDraggingRef.current = false;
+      },
+      [onToggleControls]
+    );
 
     useEffect(() => {
       const el = wheelTouchContainerRef.current;

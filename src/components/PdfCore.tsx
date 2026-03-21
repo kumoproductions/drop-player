@@ -28,6 +28,7 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
       onError,
       onLoad,
       onFullscreenToggle,
+      onToggleControls,
     } = props;
 
     // ── pdf.js document loading ──
@@ -404,10 +405,13 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     // ── Touch (pinch zoom + drag) ──
     const lastTouchDistanceRef = useRef<number | null>(null);
     const lastTouchCenterRef = useRef<{ x: number; y: number } | null>(null);
+    const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+    const wasPinchRef = useRef(false);
 
     const handleTouchStart = useCallback(
       (e: React.TouchEvent) => {
         if (e.touches.length === 2) {
+          wasPinchRef.current = true;
           const t1 = e.touches[0];
           const t2 = e.touches[1];
           lastTouchDistanceRef.current = Math.hypot(
@@ -418,13 +422,20 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
             x: (t1.clientX + t2.clientX) / 2,
             y: (t1.clientY + t2.clientY) / 2,
           };
-        } else if (e.touches.length === 1 && zoom > 1) {
-          isDraggingRef.current = true;
-          dragStartRef.current = {
+        } else if (e.touches.length === 1) {
+          wasPinchRef.current = false;
+          touchStartPosRef.current = {
             x: e.touches[0].clientX,
             y: e.touches[0].clientY,
           };
-          panStartRef.current = { x: panX, y: panY };
+          if (zoom > 1) {
+            isDraggingRef.current = true;
+            dragStartRef.current = {
+              x: e.touches[0].clientX,
+              y: e.touches[0].clientY,
+            };
+            panStartRef.current = { x: panX, y: panY };
+          }
         }
       },
       [zoom, panX, panY]
@@ -490,11 +501,28 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
       [zoom, panX, panY, clampZoom, clampPan, containerRef]
     );
 
-    const handleTouchEnd = useCallback(() => {
-      lastTouchDistanceRef.current = null;
-      lastTouchCenterRef.current = null;
-      isDraggingRef.current = false;
-    }, []);
+    const handleTouchEnd = useCallback(
+      (e: React.TouchEvent) => {
+        if (
+          onToggleControls &&
+          !wasPinchRef.current &&
+          e.changedTouches.length === 1 &&
+          touchStartPosRef.current
+        ) {
+          const touch = e.changedTouches[0];
+          const dx = touch.clientX - touchStartPosRef.current.x;
+          const dy = touch.clientY - touchStartPosRef.current.y;
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+            onToggleControls();
+          }
+        }
+        lastTouchDistanceRef.current = null;
+        lastTouchCenterRef.current = null;
+        touchStartPosRef.current = null;
+        isDraggingRef.current = false;
+      },
+      [onToggleControls]
+    );
 
     // Register passive: false event listeners (same as ImageCore)
     useEffect(() => {
