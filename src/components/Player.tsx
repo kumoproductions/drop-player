@@ -22,6 +22,7 @@ import type {
   FrameCapture,
   ImageCoreRef,
   ImageState,
+  PdfCoreRef,
   PdfState,
   PlayerProps,
   PlayerRef,
@@ -149,6 +150,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const videoCoreRef = useRef<VideoCoreRef>(null);
     const imageCoreRef = useRef<ImageCoreRef>(null);
+    const pdfCoreRef = useRef<PdfCoreRef>(null);
     const audioCoreRef = useRef<AudioCoreRef>(null);
 
     const normalized = useMemo(
@@ -199,6 +201,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       panX: 0,
       panY: 0,
       isLoaded: false,
+      currentPage: 0,
+      totalPages: 0,
     });
 
     const [audioState, setAudioState] = useState<AudioState>({
@@ -352,7 +356,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         ? videoState.isEnded
         : mediaMode === 'audio'
           ? audioState.isEnded
-          : true;
+          : false;
 
     const resetHideControlsTimer = useCallback(
       (e: React.PointerEvent) => {
@@ -572,6 +576,11 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const handleSourceChange = useCallback(
       (index: number) => {
         setActiveSourceIndex(index);
+        setControlsVisible(true);
+        // Reset readiness so the loading overlay covers the stale frame
+        setVideoState((prev) => ({ ...prev, duration: 0 }));
+        setImageState((prev) => ({ ...prev, isLoaded: false }));
+        setPdfState((prev) => ({ ...prev, isLoaded: false }));
         onActiveSourceChange?.(index);
       },
       [onActiveSourceChange]
@@ -589,8 +598,16 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       }
     }, [activeSourceIndex, entries.length, handleSourceChange]);
 
+    const handlePrevPage = useCallback(() => {
+      if (mediaMode === 'pdf') pdfCoreRef.current?.prevPage();
+    }, [mediaMode]);
+
+    const handleNextPage = useCallback(() => {
+      if (mediaMode === 'pdf') pdfCoreRef.current?.nextPage();
+    }, [mediaMode]);
+
     const isSwipeDisabled =
-      mediaMode === 'pdf' ||
+      (mediaMode === 'pdf' && pdfState.zoom > 1) ||
       (mediaMode === 'image' && imageState.zoom > 1) ||
       entries.length < 2;
 
@@ -599,8 +616,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       onTouchEnd: handleSwipeTouchEnd,
       onTouchCancel: handleSwipeTouchCancel,
     } = useSwipeNavigation({
-      onPrev: handlePrevSource,
-      onNext: handleNextSource,
+      onPrev: mediaMode === 'pdf' ? handlePrevPage : handlePrevSource,
+      onNext: mediaMode === 'pdf' ? handleNextPage : handleNextSource,
       disabled: isSwipeDisabled,
     });
 
@@ -634,16 +651,65 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       return () => container.removeEventListener('keydown', handleImageKeyDown);
     }, [mediaMode, entries.length, handlePrevSource, handleNextSource]);
 
+    // Keyboard navigation for pdf mode (ArrowUp/Down for pages, +/-/0 for zoom)
+    useEffect(() => {
+      if (mediaMode !== 'pdf') return;
+      const container = containerRef.current;
+      if (!container) return;
+
+      const handlePdfKeyDown = (e: KeyboardEvent) => {
+        const target = e.target as HTMLElement;
+        if (
+          target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable ||
+          target.closest('button,[role="button"],select,[role="slider"]')
+        ) {
+          return;
+        }
+
+        switch (e.key) {
+          case 'ArrowUp':
+            e.preventDefault();
+            pdfCoreRef.current?.prevPage();
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            pdfCoreRef.current?.nextPage();
+            break;
+          case '+':
+          case '=':
+            e.preventDefault();
+            pdfCoreRef.current?.zoomIn();
+            break;
+          case '-':
+            e.preventDefault();
+            pdfCoreRef.current?.zoomOut();
+            break;
+          case '0':
+            e.preventDefault();
+            pdfCoreRef.current?.resetZoom();
+            break;
+        }
+      };
+
+      container.addEventListener('keydown', handlePdfKeyDown);
+      return () => container.removeEventListener('keydown', handlePdfKeyDown);
+    }, [mediaMode]);
+
     const handleZoomIn = useCallback(() => {
       if (mediaMode === 'image') imageCoreRef.current?.zoomIn();
+      if (mediaMode === 'pdf') pdfCoreRef.current?.zoomIn();
     }, [mediaMode]);
 
     const handleZoomOut = useCallback(() => {
       if (mediaMode === 'image') imageCoreRef.current?.zoomOut();
+      if (mediaMode === 'pdf') pdfCoreRef.current?.zoomOut();
     }, [mediaMode]);
 
     const handleResetZoom = useCallback(() => {
       if (mediaMode === 'image') imageCoreRef.current?.resetZoom();
+      if (mediaMode === 'pdf') pdfCoreRef.current?.resetZoom();
     }, [mediaMode]);
 
     const resolvedSeekStep = seekStep ?? 10;
@@ -1287,12 +1353,14 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         case 'pdf':
           return (
             <PdfCore
+              ref={pdfCoreRef}
               src={activeEntry.url}
               minZoom={DEFAULT_MIN_ZOOM}
-              maxZoom={3}
+              maxZoom={DEFAULT_MAX_ZOOM}
               containerRef={containerRef}
               onStateChange={handlePdfStateChange}
               onError={handleError}
+              onFullscreenToggle={toggleFullscreen}
             />
           );
         case 'audio':
@@ -1389,7 +1457,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           )}
 
           {/* Loading overlay */}
-          {!isReady && !lastError && mediaMode !== 'pdf' && (
+          {!isReady && !lastError && (
             <div
               role="status"
               aria-label="Loading"
@@ -1438,8 +1506,8 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           {/* Status overlay (pill) */}
           {showStatusOverlay && <StatusOverlay state={statusOverlay.state} />}
 
-          {/* Controls overlay (hidden for PDF) */}
-          {showControlsProp && mediaMode !== 'pdf' && (
+          {/* Controls overlay */}
+          {showControlsProp && (
             <div
               className={`drop-player-controls-gradient ${
                 controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
@@ -1565,7 +1633,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 onAmbientLightToggle={handleAmbientLightToggle}
                 onSaveCapture={handleSaveCapture}
                 onCopyCapture={handleCopyCapture}
-                zoom={imageState.zoom}
+                zoom={mediaMode === 'pdf' ? pdfState.zoom : imageState.zoom}
                 minZoom={DEFAULT_MIN_ZOOM}
                 maxZoom={DEFAULT_MAX_ZOOM}
                 onZoomIn={handleZoomIn}
@@ -1575,6 +1643,10 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 sourceCount={entries.length}
                 onPrevSource={handlePrevSource}
                 onNextSource={handleNextSource}
+                currentPage={pdfState.currentPage}
+                totalPages={pdfState.totalPages}
+                onPrevPage={handlePrevPage}
+                onNextPage={handleNextPage}
                 isFullscreen={isFullscreen}
                 onFullscreenToggle={toggleFullscreen}
                 t={t}

@@ -1,8 +1,23 @@
 import { useCallback, useRef, useState } from 'react';
 
+export type StatusIconKey =
+  | 'play'
+  | 'pause'
+  | 'volume'
+  | 'volumeX'
+  | 'repeat'
+  | 'stepBack'
+  | 'stepForward'
+  | 'gauge'
+  | 'settings'
+  | 'zoomIn'
+  | 'zoomOut'
+  | 'fullscreen'
+  | '';
+
 export interface StatusOverlayState {
   visible: boolean;
-  icon: string;
+  icon: StatusIconKey;
   text: string;
   /** When true, overlay stays visible until explicitly dismissed */
   persistent: boolean;
@@ -29,7 +44,7 @@ export function useStatusOverlay() {
   }, []);
 
   const show = useCallback(
-    (icon: string, text: string, persistent = false) => {
+    (icon: StatusIconKey, text: string, persistent = false) => {
       clearTimer();
       setState({ visible: true, icon, text, persistent });
 

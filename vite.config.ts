@@ -36,6 +36,8 @@ export default defineConfig(({ command }) => {
                 'react-dom',
                 'react/jsx-runtime',
                 'hls.js',
+                'pdfjs-dist',
+                'pdfjs-dist/build/pdf.worker.min.mjs',
                 'waveform-data',
                 'lucide-react',
               ],

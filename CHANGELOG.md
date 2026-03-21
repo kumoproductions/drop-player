@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.2.0
+
+### Features
+
+- Add pdf.js integration as optional peer dependency for canvas-based PDF rendering with real zoom, pan, and page navigation
+- Add `PageNavigation` control (prev/next page with `ChevronUp`/`ChevronDown` icons)
+- Add `PdfCoreRef` imperative handle (`zoomIn`, `zoomOut`, `resetZoom`, `nextPage`, `prevPage`, `goToPage`)
+- Add keyboard shortcuts for PDF mode (`ArrowUp`/`ArrowDown` for pages, `+`/`-`/`0` for zoom)
+- Add swipe gesture for PDF page navigation (disabled when zoomed)
+- Fallback to browser-native `<object>` rendering when `pdfjs-dist` is not installed
+
+### Improvements
+
+- PDF pages fit container at 100% zoom (no excess margins)
+- Zoom re-renders via pdf.js for crisp vector text (debounced 150ms with immediate CSS feedback)
+- Page change resets zoom to 1x
+- Controls and title auto-hide after 3 seconds for image and PDF modes (consistent with video/audio)
+- Source change resets readiness state so loading overlay covers stale content
+- Add `tabular-nums` to zoom level display
+- Controls overlay now has proper z-index to remain visible during loading
+
 ## 1.1.7
 
 ### Features

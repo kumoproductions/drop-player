@@ -12,9 +12,15 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import type { StatusOverlayState } from '../hooks/useStatusOverlay';
+import type {
+  StatusIconKey,
+  StatusOverlayState,
+} from '../hooks/useStatusOverlay';
 
-const ICON_MAP: Record<string, React.ComponentType<{ size: number }>> = {
+const ICON_MAP: Record<
+  Exclude<StatusIconKey, ''>,
+  React.ComponentType<{ size: number }>
+> = {
   play: Play,
   pause: Pause,
   volume: Volume2,
@@ -35,7 +41,7 @@ interface StatusOverlayProps {
 
 export function StatusOverlay({ state }: StatusOverlayProps) {
   const { visible, icon, text } = state;
-  const IconComponent = ICON_MAP[icon];
+  const IconComponent = icon ? ICON_MAP[icon] : undefined;
 
   if (!text && !icon) return null;
 

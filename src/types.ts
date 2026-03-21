@@ -562,6 +562,9 @@ export type TranslationKey =
   // Source navigation
   | 'previous'
   | 'next'
+  // Page navigation
+  | 'previousPage'
+  | 'nextPage'
   | 'seekBackward'
   | 'seekForward'
   // Status overlay
@@ -929,6 +932,10 @@ export interface PdfState {
   panY: number;
   /** Whether the PDF has loaded */
   isLoaded: boolean;
+  /** Current page number (1-indexed, 0 when not loaded) */
+  currentPage: number;
+  /** Total number of pages (0 when not loaded or fallback mode) */
+  totalPages: number;
 }
 
 /**
@@ -953,6 +960,35 @@ export interface PdfCoreProps {
   // Event callbacks
   onError?: (error: Error) => void;
   onLoad?: () => void;
+
+  /** Optional pdf.js worker URL override */
+  workerSrc?: string;
+  /** Callback for fullscreen toggle (e.g. on double-click) */
+  onFullscreenToggle?: () => void;
+}
+
+/**
+ * PdfCore imperative handle.
+ * @internal
+ */
+export interface PdfCoreRef {
+  // Zoom (aligned with ImageCoreRef)
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+  setZoom: (zoom: number) => void;
+  getZoomLevel: () => number;
+  getPan: () => { x: number; y: number };
+
+  // Page navigation
+  nextPage: () => void;
+  prevPage: () => void;
+  goToPage: (page: number) => void;
+  getCurrentPage: () => number;
+  getTotalPages: () => number;
+
+  // State
+  isLoaded: () => boolean;
 }
 
 // ============================================================================

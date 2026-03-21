@@ -58,6 +58,8 @@ import 'drop-player/styles.css';
 const PDF_CODE = `import { PdfViewer } from 'drop-player';
 import 'drop-player/styles.css';
 
+// Requires pdfjs-dist for canvas rendering (zoom, pan, page navigation)
+// Falls back to browser-native <object> when pdfjs-dist is not installed
 <PdfViewer sources="sample.pdf" />`;
 
 export function InteractiveDemo() {
@@ -116,7 +118,7 @@ export function InteractiveDemo() {
 
       <DemoCard
         title="PDF Viewer"
-        description="Browser-native rendering with zoom controls"
+        description="Canvas rendering via pdf.js — zoom, pan, and page navigation"
         code={PDF_CODE}
       >
         <PdfViewer sources={MEDIA.pdf} />
