@@ -265,8 +265,7 @@ export function SeekBar({
                   className="drop-player-seekbar-marker-dot"
                   style={{
                     backgroundColor:
-                      marker.color ??
-                      'var(--drop-player-marker-scene, #eab308)',
+                      marker.color ?? 'var(--drop-player-marker-scene)',
                   }}
                 />
               </div>

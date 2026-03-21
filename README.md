@@ -281,22 +281,26 @@ Override CSS variables on `.drop-player`:
 @import 'drop-player/styles.css';
 
 .drop-player {
-  --drop-player-primary: #3b82f6;
-  --drop-player-success: #22c55e;
-  --drop-player-warning: #eab308;
-  --drop-player-marker-scene: #eab308;
-  --drop-player-marker-custom: #3b82f6;
+  --drop-player-blue: oklch(70.7% 0.165 254.624);
+  --drop-player-yellow: oklch(85.2% 0.199 91.936);
+  --drop-player-green: oklch(79.2% 0.209 151.711);
+  --drop-player-red: oklch(70.4% 0.191 22.216);
+  --drop-player-muted: oklch(55.2% 0.016 285.938);
+  --drop-player-marker-scene: var(--drop-player-yellow);
+  --drop-player-marker-custom: var(--drop-player-blue);
   --drop-player-border-radius: 8px;
 }
 ```
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `--drop-player-primary` | `#3b82f6` | Accent color (seek bar, active states) |
-| `--drop-player-success` | `#22c55e` | Success states (capture saved) |
-| `--drop-player-warning` | `#eab308` | Warning states |
-| `--drop-player-marker-scene` | `#eab308` | Scene marker color |
-| `--drop-player-marker-custom` | `#3b82f6` | Custom marker color |
+| `--drop-player-blue` | `oklch(70.7% 0.165 254.624)` | Accent color (active states, focus ring) |
+| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | Highlight color (ambient light on) |
+| `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | Positive color (check marks, best quality) |
+| `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | Negative color (errors) |
+| `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | Muted / inactive color |
+| `--drop-player-marker-scene` | `var(--drop-player-yellow)` | Scene marker color |
+| `--drop-player-marker-custom` | `var(--drop-player-blue)` | Custom marker color |
 | `--drop-player-border-radius` | `0` | Container border radius |
 | `--drop-player-aspect-ratio` | varies | Aspect ratio (16/9 video, 32/9 audio, 4/3 image, 1/1.414 PDF) |
 

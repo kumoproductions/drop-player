@@ -8,9 +8,11 @@ import { useState } from 'react';
 import { MEDIA } from '../data/media';
 
 const THEME_VARS = [
-  { key: '--drop-player-primary', label: 'Primary', default: '#3b82f6' },
-  { key: '--drop-player-success', label: 'Success', default: '#22c55e' },
-  { key: '--drop-player-warning', label: 'Warning', default: '#eab308' },
+  { key: '--drop-player-blue', label: 'Blue', default: '#4b8bf5' },
+  { key: '--drop-player-yellow', label: 'Yellow', default: '#d4a20a' },
+  { key: '--drop-player-green', label: 'Green', default: '#3dba5e' },
+  { key: '--drop-player-red', label: 'Red', default: '#e0513f' },
+  { key: '--drop-player-muted', label: 'Muted', default: '#787880' },
   {
     key: '--drop-player-border-radius',
     label: 'Border Radius',

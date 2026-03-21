@@ -281,22 +281,26 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 @import 'drop-player/styles.css';
 
 .drop-player {
-  --drop-player-primary: #3b82f6;
-  --drop-player-success: #22c55e;
-  --drop-player-warning: #eab308;
-  --drop-player-marker-scene: #eab308;
-  --drop-player-marker-custom: #3b82f6;
+  --drop-player-blue: oklch(70.7% 0.165 254.624);
+  --drop-player-yellow: oklch(85.2% 0.199 91.936);
+  --drop-player-green: oklch(79.2% 0.209 151.711);
+  --drop-player-red: oklch(70.4% 0.191 22.216);
+  --drop-player-muted: oklch(55.2% 0.016 285.938);
+  --drop-player-marker-scene: var(--drop-player-yellow);
+  --drop-player-marker-custom: var(--drop-player-blue);
   --drop-player-border-radius: 8px;
 }
 ```
 
 | 変数 | デフォルト | 説明 |
 |----------|---------|-------------|
-| `--drop-player-primary` | `#3b82f6` | アクセントカラー（シークバー、アクティブ状態） |
-| `--drop-player-success` | `#22c55e` | 成功状態（キャプチャ保存時） |
-| `--drop-player-warning` | `#eab308` | 警告状態 |
-| `--drop-player-marker-scene` | `#eab308` | シーンマーカーの色 |
-| `--drop-player-marker-custom` | `#3b82f6` | カスタムマーカーの色 |
+| `--drop-player-blue` | `oklch(70.7% 0.165 254.624)` | アクセントカラー（アクティブ状態、フォーカスリング） |
+| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | ハイライトカラー（アンビエントライトON時） |
+| `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | ポジティブカラー（チェックマーク、最高画質） |
+| `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | ネガティブカラー（エラー） |
+| `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | ミュート / 非アクティブカラー |
+| `--drop-player-marker-scene` | `var(--drop-player-yellow)` | シーンマーカーの色 |
+| `--drop-player-marker-custom` | `var(--drop-player-blue)` | カスタムマーカーの色 |
 | `--drop-player-border-radius` | `0` | コンテナの角丸 |
 | `--drop-player-aspect-ratio` | 可変 | アスペクト比（動画: 16/9, 音声: 32/9, 画像: 4/3, PDF: 1/1.414） |
 

@@ -4,27 +4,32 @@
 
 /* Custom CSS Variables for theming */
 :root {
-  --drop-player-primary: #3b82f6;
-  --drop-player-success: #22c55e;
-  --drop-player-warning: #eab308;
-  --drop-player-marker-scene: #eab308;
-  --drop-player-marker-custom: #3b82f6;
+  --drop-player-blue: oklch(70.7% 0.165 254.624);
+  --drop-player-yellow: oklch(85.2% 0.199 91.936);
+  --drop-player-green: oklch(79.2% 0.209 151.711);
+  --drop-player-red: oklch(70.4% 0.191 22.216);
+  --drop-player-muted: oklch(55.2% 0.016 285.938);
+  --drop-player-marker-scene: var(--drop-player-yellow);
+  --drop-player-marker-custom: var(--drop-player-blue);
+  --drop-player-border-radius: 0;
 }
 
 /* ------------------------------------------------------------ */
 /* Player container                                             */
 /* ------------------------------------------------------------ */
 .drop-player {
-  --dp-primary: var(--drop-player-primary);
-  --dp-success: var(--drop-player-success);
-  --dp-warning: var(--drop-player-warning);
+  --dp-blue: var(--drop-player-blue);
+  --dp-yellow: var(--drop-player-yellow);
+  --dp-green: var(--drop-player-green);
+  --dp-red: var(--drop-player-red);
+  --dp-muted: var(--drop-player-muted);
 
   position: relative;
   isolation: isolate;
   width: 100%;
   aspect-ratio: var(--drop-player-aspect-ratio, 16 / 9);
   background-color: #000;
-  border-radius: var(--drop-player-border-radius, 0);
+  border-radius: var(--drop-player-border-radius);
   overflow: hidden;
   outline: none;
 }
@@ -244,7 +249,7 @@
 }
 
 .drop-player-button:focus-visible {
-  outline: 2px solid var(--dp-primary);
+  outline: 2px solid var(--dp-blue);
   outline-offset: 2px;
 }
 
@@ -282,19 +287,19 @@
   color: #fff;
 }
 .drop-player-color-blue {
-  color: oklch(70.7% 0.165 254.624);
+  color: var(--dp-blue);
 }
 .drop-player-color-yellow {
-  color: oklch(85.2% 0.199 91.936);
+  color: var(--dp-yellow);
 }
 .drop-player-color-green {
-  color: oklch(79.2% 0.209 151.711);
+  color: var(--dp-green);
 }
 .drop-player-color-red {
-  color: oklch(70.4% 0.191 22.216);
+  color: var(--dp-red);
 }
 .drop-player-color-muted {
-  color: oklch(55.2% 0.016 285.938);
+  color: var(--dp-muted);
 }
 
 /* ------------------------------------------------------------ */
@@ -684,13 +689,13 @@
 }
 
 .drop-player-audio-fallback {
-  color: oklch(55.2% 0.016 285.938);
+  color: var(--dp-muted);
   font-size: 0.875rem;
   flex-shrink: 0;
 }
 
 .drop-player-audio-icon {
-  color: oklch(55.2% 0.016 285.938);
+  color: var(--dp-muted);
   flex-shrink: 0;
 }
 
