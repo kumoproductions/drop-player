@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.5
+
+- Revert 1.2.4
+
+## 1.2.4 (deprecated)
+
+- ~~Fix Webpack/Turbopack build error (`Module not found`) when optional peer dependencies are not installed~~ — reverted, `webpackIgnore` prevents bundlers from resolving installed packages at runtime
+
 ## 1.2.3
 
 ### Bug Fixes
