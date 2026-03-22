@@ -136,7 +136,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       async (audioSrc: string, signal: AbortSignal) => {
         let WaveformDataModule: typeof WaveformData;
         try {
-          const mod = await import(/* webpackIgnore: true */ 'waveform-data');
+          const mod = await import('waveform-data');
           WaveformDataModule = mod.default;
         } catch {
           console.warn(

@@ -36,7 +36,7 @@ async function importHls(
   if (HlsModule) return HlsModule;
   if (hlsImportPromise) return hlsImportPromise;
 
-  hlsImportPromise = import(/* webpackIgnore: true */ 'hls.js')
+  hlsImportPromise = import('hls.js')
     .then((mod) => {
       HlsModule = mod.default;
       hlsImportPromise = null;
