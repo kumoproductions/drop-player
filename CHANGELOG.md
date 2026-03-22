@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.4
+
+### Bug Fixes
+
+- Fix Webpack/Turbopack build error (`Module not found`) when optional peer dependencies (`pdfjs-dist`, `hls.js`, `waveform-data`) are not installed — add `/* webpackIgnore: true */` to dynamic imports
+
 ## 1.2.3
 
 ### Bug Fixes

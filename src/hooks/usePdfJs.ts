@@ -14,7 +14,7 @@ async function importPdfJs(
   if (PdfjsModule) return PdfjsModule;
   if (pdfjsImportPromise) return pdfjsImportPromise;
 
-  pdfjsImportPromise = import('pdfjs-dist')
+  pdfjsImportPromise = import(/* webpackIgnore: true */ 'pdfjs-dist')
     .then(async (mod) => {
       if (!workerConfigured) {
         if (workerSrc) {
@@ -23,7 +23,7 @@ async function importPdfJs(
           try {
             const workerModule = await import(
               // @ts-expect-error pdfjs-dist worker module
-              'pdfjs-dist/build/pdf.worker.min.mjs'
+              /* webpackIgnore: true */ 'pdfjs-dist/build/pdf.worker.min.mjs'
             );
             mod.GlobalWorkerOptions.workerSrc =
               workerModule.default ?? workerModule;
