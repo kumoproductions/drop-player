@@ -143,7 +143,44 @@ Propsは4つのグループに分かれています:
 | `filmGauge` | `number` | `16` | `'feet-frames'` 表示のフィート当たりフレーム数（例: 35mm=`16`, 16mm=`40`） |
 | `bpm` | `number` | `120` | `'bars-beats'` 表示のBPM |
 | `timeSignature` | `string` | `'4/4'` | `'bars-beats'` 表示の拍子記号（例: `'3/4'`, `'6/8'`） |
-| `markers` | `Marker[]` | `[]` | シークバーマーカー |
+| `markers` | `Marker[]` | `[]` | シークバーマーカー — [マーカータイプ](#マーカータイプ)を参照 |
+
+### マーカータイプ
+
+`Marker` は判別ユニオン型です。`type` によってシークバートラック上の表示形状が変わります:
+
+| `type` | 形状 | 追加フィールド |
+|--------|------|-------------|
+| `'circle'`（デフォルト） | 塗りつぶし円 | — |
+| `'line'` | 縦線 | — |
+| `'square'` | 塗りつぶし正方形 | — |
+| `'custom'` | 任意のReactNode | `content: ReactNode`（必須） |
+
+共通フィールド:
+
+| フィールド | 型 | デフォルト | 説明 |
+|-------|------|---------|-------------|
+| `time` | `number` | — | 位置（秒） |
+| `color` | `string` | CSS変数 | CSS色値 |
+| `snap` | `boolean` | `false` | シーク時にスナップを有効化 |
+| `snapThreshold` | `number` | `12` | スナップ距離（px）`snap: true` のときのみ使用 |
+
+```tsx
+import type { Marker } from 'drop-player';
+
+const markers: Marker[] = [
+  { time: 10, type: 'circle', snap: true },
+  { time: 30, type: 'line' },
+  { time: 60, type: 'square', color: 'red' },
+  {
+    time: 90,
+    type: 'custom',
+    content: <div style={{ ... }}>ラベル</div>,
+  },
+];
+
+<VideoPlayer sources={url} ui={{ markers }} />
+```
 
 ### `slots` — `PlayerSlots`
 
@@ -151,7 +188,6 @@ Propsは4つのグループに分かれています:
 |------|------|----------|
 | `controlsStart` | `ReactNode` | コントロールバーの左側 |
 | `controlsEnd` | `ReactNode` | コントロールバーの右側（フルスクリーンボタンの前） |
-| `seekbarOverlay` | `(state: PlayerState) => ReactNode` | シークバーの上 |
 | `topLeftOverlay` | `ReactNode` | 左上隅 |
 | `topRightOverlay` | `ReactNode` | 右上隅 |
 | `loadingIndicator` | `ReactNode` | 中央（読み込み中） |
@@ -289,8 +325,7 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
   --drop-player-green: oklch(79.2% 0.209 151.711);
   --drop-player-red: oklch(70.4% 0.191 22.216);
   --drop-player-muted: oklch(55.2% 0.016 285.938);
-  --drop-player-marker-scene: var(--drop-player-yellow);
-  --drop-player-marker-custom: var(--drop-player-blue);
+  --drop-player-marker-circle: var(--drop-player-yellow);
   --drop-player-border-radius: 8px;
 }
 ```
@@ -302,8 +337,7 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 | `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | ポジティブカラー（チェックマーク、最高画質） |
 | `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | ネガティブカラー（エラー） |
 | `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | ミュート / 非アクティブカラー |
-| `--drop-player-marker-scene` | `var(--drop-player-yellow)` | シーンマーカーの色 |
-| `--drop-player-marker-custom` | `var(--drop-player-blue)` | カスタムマーカーの色 |
+| `--drop-player-marker-circle` | `var(--drop-player-yellow)` | マーカーの色（circle・line・square） |
 | `--drop-player-border-radius` | `0` | コンテナの角丸 |
 | `--drop-player-aspect-ratio` | 可変 | アスペクト比（動画: 16/9, 音声: 32/9, 画像: 4/3, PDF: 1/1.414） |
 

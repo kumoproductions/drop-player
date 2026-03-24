@@ -1516,13 +1516,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 controlsVisible ? 'drop-player-visible' : 'drop-player-hidden'
               }`}
             >
-              {(mediaMode === 'video' || mediaMode === 'audio') &&
-                slots?.seekbarOverlay && (
-                  <div className="drop-player-seekbar-overlay-slot">
-                    {slots.seekbarOverlay(playerState)}
-                  </div>
-                )}
-
               {features.seekBar &&
                 (mediaMode === 'video' || mediaMode === 'audio') && (
                   <SeekBar

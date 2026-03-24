@@ -190,12 +190,34 @@ export interface CaptureOptions {
 // Marker Types
 // ============================================================================
 
-export interface Marker {
+interface BaseMarker {
   time: number;
-  type?: 'scene' | 'custom';
   color?: string;
+  /** Set to true to enable snap-to for this marker. Default: false. */
+  snap?: boolean;
+  /** Snap threshold in pixels. Only used when snap is true. Default: 12. */
   snapThreshold?: number;
 }
+
+export interface CircleMarker extends BaseMarker {
+  type?: 'circle';
+}
+
+export interface LineMarker extends BaseMarker {
+  type: 'line';
+}
+
+export interface SquareMarker extends BaseMarker {
+  type: 'square';
+}
+
+export interface CustomMarker extends BaseMarker {
+  type: 'custom';
+  /** ReactNode rendered at the marker's time position on the seekbar track. */
+  content: ReactNode;
+}
+
+export type Marker = CircleMarker | LineMarker | SquareMarker | CustomMarker;
 
 // ============================================================================
 // Time Display
@@ -272,9 +294,6 @@ export interface PlayerSlots {
 
   /** Add to the right of the controls bar (before fullscreen button) */
   controlsEnd?: ReactNode;
-
-  /** Overlay on the timeline (comment markers, etc.). Shown above controls for video (with seek bar) and for audio (no seek bar). */
-  seekbarOverlay?: (state: PlayerState) => ReactNode;
 
   /** Overlay on the top-left of the player */
   topLeftOverlay?: ReactNode;

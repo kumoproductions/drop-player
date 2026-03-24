@@ -143,7 +143,44 @@ Props are organised into four groups to keep the surface area manageable:
 | `filmGauge` | `number` | `16` | Frames per foot for `'feet-frames'` display (e.g. `16` for 35mm, `40` for 16mm) |
 | `bpm` | `number` | `120` | BPM for `'bars-beats'` display |
 | `timeSignature` | `string` | `'4/4'` | Time signature for `'bars-beats'` display (e.g. `'3/4'`, `'6/8'`) |
-| `markers` | `Marker[]` | `[]` | Seekbar markers |
+| `markers` | `Marker[]` | `[]` | Seekbar markers — see [Marker types](#marker-types) |
+
+### Marker types
+
+`Marker` is a discriminated union. Each type renders a different shape on the seekbar track:
+
+| `type` | Shape | Extra fields |
+|--------|-------|-------------|
+| `'circle'` (default) | Filled dot | — |
+| `'line'` | Vertical line | — |
+| `'square'` | Filled square | — |
+| `'custom'` | Your ReactNode | `content: ReactNode` (required) |
+
+All types share these base fields:
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `time` | `number` | — | Position in seconds |
+| `color` | `string` | CSS var | CSS color value |
+| `snap` | `boolean` | `false` | Enable snap-to on seek |
+| `snapThreshold` | `number` | `12` | Snap threshold in px (only when `snap: true`) |
+
+```tsx
+import type { Marker } from 'drop-player';
+
+const markers: Marker[] = [
+  { time: 10, type: 'circle', snap: true },
+  { time: 30, type: 'line' },
+  { time: 60, type: 'square', color: 'red' },
+  {
+    time: 90,
+    type: 'custom',
+    content: <div style={{ ... }}>Label</div>,
+  },
+];
+
+<VideoPlayer sources={url} ui={{ markers }} />
+```
 
 ### `slots` — `PlayerSlots`
 
@@ -151,7 +188,6 @@ Props are organised into four groups to keep the surface area manageable:
 |------|------|----------|
 | `controlsStart` | `ReactNode` | Left of control bar |
 | `controlsEnd` | `ReactNode` | Right of control bar (before fullscreen) |
-| `seekbarOverlay` | `(state: PlayerState) => ReactNode` | Above seekbar |
 | `topLeftOverlay` | `ReactNode` | Top-left corner |
 | `topRightOverlay` | `ReactNode` | Top-right corner |
 | `loadingIndicator` | `ReactNode` | Centre (while loading) |
@@ -290,8 +326,7 @@ Override CSS variables on `.drop-player`:
   --drop-player-green: oklch(79.2% 0.209 151.711);
   --drop-player-red: oklch(70.4% 0.191 22.216);
   --drop-player-muted: oklch(55.2% 0.016 285.938);
-  --drop-player-marker-scene: var(--drop-player-yellow);
-  --drop-player-marker-custom: var(--drop-player-blue);
+  --drop-player-marker-circle: var(--drop-player-yellow);
   --drop-player-border-radius: 8px;
 }
 ```
@@ -303,8 +338,7 @@ Override CSS variables on `.drop-player`:
 | `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | Positive color (check marks, best quality) |
 | `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | Negative color (errors) |
 | `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | Muted / inactive color |
-| `--drop-player-marker-scene` | `var(--drop-player-yellow)` | Scene marker color |
-| `--drop-player-marker-custom` | `var(--drop-player-blue)` | Custom marker color |
+| `--drop-player-marker-circle` | `var(--drop-player-yellow)` | Marker color (circle, line, square) |
 | `--drop-player-border-radius` | `0` | Container border radius |
 | `--drop-player-aspect-ratio` | varies | Aspect ratio (16/9 video, 32/9 audio, 4/3 image, 1/1.414 PDF) |
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.3.0
+
+### Breaking Changes
+
+- **Marker API redesigned** — `Marker` is now a discriminated union. Replace `type: 'scene'` with `type: 'circle'`. The old `type: 'custom'` (no-op) now requires `content: ReactNode`.
+- **`slots.seekbarOverlay` removed** — use `type: 'custom'` markers instead.
+- **CSS variable `--drop-player-marker-scene` renamed** to `--drop-player-marker-circle`. `--drop-player-marker-custom` removed.
+- **Snap is now opt-in per marker** — add `snap: true` to each marker that should snap. Previously snap was always active when markers were present.
+
+### Features
+
+- New marker types: `'circle'` (renamed from `'scene'`), `'line'`, `'square'`, `'custom'`
+- `snap?: boolean` — enable snap-to per marker (default: `false`)
+- `snapThreshold?: number` — per-marker snap distance in px (default: `12`, only used when `snap: true`)
+- `content: ReactNode` — render arbitrary content on the seekbar track at a specific time (`type: 'custom'`)
+- Named marker types (`CircleMarker`, `LineMarker`, `SquareMarker`, `CustomMarker`) exported from package root
+
 ## 1.2.5
 
 - Revert 1.2.4

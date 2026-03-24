@@ -9,8 +9,7 @@
   --drop-player-green: oklch(79.2% 0.209 151.711);
   --drop-player-red: oklch(70.4% 0.191 22.216);
   --drop-player-muted: oklch(55.2% 0.016 285.938);
-  --drop-player-marker-scene: var(--drop-player-yellow);
-  --drop-player-marker-custom: var(--drop-player-blue);
+  --drop-player-marker-circle: var(--drop-player-yellow);
   --drop-player-border-radius: 0;
 }
 
@@ -223,23 +222,6 @@
   width: 100%;
   min-width: 100%;
   transition: opacity 0.3s;
-}
-
-/* ------------------------------------------------------------ */
-/* Seekbar overlay slot                                         */
-/* ------------------------------------------------------------ */
-.drop-player-seekbar-overlay-slot {
-  position: absolute;
-  inset-inline: 0;
-  top: -24px;
-  height: 24px;
-  pointer-events: none;
-  z-index: 10;
-  margin-inline: 12px;
-}
-
-.drop-player-seekbar-overlay-slot > * {
-  pointer-events: auto;
 }
 
 /* ------------------------------------------------------------ */
@@ -639,6 +621,7 @@
   top: 50%;
   transform: translateY(-50%);
   height: 12px;
+  overflow: visible;
   pointer-events: none;
   z-index: 10;
 }
@@ -654,6 +637,26 @@
   height: 6px;
   border-radius: 9999px;
   opacity: 0.7;
+}
+
+.drop-player-seekbar-marker-line {
+  width: 2px;
+  /* 12px matches the markers container height, intentionally taller than the
+     4px track bar for visual salience */
+  height: 12px;
+  background-color: var(--drop-player-marker-circle);
+  opacity: 0.7;
+}
+
+.drop-player-seekbar-marker-square {
+  width: 6px;
+  height: 6px;
+  opacity: 0.7;
+  background-color: var(--drop-player-marker-circle);
+}
+
+.drop-player-seekbar-marker--custom {
+  pointer-events: auto;
 }
 
 .drop-player-seekbar-track {
