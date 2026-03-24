@@ -24,13 +24,16 @@ export {
 // Types
 export type {
   CaptureOptions,
+  // Marker types
+  CircleMarker,
+  CustomMarker,
   FallbackEvent,
   FallbackReason,
   // Capture types
   FrameCapture,
   // Quality types
   HlsLevelInfo,
-  // Marker types
+  LineMarker,
   Marker,
   // Media mode
   MediaMode,
@@ -51,6 +54,7 @@ export type {
   PlayerState,
   PlayerUiConfig,
   QualityLevel,
+  SquareMarker,
   // Storage
   StorageAdapter,
   // Time Display
