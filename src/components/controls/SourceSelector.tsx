@@ -61,6 +61,7 @@ export function SourceSelector({
             type="button"
             onClick={() => setIsOpen(!isOpen)}
             aria-expanded={isOpen}
+            aria-haspopup="menu"
             aria-controls={SOURCE_DROPDOWN_ID}
             className="drop-player-source-button"
           >
@@ -84,12 +85,14 @@ export function SourceSelector({
 
               <div
                 id={SOURCE_DROPDOWN_ID}
+                role="menu"
                 className="drop-player-dropdown drop-player-dropdown--source"
               >
                 {sources.map((source, index) => (
                   <button
                     key={source.url}
                     type="button"
+                    role="menuitem"
                     className="drop-player-dropdown-item"
                     data-selected={index === activeSourceIndex}
                     onClick={() => handleSelect(index)}

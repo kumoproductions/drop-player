@@ -99,7 +99,7 @@ Props are organised into four groups to keep the surface area manageable:
   poster="poster.jpg"
 
   playback={{ autoPlay: true, volume: 0.8 }}
-  ui={{ features: { capture: true }, locale: 'ja' }}
+  ui={{ features: { saveCapture: true, copyCapture: true }, locale: 'ja' }}
   slots={{ topRightOverlay: <Badge /> }}
   events={{ onPlay: () => log('playing') }}
 />
@@ -230,7 +230,7 @@ Two presets are exported for convenience:
 
 | Export | Description |
 |--------|-------------|
-| `defaultFeatures` | Most controls on, heavy options (`ambientLight`, `capture`) off |
+| `defaultFeatures` | Most controls on, heavy options (`ambientLight`, `saveCapture`, `copyCapture`) off |
 | `noFeatures` | All controls off — use as a base for minimal builds |
 
 ```tsx
@@ -239,8 +239,8 @@ import { noFeatures } from 'drop-player';
 // Default — most controls on
 <VideoPlayer sources={url} />
 
-// Add capture to defaults
-<VideoPlayer sources={url} ui={{ features: { capture: true } }} />
+// Add capture buttons to defaults
+<VideoPlayer sources={url} ui={{ features: { saveCapture: true, copyCapture: true } }} />
 
 // Remove loop from defaults
 <VideoPlayer sources={url} ui={{ features: { loop: false } }} />
@@ -257,7 +257,8 @@ import { noFeatures } from 'drop-player';
 | `seekBar` | `true` | video, audio |
 | `volume` | `true` | video, audio |
 | `ambientLight` | `false` | video |
-| `capture` | `false` | video, image |
+| `saveCapture` | `false` | video, image |
+| `copyCapture` | `false` | video, image |
 | `qualitySelector` | `true` | video (HLS) |
 | `fullscreen` | `true` | all |
 | `zoom` | `true` | image, PDF (requires `pdfjs-dist`) |

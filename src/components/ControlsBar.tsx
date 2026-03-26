@@ -1,4 +1,6 @@
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useElementWidths } from '../hooks/useElementWidths';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import type {
   HlsLevelInfo,
   MediaMode,
@@ -8,20 +10,39 @@ import type {
   TranslationKey,
 } from '../types';
 import { AmbientLightButton } from './controls/AmbientLightButton';
-import { CaptureButtons } from './controls/CaptureButtons';
+import { CopyCaptureButton } from './controls/CopyCaptureButton';
 import { FullscreenButton } from './controls/FullscreenButton';
 import { LoopButton } from './controls/LoopButton';
+import { OverflowMenu } from './controls/OverflowMenu';
 import { PageNavigation } from './controls/PageNavigation';
 import { PipButton } from './controls/PipButton';
 import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
 import { QualitySelector } from './controls/QualitySelector';
+import { SaveCaptureButton } from './controls/SaveCaptureButton';
 import { SeekStepButtons } from './controls/SeekStepButtons';
 import { SourceNavigation } from './controls/SourceNavigation';
 import { TimeDisplay } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
 import { VolumeControl } from './controls/VolumeControl';
 import { ZoomControls } from './controls/ZoomControls';
+
+// Fallback width estimates (px) used before the first measurement.
+const F_BTN = 36;
+const F_SEEK_STEP = 76;
+const F_SOURCE_NAV = 112;
+const F_PAGE_NAV = 112;
+const F_ZOOM = 164;
+const F_TIME_DISPLAY = 120;
+
+const GAP = 4;
+const W_OVERFLOW_BTN = F_BTN + GAP;
+
+interface OverflowEntry {
+  key: string;
+  element: ReactNode;
+  width: number;
+}
 
 interface ControlsBarProps {
   features: Required<PlayerFeatures>;
@@ -108,6 +129,9 @@ interface ControlsBarProps {
   // Slots
   controlsStart?: ReactNode;
   controlsEnd?: ReactNode;
+
+  // TimeDisplay inline state callback
+  onTimeDisplayInline?: (inline: boolean) => void;
 }
 
 export function ControlsBar({
@@ -167,213 +191,348 @@ export function ControlsBar({
   onNextPage,
   controlsStart,
   controlsEnd,
+  onTimeDisplayInline,
 }: ControlsBarProps) {
-  const renderLeftControls = () => {
-    switch (mediaMode) {
-      case 'video':
-      case 'audio':
-        return (
-          <>
-            {features.playButton && (
-              <PlayButton
-                isPlaying={isPlaying}
-                onToggle={onPlayToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.seekStepButtons && onSeekBackward && onSeekForward && (
-              <SeekStepButtons
-                seekStep={seekStep}
-                onSeekBackward={onSeekBackward}
-                onSeekForward={onSeekForward}
-                t={t}
-              />
-            )}
-            {features.sourceNavigation &&
-              sourceCount > 1 &&
-              onPrevSource &&
-              onNextSource && (
-                <SourceNavigation
-                  activeIndex={activeSourceIndex}
-                  sourceCount={sourceCount}
-                  onPrev={onPrevSource}
-                  onNext={onNextSource}
-                  t={t}
-                />
-              )}
-            {features.loop && (
-              <LoopButton
-                isLoop={isLoop}
-                onToggle={onLoopToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.timeDisplay && (
-              <div className="drop-player-responsive-hide">
-                <TimeDisplay
-                  currentTime={currentTime}
-                  duration={duration}
-                  frameRate={frameRate}
-                  filmGauge={filmGauge}
-                  bpm={bpm}
-                  timeSignature={timeSignature}
-                  format={timeDisplayFormat}
-                  formats={timeDisplayFormats ?? ['elapsed-total', 'remaining']}
-                  onFormatChange={onTimeDisplayFormatChange ?? (() => {})}
-                  t={t}
-                />
-              </div>
-            )}
-          </>
-        );
-      case 'image':
-      case 'pdf':
-        return (
-          <>
-            {features.sourceNavigation &&
-              sourceCount > 1 &&
-              onPrevSource &&
-              onNextSource && (
-                <SourceNavigation
-                  activeIndex={activeSourceIndex}
-                  sourceCount={sourceCount}
-                  onPrev={onPrevSource}
-                  onNext={onNextSource}
-                  t={t}
-                />
-              )}
-            {mediaMode === 'pdf' &&
-              totalPages >= 2 &&
-              onPrevPage &&
-              onNextPage && (
-                <PageNavigation
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPrev={onPrevPage}
-                  onNext={onNextPage}
-                  t={t}
-                />
-              )}
-            {features.zoom && (mediaMode === 'image' || totalPages > 0) && (
-              <ZoomControls
-                zoom={zoom}
-                minZoom={minZoom}
-                maxZoom={maxZoom}
-                onZoomIn={onZoomIn ?? (() => {})}
-                onZoomOut={onZoomOut ?? (() => {})}
-                onResetZoom={onResetZoom ?? (() => {})}
-                t={t}
-              />
-            )}
-          </>
-        );
-    }
-  };
-
-  const renderRightControls = () => {
-    switch (mediaMode) {
-      case 'video':
-        return (
-          <>
-            {features.volume && (
-              <VolumeControl
-                volume={volume}
-                isMuted={isMuted}
-                onVolumeChange={onVolumeChange ?? (() => {})}
-                onMuteToggle={onMuteToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.playbackSpeed && (
-              <PlaybackSpeedSelector
-                playbackRate={playbackRate}
-                onPlaybackRateChange={onPlaybackRateChange ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.ambientLight && (
-              <AmbientLightButton
-                isEnabled={isAmbientLight}
-                onToggle={onAmbientLightToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.capture && (
-              <CaptureButtons
-                onSave={onSaveCapture ?? (() => Promise.resolve())}
-                onCopy={onCopyCapture ?? (() => Promise.resolve())}
-                t={t}
-              />
-            )}
-            {features.qualitySelector && (
-              <QualitySelector
-                hlsLevels={hlsLevels}
-                currentHlsLevel={currentHlsLevel}
-                qualityLevel={qualityLevel}
-                hasOriginal={hasOriginal}
-                isPlayingOriginal={isPlayingOriginal}
-                onQualityChange={onQualityChange ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.pip && isPipSupported && (
-              <PipButton
-                isPip={isPip}
-                onToggle={onPipToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-          </>
-        );
-      case 'audio':
-        return (
-          <>
-            {features.volume && (
-              <VolumeControl
-                volume={volume}
-                isMuted={isMuted}
-                onVolumeChange={onVolumeChange ?? (() => {})}
-                onMuteToggle={onMuteToggle ?? (() => {})}
-                t={t}
-              />
-            )}
-            {features.playbackSpeed && (
-              <PlaybackSpeedSelector
-                playbackRate={playbackRate}
-                onPlaybackRateChange={onPlaybackRateChange ?? (() => {})}
-                t={t}
-              />
-            )}
-          </>
-        );
-      case 'image':
-        return (
-          features.capture && (
-            <CaptureButtons
-              onSave={onSaveCapture ?? (() => Promise.resolve())}
-              onCopy={onCopyCapture ?? (() => Promise.resolve())}
-              t={t}
-            />
-          )
-        );
-      case 'pdf':
-        return null;
-    }
-  };
-
   const controlsRef = useRef<HTMLDivElement>(null);
+  const { refFor, widths: measured } = useElementWidths();
+  const barWidth = measured.bar ?? 0;
+
+  const barRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      (controlsRef as React.MutableRefObject<HTMLDivElement | null>).current =
+        el;
+      refFor('bar')(el);
+    },
+    [refFor]
+  );
+
+  const isVideoOrAudio = mediaMode === 'video' || mediaMode === 'audio';
+  const isImageOrPdf = mediaMode === 'image' || mediaMode === 'pdf';
+  const showVolumeSlider = useMediaQuery('(min-width: 640px)');
+
+  // Measured width + gap, with fallback before first measurement
+  const w = useCallback(
+    (key: string, fallback: number) => (measured[key] ?? fallback) + GAP,
+    [measured]
+  );
+
+  // ── Control elements (null when not applicable to current mode) ─
+
+  const seekStepEl =
+    isVideoOrAudio &&
+    features.seekStepButtons &&
+    onSeekBackward &&
+    onSeekForward ? (
+      <SeekStepButtons
+        seekStep={seekStep}
+        onSeekBackward={onSeekBackward}
+        onSeekForward={onSeekForward}
+        t={t}
+      />
+    ) : null;
+
+  const sourceNavEl =
+    features.sourceNavigation &&
+    sourceCount > 1 &&
+    onPrevSource &&
+    onNextSource ? (
+      <SourceNavigation
+        activeIndex={activeSourceIndex}
+        sourceCount={sourceCount}
+        onPrev={onPrevSource}
+        onNext={onNextSource}
+        t={t}
+      />
+    ) : null;
+
+  const pageNavEl =
+    mediaMode === 'pdf' && totalPages >= 2 && onPrevPage && onNextPage ? (
+      <PageNavigation
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPrev={onPrevPage}
+        onNext={onNextPage}
+        t={t}
+      />
+    ) : null;
+
+  const zoomEl =
+    isImageOrPdf &&
+    features.zoom &&
+    (mediaMode === 'image' || totalPages > 0) ? (
+      <ZoomControls
+        zoom={zoom}
+        minZoom={minZoom}
+        maxZoom={maxZoom}
+        onZoomIn={onZoomIn ?? (() => {})}
+        onZoomOut={onZoomOut ?? (() => {})}
+        onResetZoom={onResetZoom ?? (() => {})}
+        t={t}
+      />
+    ) : null;
+
+  const loopEl =
+    isVideoOrAudio && features.loop ? (
+      <LoopButton isLoop={isLoop} onToggle={onLoopToggle ?? (() => {})} t={t} />
+    ) : null;
+
+  const timeDisplayEl =
+    isVideoOrAudio && features.timeDisplay ? (
+      <TimeDisplay
+        currentTime={currentTime}
+        duration={duration}
+        frameRate={frameRate}
+        filmGauge={filmGauge}
+        bpm={bpm}
+        timeSignature={timeSignature}
+        format={timeDisplayFormat}
+        formats={timeDisplayFormats ?? ['elapsed-total', 'remaining']}
+        onFormatChange={onTimeDisplayFormatChange ?? (() => {})}
+        t={t}
+      />
+    ) : null;
+
+  const speedEl =
+    isVideoOrAudio && features.playbackSpeed ? (
+      <PlaybackSpeedSelector
+        playbackRate={playbackRate}
+        onPlaybackRateChange={onPlaybackRateChange ?? (() => {})}
+        t={t}
+      />
+    ) : null;
+
+  const ambientEl =
+    mediaMode === 'video' && features.ambientLight ? (
+      <AmbientLightButton
+        isEnabled={isAmbientLight}
+        onToggle={onAmbientLightToggle ?? (() => {})}
+        t={t}
+      />
+    ) : null;
+
+  const hasCaptureMode = mediaMode === 'video' || mediaMode === 'image';
+
+  const saveCaptureEl =
+    hasCaptureMode && features.saveCapture ? (
+      <SaveCaptureButton
+        onAction={onSaveCapture ?? (() => Promise.resolve())}
+        t={t}
+      />
+    ) : null;
+
+  const copyCaptureEl =
+    hasCaptureMode && features.copyCapture ? (
+      <CopyCaptureButton
+        onAction={onCopyCapture ?? (() => Promise.resolve())}
+        t={t}
+      />
+    ) : null;
+
+  const qualityEl =
+    mediaMode === 'video' && features.qualitySelector ? (
+      <QualitySelector
+        hlsLevels={hlsLevels}
+        currentHlsLevel={currentHlsLevel}
+        qualityLevel={qualityLevel}
+        hasOriginal={hasOriginal}
+        isPlayingOriginal={isPlayingOriginal}
+        onQualityChange={onQualityChange ?? (() => {})}
+        t={t}
+      />
+    ) : null;
+
+  const pipEl =
+    mediaMode === 'video' && features.pip && isPipSupported ? (
+      <PipButton isPip={isPip} onToggle={onPipToggle ?? (() => {})} t={t} />
+    ) : null;
+
+  const volumeEl =
+    isVideoOrAudio && features.volume ? (
+      <VolumeControl
+        volume={volume}
+        isMuted={isMuted}
+        showSlider={false}
+        onVolumeChange={onVolumeChange ?? (() => {})}
+        onMuteToggle={onMuteToggle ?? (() => {})}
+        t={t}
+      />
+    ) : null;
+
+  const volumeSliderEl =
+    isVideoOrAudio && features.volume && showVolumeSlider ? (
+      <input
+        type="range"
+        min={0}
+        max={1}
+        step={0.01}
+        value={isMuted ? 0 : volume}
+        onChange={(e) =>
+          (onVolumeChange ?? (() => {}))(parseFloat(e.target.value))
+        }
+        className="drop-player-slider drop-player-volume-slider"
+        aria-label={t('volume')}
+      />
+    ) : null;
+
+  // ── Priority-based overflow ────────────────────────────────────
+  // Single priority list for all modes. Controls that don't apply
+  // to the current mode are null and excluded automatically.
+  // Highest priority (hidden last) → lowest (hidden first).
+  // TimeDisplay goes to seekbar startSlot when overflowed, not the panel.
+
+  const overflowable: OverflowEntry[] = useMemo(() => {
+    const entries: OverflowEntry[] = [];
+    const push = (key: string, el: ReactNode, fallback: number) => {
+      if (el) entries.push({ key, element: el, width: w(key, fallback) });
+    };
+    // — High priority —
+    push('volume', volumeEl, F_BTN);
+    push('zoom', zoomEl, F_ZOOM);
+    push('seekStep', seekStepEl, F_SEEK_STEP);
+    push('sourceNav', sourceNavEl, F_SOURCE_NAV);
+    push('pageNav', pageNavEl, F_PAGE_NAV);
+    push('loop', loopEl, F_BTN);
+    push('timeDisplay', timeDisplayEl, F_TIME_DISPLAY);
+    // — Medium priority —
+    push('speed', speedEl, F_BTN);
+    push('quality', qualityEl, F_BTN);
+    push('saveCapture', saveCaptureEl, F_BTN);
+    push('copyCapture', copyCaptureEl, F_BTN);
+    // — Low priority —
+    push('ambient', ambientEl, F_BTN);
+    push('pip', pipEl, F_BTN);
+    return entries;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    volumeEl,
+    zoomEl,
+    seekStepEl,
+    sourceNavEl,
+    pageNavEl,
+    loopEl,
+    timeDisplayEl,
+    speedEl,
+    qualityEl,
+    saveCaptureEl,
+    copyCaptureEl,
+    ambientEl,
+    pipEl,
+    w,
+  ]);
+
+  const visibleKeys = useMemo(() => {
+    if (barWidth === 0 || overflowable.length === 0) {
+      return new Set(overflowable.map((c) => c.key));
+    }
+
+    // Base width: always-visible controls (Play + Fullscreen) + gap overhead
+    let baseWidth = GAP * 2;
+    if (isVideoOrAudio && features.playButton) baseWidth += F_BTN + GAP;
+    if (features.fullscreen) baseWidth += F_BTN + GAP;
+
+    const totalNeeded =
+      overflowable.reduce((sum, c) => sum + c.width, 0) + baseWidth;
+
+    if (totalNeeded <= barWidth) {
+      return new Set(overflowable.map((c) => c.key));
+    }
+
+    // Greedy packing: iterate by priority (highest first) and add
+    // each control if it fits. A large high-priority control that
+    // doesn't fit is skipped, but smaller lower-priority ones can
+    // still be shown inline.
+    const visible = new Set<string>();
+    let remaining = barWidth - baseWidth - W_OVERFLOW_BTN;
+
+    for (const control of overflowable) {
+      if (control.width <= remaining) {
+        visible.add(control.key);
+        remaining -= control.width;
+      }
+    }
+
+    // If only 1 item would go to the overflow panel (excluding
+    // timeDisplay which goes to startSlot), the overflow button
+    // itself wastes more space than it saves — keep everything inline.
+    const panelCount = overflowable.filter(
+      (c) => !visible.has(c.key) && c.key !== 'timeDisplay'
+    ).length;
+    if (panelCount <= 1) {
+      return new Set(overflowable.map((c) => c.key));
+    }
+
+    return visible;
+  }, [
+    barWidth,
+    overflowable,
+    isVideoOrAudio,
+    features.playButton,
+    features.fullscreen,
+  ]);
+
+  // TimeDisplay goes to startSlot when overflowed, not the overflow panel
+  const overflowItems = overflowable.filter(
+    (c) => !visibleKeys.has(c.key) && c.key !== 'timeDisplay'
+  );
+  const isVisible = (key: string) => visibleKeys.has(key);
+  const showInlineTimeDisplay = isVisible('timeDisplay');
+
+  // Notify parent so it can show/hide the startSlot
+  useEffect(() => {
+    onTimeDisplayInline?.(showInlineTimeDisplay);
+  }, [showInlineTimeDisplay, onTimeDisplayInline]);
+
+  // ── Helpers ────────────────────────────────────────────────────
+
+  const item = (key: string, el: ReactNode) => (
+    <div ref={refFor(key)} className="drop-player-controls-item">
+      {el}
+    </div>
+  );
+
+  // ── Unified render ─────────────────────────────────────────────
 
   return (
     <TooltipContainerContext.Provider value={controlsRef}>
-      <div ref={controlsRef} className="drop-player-controls">
+      <div ref={barRef} className="drop-player-controls">
+        {/* ── Left group ── */}
         <div className="drop-player-controls-group">
-          {renderLeftControls()}
+          {isVideoOrAudio && features.playButton && (
+            <PlayButton
+              isPlaying={isPlaying}
+              onToggle={onPlayToggle ?? (() => {})}
+              t={t}
+            />
+          )}
+          {isVisible('seekStep') && item('seekStep', seekStepEl)}
+          {isVisible('sourceNav') && item('sourceNav', sourceNavEl)}
+          {isVisible('pageNav') && item('pageNav', pageNavEl)}
+          {isVisible('zoom') && item('zoom', zoomEl)}
+          {isVisible('loop') && item('loop', loopEl)}
+          {showInlineTimeDisplay && item('timeDisplay', timeDisplayEl)}
           {controlsStart}
         </div>
 
+        {/* ── Right group ── */}
         <div className="drop-player-controls-group">
-          {renderRightControls()}
+          {isVisible('volume') && item('volume', volumeEl)}
+          {volumeSliderEl}
+          {isVisible('speed') && item('speed', speedEl)}
+          {isVisible('ambient') && item('ambient', ambientEl)}
+          {isVisible('saveCapture') && item('saveCapture', saveCaptureEl)}
+          {isVisible('copyCapture') && item('copyCapture', copyCaptureEl)}
+          {isVisible('quality') && item('quality', qualityEl)}
+          {isVisible('pip') && item('pip', pipEl)}
           {controlsEnd}
+          {overflowItems.length > 0 && (
+            <OverflowMenu t={t}>
+              {overflowItems.map((c) => (
+                <div key={c.key} className="drop-player-controls-item">
+                  {c.element}
+                </div>
+              ))}
+            </OverflowMenu>
+          )}
           {features.fullscreen && (
             <FullscreenButton
               isFullscreen={isFullscreen}

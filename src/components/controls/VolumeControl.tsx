@@ -6,6 +6,7 @@ import { Tooltip } from './Tooltip';
 interface VolumeControlProps {
   volume: number;
   isMuted: boolean;
+  showSlider?: boolean;
   onVolumeChange: (volume: number) => void;
   onMuteToggle: () => void;
   t: (key: TranslationKey) => string;
@@ -14,6 +15,7 @@ interface VolumeControlProps {
 export function VolumeControl({
   volume,
   isMuted,
+  showSlider = true,
   onVolumeChange,
   onMuteToggle,
   t,
@@ -65,17 +67,19 @@ export function VolumeControl({
         </button>
       </Tooltip>
 
-      <input
-        ref={sliderRef}
-        type="range"
-        min={0}
-        max={1}
-        step={0.01}
-        value={displayVolume}
-        onChange={handleSliderChange}
-        className="drop-player-slider drop-player-volume-slider"
-        aria-label={t('volume')}
-      />
+      {showSlider && (
+        <input
+          ref={sliderRef}
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={displayVolume}
+          onChange={handleSliderChange}
+          className="drop-player-slider drop-player-volume-slider"
+          aria-label={t('volume')}
+        />
+      )}
     </div>
   );
 }

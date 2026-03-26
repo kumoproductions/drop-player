@@ -52,7 +52,7 @@ import 'drop-player/styles.css';
     { url: 'image-05.jpg', label: 'Photo 5' },
     { url: 'image-06.jpg', label: 'Photo 6' },
   ]}
-  ui={{ features: { capture: true } }}
+  ui={{ features: { saveCapture: true, copyCapture: true } }}
 />`;
 
 const PDF_CODE = `import { PdfViewer } from 'drop-player';
@@ -112,7 +112,7 @@ export function InteractiveDemo() {
       >
         <ImageViewer
           sources={MEDIA.images}
-          ui={{ features: { capture: true } }}
+          ui={{ features: { saveCapture: true, copyCapture: true } }}
         />
       </DemoCard>
 

@@ -171,6 +171,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const activeEntry = entries[activeSourceIndex];
 
     const [lastError, setLastError] = useState<Error | null>(null);
+    const [isTimeDisplayInline, setIsTimeDisplayInline] = useState(true);
 
     // biome-ignore lint/correctness/useExhaustiveDependencies: reset error when source changes
     useEffect(() => {
@@ -1545,7 +1546,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                     onSeekEnd={handleSeekEnd}
                     t={t}
                     startSlot={
-                      features.timeDisplay ? (
+                      features.timeDisplay && !isTimeDisplayInline ? (
                         <TimeDisplay
                           currentTime={
                             mediaMode === 'audio'
@@ -1648,6 +1649,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 t={t}
                 controlsStart={slots?.controlsStart}
                 controlsEnd={slots?.controlsEnd}
+                onTimeDisplayInline={setIsTimeDisplayInline}
               />
             </div>
           )}

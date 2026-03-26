@@ -44,6 +44,7 @@ export const ja: Translations = {
   nextPage: '次のページ',
   seekBackward: '巻き戻し',
   seekForward: '早送り',
+  more: 'その他',
   muted: 'ミュート',
   unmuted: 'ミュート解除',
   loopOn: 'ループ ON',

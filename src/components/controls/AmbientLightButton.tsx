@@ -15,17 +15,15 @@ export function AmbientLightButton({
 }: AmbientLightButtonProps) {
   const label = t('ambientLight');
   return (
-    <div className="drop-player-responsive-hide">
-      <Tooltip content={label}>
-        <button
-          type="button"
-          onClick={onToggle}
-          className={`drop-player-button ${isEnabled ? 'drop-player-color-yellow' : ''}`}
-          aria-label={label}
-        >
-          <Sun size={20} />
-        </button>
-      </Tooltip>
-    </div>
+    <Tooltip content={label}>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={`drop-player-button ${isEnabled ? 'drop-player-color-yellow' : ''}`}
+        aria-label={label}
+      >
+        <Sun size={20} />
+      </button>
+    </Tooltip>
   );
 }

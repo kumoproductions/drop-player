@@ -148,6 +148,8 @@ export function QualitySelector({
           onClick={() => setIsOpen(!isOpen)}
           className={`drop-player-button ${getButtonColor()}`}
           aria-label={t('quality')}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
         >
           <Settings2 size={24} />
         </button>
@@ -164,11 +166,15 @@ export function QualitySelector({
             }}
           />
 
-          <div className="drop-player-dropdown drop-player-dropdown--quality">
+          <div
+            role="menu"
+            className="drop-player-dropdown drop-player-dropdown--quality"
+          >
             {options.map((option) => (
               <button
                 key={option.key}
                 type="button"
+                role="menuitem"
                 className="drop-player-dropdown-item"
                 data-selected={option.key === currentKey}
                 onClick={() => handleSelect(option.mode)}

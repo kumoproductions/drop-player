@@ -44,6 +44,7 @@ export const en: Translations = {
   nextPage: 'Next page',
   seekBackward: 'Seek backward',
   seekForward: 'Seek forward',
+  more: 'More',
   muted: 'Muted',
   unmuted: 'Unmuted',
   loopOn: 'Loop ON',

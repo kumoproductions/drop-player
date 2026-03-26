@@ -99,7 +99,7 @@ Propsは4つのグループに分かれています:
   poster="poster.jpg"
 
   playback={{ autoPlay: true, volume: 0.8 }}
-  ui={{ features: { capture: true }, locale: 'ja' }}
+  ui={{ features: { saveCapture: true, copyCapture: true }, locale: 'ja' }}
   slots={{ topRightOverlay: <Badge /> }}
   events={{ onPlay: () => log('playing') }}
 />
@@ -230,7 +230,7 @@ const markers: Marker[] = [
 
 | エクスポート | 説明 |
 |--------|-------------|
-| `defaultFeatures` | 主要コントロールON、負荷の高い機能（`ambientLight`, `capture`）はOFF |
+| `defaultFeatures` | 主要コントロールON、負荷の高い機能（`ambientLight`, `saveCapture`, `copyCapture`）はOFF |
 | `noFeatures` | すべてOFF — 最小構成のベースに |
 
 ```tsx
@@ -239,8 +239,8 @@ import { noFeatures } from 'drop-player';
 // Default — most controls on
 <VideoPlayer sources={url} />
 
-// Add capture to defaults
-<VideoPlayer sources={url} ui={{ features: { capture: true } }} />
+// Add capture buttons to defaults
+<VideoPlayer sources={url} ui={{ features: { saveCapture: true, copyCapture: true } }} />
 
 // Remove loop from defaults
 <VideoPlayer sources={url} ui={{ features: { loop: false } }} />
@@ -257,7 +257,8 @@ import { noFeatures } from 'drop-player';
 | `seekBar` | `true` | 動画, 音声 |
 | `volume` | `true` | 動画, 音声 |
 | `ambientLight` | `false` | 動画 |
-| `capture` | `false` | 動画, 画像 |
+| `saveCapture` | `false` | 動画, 画像 |
+| `copyCapture` | `false` | 動画, 画像 |
 | `qualitySelector` | `true` | 動画 (HLS) |
 | `fullscreen` | `true` | すべて |
 | `zoom` | `true` | 画像, PDF |

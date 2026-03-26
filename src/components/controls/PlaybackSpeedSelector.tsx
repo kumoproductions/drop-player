@@ -48,12 +48,12 @@ export function PlaybackSpeedSelector({
   const tooltipContent = `${t('playbackSpeed')} (${formatRate(playbackRate)})`;
 
   return (
-    <div className="drop-player-relative drop-player-responsive-hide">
+    <div className="drop-player-relative">
       <Tooltip content={isOpen ? '' : tooltipContent}>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`drop-player-button drop-player-button--speed ${playbackRate !== 1 ? 'drop-player-color-blue' : ''}`}
+          className={`drop-player-button ${playbackRate !== 1 ? 'drop-player-color-blue' : ''}`}
           aria-label={t('playbackSpeed')}
           aria-expanded={isOpen}
           aria-haspopup="menu"

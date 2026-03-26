@@ -264,8 +264,10 @@ export interface PlayerFeatures {
   volume?: boolean;
   /** Ambient light effect button (video) */
   ambientLight?: boolean;
-  /** Frame capture save/copy buttons (video/image) */
-  capture?: boolean;
+  /** Frame capture save button (video/image) */
+  saveCapture?: boolean;
+  /** Frame capture copy button (video/image) */
+  copyCapture?: boolean;
   /** HLS quality selector (video) */
   qualitySelector?: boolean;
   /** Fullscreen button (all modes) */
@@ -586,6 +588,8 @@ export type TranslationKey =
   | 'nextPage'
   | 'seekBackward'
   | 'seekForward'
+  // Overflow menu
+  | 'more'
   // Status overlay
   | 'muted'
   | 'unmuted'

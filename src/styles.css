@@ -40,6 +40,7 @@
   overflow: hidden;
   border-radius: inherit;
   container-type: size;
+  container-name: drop-player;
 }
 
 .drop-player--flex-center {
@@ -228,6 +229,7 @@
 /* Controls bar                                                 */
 /* ------------------------------------------------------------ */
 .drop-player-controls {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -235,6 +237,12 @@
 }
 
 .drop-player-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.drop-player-controls-item {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -281,6 +289,7 @@
   font-size: 0.875rem;
   font-variant-numeric: tabular-nums;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 /* Zoom level button */
@@ -320,16 +329,26 @@
 }
 
 /* ------------------------------------------------------------ */
-/* Responsive hide (hidden on small, contents on sm+)           */
+/* Overflow panel (overlays control bar in-place)               */
 /* ------------------------------------------------------------ */
-.drop-player-responsive-hide {
-  display: none;
+.drop-player-overflow-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 6px;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-@media (min-width: 640px) {
-  .drop-player-responsive-hide {
-    display: block;
-  }
+.drop-player-overflow-panel::-webkit-scrollbar {
+  display: none;
 }
 
 /* ------------------------------------------------------------ */
@@ -338,13 +357,6 @@
 .drop-player-volume-slider {
   width: 96px;
   height: 4px;
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .drop-player-volume-slider {
-    display: block;
-  }
 }
 
 /* Slider thumb styles */
@@ -482,11 +494,6 @@
   min-width: 100px;
 }
 
-.drop-player-dropdown--quality .drop-player-dropdown-item,
-.drop-player-dropdown--speed .drop-player-dropdown-item {
-  font-variant-numeric: tabular-nums;
-}
-
 .drop-player-dropdown-item {
   display: flex;
   align-items: center;
@@ -508,6 +515,11 @@
 
 .drop-player-dropdown-item[data-selected="true"] {
   background: rgba(255, 255, 255, 0.15);
+}
+
+.drop-player-dropdown--quality .drop-player-dropdown-item,
+.drop-player-dropdown--speed .drop-player-dropdown-item {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ------------------------------------------------------------ */
@@ -596,12 +608,6 @@
   display: flex;
   align-items: center;
   margin-bottom: 4px;
-}
-
-@media (min-width: 640px) {
-  .drop-player-seekbar-start-slot {
-    display: none;
-  }
 }
 
 .drop-player-seekbar-start-slot .drop-player-button--time {
