@@ -125,12 +125,42 @@ Props are organised into four groups to keep the surface area manageable:
 - filmGauge: Frames per foot for 'feet-frames' display (e.g. 16 for 35mm, 40 for 16mm)
 - bpm: BPM for 'bars-beats' display
 - timeSignature: Time signature for 'bars-beats' display (e.g. '3/4', '6/8')
-- markers: Seekbar markers
+- markers: Seekbar markers — see [Marker types](#marker-types)
+### Marker types
+
+`Marker` is a discriminated union. Each type renders a different shape on the seekbar track:
+
+- 'circle' (default): —
+- 'line': —
+- 'square': —
+- 'custom': content: ReactNode (required)
+All types share these base fields:
+
+- time: Position in seconds
+- color: CSS color value
+- snap: Enable snap-to on seek
+- snapThreshold: Snap threshold in px (only when snap: true)
+```tsx
+import type { Marker } from 'drop-player';
+
+const markers: Marker[] = [
+  { time: 10, type: 'circle', snap: true },
+  { time: 30, type: 'line' },
+  { time: 60, type: 'square', color: 'red' },
+  {
+    time: 90,
+    type: 'custom',
+    content: <div style={{ ... }}>Label</div>,
+  },
+];
+
+<VideoPlayer sources={url} ui={{ markers }} />
+```
+
 ### `slots` — `PlayerSlots`
 
 - controlsStart: Left of control bar
 - controlsEnd: Right of control bar (before fullscreen)
-- seekbarOverlay: Above seekbar
 - topLeftOverlay: Top-left corner
 - topRightOverlay: Top-right corner
 - loadingIndicator: Centre (while loading)
@@ -253,8 +283,7 @@ Override CSS variables on `.drop-player`:
   --drop-player-green: oklch(79.2% 0.209 151.711);
   --drop-player-red: oklch(70.4% 0.191 22.216);
   --drop-player-muted: oklch(55.2% 0.016 285.938);
-  --drop-player-marker-scene: var(--drop-player-yellow);
-  --drop-player-marker-custom: var(--drop-player-blue);
+  --drop-player-marker-circle: var(--drop-player-yellow);
   --drop-player-border-radius: 8px;
 }
 ```
@@ -264,8 +293,7 @@ Override CSS variables on `.drop-player`:
 - --drop-player-green: Positive color (check marks, best quality)
 - --drop-player-red: Negative color (errors)
 - --drop-player-muted: Muted / inactive color
-- --drop-player-marker-scene: Scene marker color
-- --drop-player-marker-custom: Custom marker color
+- --drop-player-marker-circle: Marker color (circle, line, square)
 - --drop-player-border-radius: Container border radius
 - --drop-player-aspect-ratio: Aspect ratio (16/9 video, 32/9 audio, 4/3 image, 1/1.414 PDF)
 
