@@ -590,6 +590,9 @@
 }
 
 .drop-player-seekbar-start-slot {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
   display: flex;
   align-items: center;
   margin-bottom: 4px;

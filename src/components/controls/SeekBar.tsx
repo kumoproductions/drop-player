@@ -37,7 +37,7 @@ export function SeekBar({
   // Find snap target
   const findSnapTarget = useCallback(
     (timeSeconds: number): number | null => {
-      if (markers.length === 0 || !duration || duration <= 0) return null;
+      if (!duration || duration <= 0) return null;
 
       const slider = sliderRef.current;
       if (!slider) return null;
@@ -46,12 +46,31 @@ export function SeekBar({
       if (sliderWidth <= 0) return null;
 
       let nearestTime: number | null = null;
-      // Initialize to Infinity — each marker has its own threshold now,
-      // so there is no single shared bound to initialize from.
       let nearestDistance = Infinity;
 
+      // Always snap to the start and end of the video
+      const edgeThresholdSeconds = (SNAP_THRESHOLD_PX / sliderWidth) * duration;
+
+      const distanceToStart = Math.abs(timeSeconds);
+      if (
+        distanceToStart < edgeThresholdSeconds &&
+        distanceToStart < nearestDistance
+      ) {
+        nearestDistance = distanceToStart;
+        nearestTime = 0;
+      }
+
+      const distanceToEnd = Math.abs(duration - timeSeconds);
+      if (
+        distanceToEnd < edgeThresholdSeconds &&
+        distanceToEnd < nearestDistance
+      ) {
+        nearestDistance = distanceToEnd;
+        nearestTime = duration;
+      }
+
       for (const marker of markers) {
-        if (!marker.snap) continue; // snap is opt-in per marker
+        if (!marker.snap) continue;
         const thresholdSeconds =
           ((marker.snapThreshold ?? SNAP_THRESHOLD_PX) / sliderWidth) *
           duration;
@@ -248,63 +267,6 @@ export function SeekBar({
         <div className="drop-player-seekbar-start-slot">{startSlot}</div>
       )}
 
-      {/* Markers — pre-keyed to avoid duplicate type+time collisions without
-           triggering Biome's noArrayIndexKey rule on the render .map */}
-      {markers.filter((m) => m.time <= duration).length > 0 && duration > 0 && (
-        <div className="drop-player-seekbar-markers">
-          {markers
-            .filter((m) => m.time <= duration)
-            .map((marker, idx) => ({
-              marker,
-              // ?? 'circle' is required: CircleMarker.type is optional and may be undefined
-              markerKey: `${marker.type ?? 'circle'}-${marker.time}-${idx}`,
-            }))
-            .map(({ marker, markerKey }) => {
-              const left = (marker.time / duration) * 100;
-              const type = marker.type ?? 'circle';
-              return (
-                <div
-                  key={markerKey}
-                  className={`drop-player-seekbar-marker drop-player-seekbar-marker--${type}`}
-                  style={{ left: `${left}%` }}
-                  aria-hidden={type !== 'custom'}
-                >
-                  {type === 'circle' && (
-                    <div
-                      className="drop-player-seekbar-marker-dot"
-                      style={{
-                        backgroundColor:
-                          marker.color ?? 'var(--drop-player-marker-circle)',
-                      }}
-                    />
-                  )}
-                  {type === 'line' && (
-                    <div
-                      className="drop-player-seekbar-marker-line"
-                      style={
-                        marker.color
-                          ? { backgroundColor: marker.color }
-                          : undefined
-                      }
-                    />
-                  )}
-                  {type === 'square' && (
-                    <div
-                      className="drop-player-seekbar-marker-square"
-                      style={
-                        marker.color
-                          ? { backgroundColor: marker.color }
-                          : undefined
-                      }
-                    />
-                  )}
-                  {type === 'custom' && (marker as CustomMarker).content}
-                </div>
-              );
-            })}
-        </div>
-      )}
-
       {/* Slider track */}
       <div
         ref={sliderRef}
@@ -329,6 +291,63 @@ export function SeekBar({
             style={{ width: `${progress}%` }}
           />
         </div>
+
+        {/* Markers — inside track so they share the same coordinate space */}
+        {markers.filter((m) => m.time <= duration).length > 0 &&
+          duration > 0 && (
+            <div className="drop-player-seekbar-markers">
+              {markers
+                .filter((m) => m.time <= duration)
+                .map((marker, idx) => ({
+                  marker,
+                  markerKey: `${marker.type ?? 'circle'}-${marker.time}-${idx}`,
+                }))
+                .map(({ marker, markerKey }) => {
+                  const left = (marker.time / duration) * 100;
+                  const type = marker.type ?? 'circle';
+                  return (
+                    <div
+                      key={markerKey}
+                      className={`drop-player-seekbar-marker drop-player-seekbar-marker--${type}`}
+                      style={{ left: `${left}%` }}
+                      aria-hidden={type !== 'custom'}
+                    >
+                      {type === 'circle' && (
+                        <div
+                          className="drop-player-seekbar-marker-dot"
+                          style={{
+                            backgroundColor:
+                              marker.color ??
+                              'var(--drop-player-marker-circle)',
+                          }}
+                        />
+                      )}
+                      {type === 'line' && (
+                        <div
+                          className="drop-player-seekbar-marker-line"
+                          style={
+                            marker.color
+                              ? { backgroundColor: marker.color }
+                              : undefined
+                          }
+                        />
+                      )}
+                      {type === 'square' && (
+                        <div
+                          className="drop-player-seekbar-marker-square"
+                          style={
+                            marker.color
+                              ? { backgroundColor: marker.color }
+                              : undefined
+                          }
+                        />
+                      )}
+                      {type === 'custom' && (marker as CustomMarker).content}
+                    </div>
+                  );
+                })}
+            </div>
+          )}
 
         {/* Thumb */}
         <div

@@ -1,12 +1,30 @@
 import type {
+  Marker,
   PlayerFeatures,
   PlayerPlaybackConfig,
   PlayerUiConfig,
   TimeDisplayFormat,
 } from 'drop-player';
 import { VideoPlayer } from 'drop-player';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { MEDIA } from '../data/media';
+
+const MARKER_TYPES = ['circle', 'line', 'square'] as const;
+type MarkerType = (typeof MARKER_TYPES)[number];
+
+interface PlaygroundMarker {
+  id: number;
+  time: number;
+  type: MarkerType;
+  color: string;
+  snap: boolean;
+}
+
+const DEFAULT_MARKERS: PlaygroundMarker[] = [
+  { id: 1, time: 3, type: 'circle', color: '#d4a20a', snap: true },
+  { id: 2, time: 8, type: 'line', color: '#e0513f', snap: false },
+  { id: 3, time: 15, type: 'square', color: '#3dba5e', snap: true },
+];
 
 const THEME_VARS = [
   { key: '--drop-player-blue', label: 'Blue', default: '#4b8bf5' },
@@ -89,6 +107,41 @@ export function ThemePlayground() {
     ) as Record<TimeDisplayFormat, boolean>
   );
   const [seekStep, setSeekStep] = useState(10);
+  const [markersEnabled, setMarkersEnabled] = useState(true);
+  const [pgMarkers, setPgMarkers] =
+    useState<PlaygroundMarker[]>(DEFAULT_MARKERS);
+  const [nextId, setNextId] = useState(DEFAULT_MARKERS.length + 1);
+
+  const addMarker = useCallback(() => {
+    setPgMarkers((prev) => [
+      ...prev,
+      { id: nextId, time: 5, type: 'circle', color: '#d4a20a', snap: false },
+    ]);
+    setNextId((n) => n + 1);
+  }, [nextId]);
+
+  const removeMarker = useCallback((id: number) => {
+    setPgMarkers((prev) => prev.filter((m) => m.id !== id));
+  }, []);
+
+  const updateMarker = useCallback(
+    (id: number, patch: Partial<PlaygroundMarker>) => {
+      setPgMarkers((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, ...patch } : m))
+      );
+    },
+    []
+  );
+
+  const markers: Marker[] | undefined =
+    markersEnabled && pgMarkers.length > 0
+      ? pgMarkers.map((m) => ({
+          time: m.time,
+          type: m.type,
+          color: m.color,
+          snap: m.snap,
+        }))
+      : undefined;
   const [frameRate, setFrameRate] = useState(30);
   const [filmGauge, setFilmGauge] = useState(16);
   const [bpm, setBpm] = useState(120);
@@ -118,6 +171,7 @@ export function ThemePlayground() {
     filmGauge,
     bpm,
     timeSignature,
+    markers,
   };
 
   const needsFrameRate =
@@ -139,7 +193,7 @@ export function ThemePlayground() {
         <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
           CSS Variables
         </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           {THEME_VARS.map((v) => (
             // biome-ignore lint/a11y/noLabelWithoutControl: input is nested
             <label key={v.key} className="space-y-1.5">
@@ -368,6 +422,105 @@ export function ThemePlayground() {
             </>
           )}
         </div>
+      </div>
+
+      {/* Markers */}
+      <div>
+        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+          Markers
+        </h4>
+        <div className="flex items-center gap-4 mb-3">
+          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={markersEnabled}
+              onChange={(e) => setMarkersEnabled(e.target.checked)}
+              className="rounded border-zinc-700"
+            />
+            Enable markers
+          </label>
+          <button
+            type="button"
+            onClick={addMarker}
+            disabled={!markersEnabled}
+            className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            + Add
+          </button>
+        </div>
+        {markersEnabled && pgMarkers.length > 0 && (
+          <div className="space-y-2">
+            {pgMarkers.map((m) => (
+              <div
+                key={m.id}
+                className="flex flex-wrap items-center gap-3 text-sm text-zinc-400"
+              >
+                <label className="flex items-center gap-1.5">
+                  <span className="text-xs text-zinc-500">time</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value={m.time}
+                    onChange={(e) =>
+                      updateMarker(m.id, {
+                        time: Math.max(0, Number(e.target.value) || 0),
+                      })
+                    }
+                    className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+                  />
+                </label>
+                <label className="flex items-center gap-1.5">
+                  <span className="text-xs text-zinc-500">type</span>
+                  <select
+                    value={m.type}
+                    onChange={(e) =>
+                      updateMarker(m.id, {
+                        type: e.target.value as MarkerType,
+                      })
+                    }
+                    className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300"
+                  >
+                    {MARKER_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex items-center gap-1.5">
+                  <span className="text-xs text-zinc-500">color</span>
+                  <input
+                    type="color"
+                    value={m.color}
+                    onChange={(e) =>
+                      updateMarker(m.id, { color: e.target.value })
+                    }
+                    className="w-6 h-6 rounded border border-zinc-700 cursor-pointer bg-transparent"
+                  />
+                </label>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={m.snap}
+                    onChange={(e) =>
+                      updateMarker(m.id, { snap: e.target.checked })
+                    }
+                    className="rounded border-zinc-700"
+                  />
+                  <span className="text-xs text-zinc-500">snap</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => removeMarker(m.id)}
+                  className="text-xs text-zinc-600 hover:text-red-400 transition-colors ml-auto"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Preview */}
