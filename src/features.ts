@@ -1,7 +1,7 @@
 import type { PlayerFeatures, TimeDisplayFormat } from './types';
 
 /**
- * Sensible defaults: most controls enabled, heavy options (ambientLight, saveCapture, copyCapture) off.
+ * Sensible defaults: most controls enabled, opt-in features off.
  * Partial overrides merge on top: `{ saveCapture: true }` enables save capture while keeping the rest.
  */
 export const defaultFeatures: Required<PlayerFeatures> = {
@@ -10,7 +10,6 @@ export const defaultFeatures: Required<PlayerFeatures> = {
   timeDisplay: true,
   seekBar: true,
   volume: true,
-  ambientLight: false,
   saveCapture: false,
   copyCapture: false,
   qualitySelector: true,
@@ -33,7 +32,6 @@ export const noFeatures: Required<PlayerFeatures> = {
   timeDisplay: false,
   seekBar: false,
   volume: false,
-  ambientLight: false,
   saveCapture: false,
   copyCapture: false,
   qualitySelector: false,

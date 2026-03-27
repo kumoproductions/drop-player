@@ -55,7 +55,6 @@ const FEATURE_TOGGLES: FeatureToggle[] = [
   { key: 'timeDisplay', label: 'timeDisplay', default: true },
   { key: 'volume', label: 'volume', default: true },
   { key: 'playbackSpeed', label: 'playbackSpeed', default: true },
-  { key: 'ambientLight', label: 'ambientLight', default: false },
   { key: 'saveCapture', label: 'saveCapture', default: false },
   { key: 'copyCapture', label: 'copyCapture', default: false },
   { key: 'qualitySelector', label: 'qualitySelector', default: true },

@@ -10,7 +10,6 @@ import type {
   TranslationKey,
 } from '../types';
 import { computeVisibleKeys } from '../utils/computeVisibleKeys';
-import { AmbientLightButton } from './controls/AmbientLightButton';
 import { CopyCaptureButton } from './controls/CopyCaptureButton';
 import { FullscreenButton } from './controls/FullscreenButton';
 import { LoopButton } from './controls/LoopButton';
@@ -75,9 +74,6 @@ interface ControlsBarProps {
   hasOriginal?: boolean;
   isPlayingOriginal?: boolean;
 
-  // Video ambient light
-  isAmbientLight?: boolean;
-
   // PIP
   isPip?: boolean;
   isPipSupported?: boolean;
@@ -89,7 +85,6 @@ interface ControlsBarProps {
   onVolumeChange?: (volume: number) => void;
   onMuteToggle?: () => void;
   onQualityChange?: (level: number | 'auto' | 'original') => void;
-  onAmbientLightToggle?: () => void;
   onSaveCapture?: () => Promise<void>;
   onCopyCapture?: () => Promise<void>;
 
@@ -158,7 +153,6 @@ export function ControlsBar({
   qualityLevel,
   hasOriginal = false,
   isPlayingOriginal = false,
-  isAmbientLight = false,
   isPip = false,
   isPipSupported = false,
   onPipToggle,
@@ -167,7 +161,6 @@ export function ControlsBar({
   onVolumeChange,
   onMuteToggle,
   onQualityChange,
-  onAmbientLightToggle,
   onSaveCapture,
   onCopyCapture,
   zoom = 1,
@@ -302,15 +295,6 @@ export function ControlsBar({
       />
     ) : null;
 
-  const ambientEl =
-    mediaMode === 'video' && features.ambientLight ? (
-      <AmbientLightButton
-        isEnabled={isAmbientLight}
-        onToggle={onAmbientLightToggle ?? (() => {})}
-        t={t}
-      />
-    ) : null;
-
   const hasCaptureMode = mediaMode === 'video' || mediaMode === 'image';
 
   const saveCaptureEl =
@@ -409,7 +393,6 @@ export function ControlsBar({
     push('saveCapture', saveCaptureEl, F_BTN);
     push('copyCapture', copyCaptureEl, F_BTN);
     // — Low priority —
-    push('ambient', ambientEl, F_BTN);
     push('pip', pipEl, F_BTN);
     // — Lowest priority (first to move to seekbar chip) —
     push('timeDisplay', timeDisplayEl, F_TIME_DISPLAY);
@@ -428,7 +411,6 @@ export function ControlsBar({
     qualityEl,
     saveCaptureEl,
     copyCaptureEl,
-    ambientEl,
     pipEl,
     timeDisplayEl,
     w,
@@ -496,7 +478,6 @@ export function ControlsBar({
           {isVisible('volume') && item('volume', volumeEl)}
           {isVisible('volume') && volumeSliderEl}
           {isVisible('speed') && item('speed', speedEl)}
-          {isVisible('ambient') && item('ambient', ambientEl)}
           {isVisible('saveCapture') && item('saveCapture', saveCaptureEl)}
           {isVisible('copyCapture') && item('copyCapture', copyCaptureEl)}
           {isVisible('quality') && item('quality', qualityEl)}

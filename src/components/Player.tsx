@@ -232,8 +232,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       isSeeking: false,
       seekValue: 0,
       isLoop: initialLoop,
-      isAmbientLight: false,
-      ambientColor: { r: 40, g: 40, b: 40 },
       isPlayingOriginal: false,
       qualityLevel: undefined,
       hlsLevels: [],
@@ -899,10 +897,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       };
     }, [mediaMode, onPipChange, videoState.duration]); // videoState.duration ensures re-attach after video element ready
 
-    const handleAmbientLightToggle = useCallback(() => {
-      videoCoreRef.current?.toggleAmbientLight();
-    }, []);
-
     const handleQualityChangeFromUI = useCallback(
       (level: number | 'auto' | 'original') => {
         if (level === 'original') {
@@ -1404,7 +1398,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         ref={containerRef}
         role="application"
         aria-label={ariaLabel}
-        className={`drop-player ${mediaMode === 'video' && videoState.isAmbientLight ? 'drop-player-ambient' : ''} ${className ?? ''}`}
+        className={`drop-player ${className ?? ''}`}
         style={{
           ['--drop-player-aspect-ratio' as string]:
             mediaMode === 'video'
@@ -1414,11 +1408,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 : mediaMode === 'image'
                   ? '4 / 3'
                   : '1 / 1.414',
-          ...(mediaMode === 'video' && videoState.isAmbientLight
-            ? {
-                ['--drop-player-ambient-shadow' as string]: `0 0 240px 60px rgba(${videoState.ambientColor.r}, ${videoState.ambientColor.g}, ${videoState.ambientColor.b}, 0.6)`,
-              }
-            : undefined),
         }}
         onPointerDown={() => {
           containerRef.current?.focus({ preventScroll: true });
@@ -1615,7 +1604,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 qualityLevel={videoState.qualityLevel}
                 hasOriginal={!!activeEntry?.originalUrl}
                 isPlayingOriginal={videoState.isPlayingOriginal}
-                isAmbientLight={videoState.isAmbientLight}
                 isPip={isPip}
                 isPipSupported={isPipSupported}
                 onPipToggle={handlePipToggle}
@@ -1627,7 +1615,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
                 onVolumeChange={handleVolumeChange}
                 onMuteToggle={handleMuteToggle}
                 onQualityChange={handleQualityChangeFromUI}
-                onAmbientLightToggle={handleAmbientLightToggle}
                 onSaveCapture={handleSaveCapture}
                 onCopyCapture={handleCopyCapture}
                 zoom={mediaMode === 'pdf' ? pdfState.zoom : imageState.zoom}

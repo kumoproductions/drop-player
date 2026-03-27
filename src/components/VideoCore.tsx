@@ -63,9 +63,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
     } = props;
 
     const videoRef = useRef<HTMLVideoElement>(null);
-    const ambientCanvasRef = useRef<HTMLCanvasElement | null>(null);
-    const ambientCtxRef = useRef<CanvasRenderingContext2D | null>(null);
-
     const dragWasPlayingRef = useRef(false);
 
     const {
@@ -113,10 +110,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       seekValue,
     } = state;
 
-    const [isAmbientLight, setIsAmbientLight] = useState(() =>
-      storage.getStoredValue('ambient_light', false)
-    );
-    const [ambientColor, setAmbientColor] = useState({ r: 40, g: 40, b: 40 });
     const [qualityLevel, setQualityLevel] = useState<
       QualityLevel | undefined
     >();
@@ -196,8 +189,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
         isSeeking,
         seekValue,
         isLoop,
-        isAmbientLight,
-        ambientColor,
         isPlayingOriginal,
         qualityLevel,
         hlsLevels: hlsLevelInfos,
@@ -215,8 +206,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       isSeeking,
       seekValue,
       isLoop,
-      isAmbientLight,
-      ambientColor,
       isPlayingOriginal,
       qualityLevel,
       hlsLevelInfos,
@@ -284,87 +273,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       };
     }, [onPlaybackRateChange, onProgress, onWaiting]);
 
-    useEffect(() => {
-      if (!isAmbientLight) return;
-
-      const video = videoRef.current;
-      if (!video) return;
-
-      if (!ambientCanvasRef.current) {
-        ambientCanvasRef.current = document.createElement('canvas');
-        ambientCtxRef.current = ambientCanvasRef.current.getContext('2d', {
-          willReadFrequently: true,
-        });
-      }
-
-      const canvas = ambientCanvasRef.current;
-      const ctx = ambientCtxRef.current;
-      if (!ctx) return;
-
-      let rafId: number;
-      let lastUpdate = 0;
-      const UPDATE_INTERVAL = 100;
-
-      const updateAmbientColor = (timestamp: number) => {
-        if (timestamp - lastUpdate >= UPDATE_INTERVAL) {
-          lastUpdate = timestamp;
-
-          if (video.videoWidth > 0 && video.videoHeight > 0 && !video.paused) {
-            const scale = 0.1;
-            canvas.width = Math.floor(video.videoWidth * scale);
-            canvas.height = Math.floor(video.videoHeight * scale);
-
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            try {
-              const data = ctx.getImageData(
-                0,
-                0,
-                canvas.width,
-                canvas.height
-              ).data;
-              let r = 0;
-              let g = 0;
-              let b = 0;
-
-              const step = 16;
-              let sampleCount = 0;
-              for (let i = 0; i < data.length; i += step) {
-                r += data[i];
-                g += data[i + 1];
-                b += data[i + 2];
-                sampleCount++;
-              }
-
-              if (sampleCount > 0) {
-                const minBrightness = 40;
-                setAmbientColor({
-                  r: Math.max(minBrightness, Math.floor(r / sampleCount)),
-                  g: Math.max(minBrightness, Math.floor(g / sampleCount)),
-                  b: Math.max(minBrightness, Math.floor(b / sampleCount)),
-                });
-              }
-            } catch (err) {
-              const error =
-                err instanceof Error
-                  ? err
-                  : new Error('Failed to sample ambient color');
-              onError?.(error);
-              setIsAmbientLight(false);
-            }
-          }
-        }
-
-        rafId = requestAnimationFrame(updateAmbientColor);
-      };
-
-      rafId = requestAnimationFrame(updateAmbientColor);
-
-      return () => {
-        cancelAnimationFrame(rafId);
-      };
-    }, [isAmbientLight, onError]);
-
     const handleDragSeekStart = useCallback(() => {
       const video = videoRef.current;
       if (!video) return;
@@ -424,12 +332,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       },
       [onFullscreenToggle]
     );
-
-    const handleAmbientLightToggle = useCallback(() => {
-      const newAmbient = !isAmbientLight;
-      setIsAmbientLight(newAmbient);
-      storage.setStoredValue('ambient_light', newAmbient);
-    }, [isAmbientLight, storage]);
 
     const handleSetPlayOriginal = useCallback(
       (playing: boolean) => {
@@ -571,7 +473,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
             videoRef.current.playbackRate = rate;
           }
         },
-        toggleAmbientLight: handleAmbientLightToggle,
         setPlayOriginal: handleSetPlayOriginal,
         setQualityLevel: handleQualityChangeFromUI,
         captureFrame,
@@ -583,7 +484,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
         getImperativeBase,
         frameRate,
         setCurrentTime,
-        handleAmbientLightToggle,
         handleSetPlayOriginal,
         handleQualityChangeFromUI,
         captureFrame,

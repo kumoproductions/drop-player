@@ -230,7 +230,7 @@ const markers: Marker[] = [
 
 | エクスポート | 説明 |
 |--------|-------------|
-| `defaultFeatures` | 主要コントロールON、負荷の高い機能（`ambientLight`, `saveCapture`, `copyCapture`）はOFF |
+| `defaultFeatures` | 主要コントロールON、オプトイン機能はOFF |
 | `noFeatures` | すべてOFF — 最小構成のベースに |
 
 ```tsx
@@ -256,7 +256,6 @@ import { noFeatures } from 'drop-player';
 | `timeDisplay` | `true` | 動画, 音声 |
 | `seekBar` | `true` | 動画, 音声 |
 | `volume` | `true` | 動画, 音声 |
-| `ambientLight` | `false` | 動画 |
 | `saveCapture` | `false` | 動画, 画像 |
 | `copyCapture` | `false` | 動画, 画像 |
 | `qualitySelector` | `true` | 動画 (HLS) |
@@ -334,7 +333,7 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 | 変数 | デフォルト | 説明 |
 |----------|---------|-------------|
 | `--drop-player-blue` | `oklch(70.7% 0.165 254.624)` | アクセントカラー（アクティブ状態、フォーカスリング） |
-| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | ハイライトカラー（アンビエントライトON時） |
+| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | ハイライトカラー |
 | `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | ポジティブカラー（チェックマーク、最高画質） |
 | `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | ネガティブカラー（エラー） |
 | `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | ミュート / 非アクティブカラー |

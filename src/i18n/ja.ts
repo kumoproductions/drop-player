@@ -13,7 +13,6 @@ export const ja: Translations = {
   loop: 'ループ',
   enableRepeat: 'リピート有効',
   disableRepeat: 'リピート無効',
-  ambientLight: 'アンビエントライト',
   saveCapture: 'キャプチャ保存',
   copyCapture: 'キャプチャコピー',
   original: 'オリジナル',

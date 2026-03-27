@@ -62,23 +62,6 @@
 }
 
 /* ------------------------------------------------------------ */
-/* Ambient light effect                                         */
-/* ------------------------------------------------------------ */
-.drop-player-ambient {
-  overflow: visible;
-}
-.drop-player-ambient::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  box-shadow: var(--drop-player-ambient-shadow);
-  mix-blend-mode: plus-lighter;
-  transition: box-shadow 0.3s ease-out;
-}
-
-/* ------------------------------------------------------------ */
 /* Overlay (error / loading)                                    */
 /* ------------------------------------------------------------ */
 .drop-player-overlay {

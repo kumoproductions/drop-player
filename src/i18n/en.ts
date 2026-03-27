@@ -13,7 +13,6 @@ export const en: Translations = {
   loop: 'Loop',
   enableRepeat: 'Enable repeat',
   disableRepeat: 'Disable repeat',
-  ambientLight: 'Ambient Light',
   saveCapture: 'Save capture',
   copyCapture: 'Copy capture',
   original: 'Original',

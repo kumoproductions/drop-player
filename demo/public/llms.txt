@@ -197,7 +197,7 @@ const markers: Marker[] = [
 
 Two presets are exported for convenience:
 
-- defaultFeatures: Most controls on, heavy options (ambientLight, saveCapture, copyCapture) off
+- defaultFeatures: Most controls on, opt-in features off
 - noFeatures: All controls off — use as a base for minimal builds
 ```tsx
 import { noFeatures } from 'drop-player';
@@ -220,7 +220,6 @@ import { noFeatures } from 'drop-player';
 - timeDisplay: video, audio
 - seekBar: video, audio
 - volume: video, audio
-- ambientLight: video
 - saveCapture: video, image
 - copyCapture: video, image
 - qualitySelector: video (HLS)
@@ -290,7 +289,7 @@ Override CSS variables on `.drop-player`:
 ```
 
 - --drop-player-blue: Accent color (active states, focus ring)
-- --drop-player-yellow: Highlight color (ambient light on)
+- --drop-player-yellow: Highlight color
 - --drop-player-green: Positive color (check marks, best quality)
 - --drop-player-red: Negative color (errors)
 - --drop-player-muted: Muted / inactive color
@@ -442,7 +441,7 @@ MIT
 ### Features
 
 - Add responsive controls bar — controls dynamically collapse into an overflow menu based on available width
-- Add overflow menu (⋯) that groups secondary controls (ambient light, PiP, playback speed, capture) when space is limited
+- Add overflow menu (⋯) that groups secondary controls (PiP, playback speed, capture) when space is limited
 - Split capture button into separate `CopyCaptureButton` and `SaveCaptureButton` controls
 - Add `useFeedback` hook for transient action feedback (e.g. "Copied!")
 - Add `useMediaQuery` and `useElementWidths` hooks for responsive layout
@@ -602,7 +601,6 @@ MIT
 
 ### Styles
 
-- Fix ambient light mode rendering
 - Reposition timestamp display
 
 ## 1.1.0
@@ -689,7 +687,6 @@ MIT
 - Playback speed control
 - Volume control with mute toggle
 - Fullscreen support
-- Ambient light effect
 - Multiple source selector
 - Customizable theming via CSS variables
 - Error handling with retry

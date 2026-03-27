@@ -262,8 +262,6 @@ export interface PlayerFeatures {
   seekBar?: boolean;
   /** Volume control (video/audio) */
   volume?: boolean;
-  /** Ambient light effect button (video) */
-  ambientLight?: boolean;
   /** Frame capture save button (video/image) */
   saveCapture?: boolean;
   /** Frame capture copy button (video/image) */
@@ -553,7 +551,6 @@ export type TranslationKey =
   | 'loop'
   | 'enableRepeat'
   | 'disableRepeat'
-  | 'ambientLight'
   | 'saveCapture'
   | 'copyCapture'
   | 'original'
@@ -734,10 +731,6 @@ export interface VideoState {
   // Loop
   isLoop: boolean;
 
-  // Ambient light
-  isAmbientLight: boolean;
-  ambientColor: { r: number; g: number; b: number };
-
   // Source/Quality
   isPlayingOriginal: boolean;
   qualityLevel?: QualityLevel;
@@ -855,8 +848,6 @@ export interface VideoCoreRef {
   // Toggles
   toggleLoop: () => void;
   toggleMute: () => void;
-  toggleAmbientLight: () => void;
-
   // Source/Quality
   setPlayOriginal: (playing: boolean) => void;
   setQualityLevel: (level: number | 'auto') => void;

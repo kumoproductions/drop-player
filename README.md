@@ -230,7 +230,7 @@ Two presets are exported for convenience:
 
 | Export | Description |
 |--------|-------------|
-| `defaultFeatures` | Most controls on, heavy options (`ambientLight`, `saveCapture`, `copyCapture`) off |
+| `defaultFeatures` | Most controls on, opt-in features off |
 | `noFeatures` | All controls off — use as a base for minimal builds |
 
 ```tsx
@@ -256,7 +256,6 @@ import { noFeatures } from 'drop-player';
 | `timeDisplay` | `true` | video, audio |
 | `seekBar` | `true` | video, audio |
 | `volume` | `true` | video, audio |
-| `ambientLight` | `false` | video |
 | `saveCapture` | `false` | video, image |
 | `copyCapture` | `false` | video, image |
 | `qualitySelector` | `true` | video (HLS) |
@@ -335,7 +334,7 @@ Override CSS variables on `.drop-player`:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `--drop-player-blue` | `oklch(70.7% 0.165 254.624)` | Accent color (active states, focus ring) |
-| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | Highlight color (ambient light on) |
+| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | Highlight color |
 | `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | Positive color (check marks, best quality) |
 | `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | Negative color (errors) |
 | `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | Muted / inactive color |

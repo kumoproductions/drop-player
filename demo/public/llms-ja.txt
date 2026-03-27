@@ -197,7 +197,7 @@ const markers: Marker[] = [
 
 2つのプリセットをエクスポートしています:
 
-- defaultFeatures: 主要コントロールON、負荷の高い機能（ambientLight, saveCapture, copyCapture）はOFF
+- defaultFeatures: 主要コントロールON、オプトイン機能はOFF
 - noFeatures: すべてOFF — 最小構成のベースに
 ```tsx
 import { noFeatures } from 'drop-player';
@@ -220,7 +220,6 @@ import { noFeatures } from 'drop-player';
 - timeDisplay: 動画, 音声
 - seekBar: 動画, 音声
 - volume: 動画, 音声
-- ambientLight: 動画
 - saveCapture: 動画, 画像
 - copyCapture: 動画, 画像
 - qualitySelector: 動画 (HLS)
@@ -289,7 +288,7 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 ```
 
 - --drop-player-blue: アクセントカラー（アクティブ状態、フォーカスリング）
-- --drop-player-yellow: ハイライトカラー（アンビエントライトON時）
+- --drop-player-yellow: ハイライトカラー
 - --drop-player-green: ポジティブカラー（チェックマーク、最高画質）
 - --drop-player-red: ネガティブカラー（エラー）
 - --drop-player-muted: ミュート / 非アクティブカラー
@@ -441,7 +440,7 @@ MIT
 ### Features
 
 - Add responsive controls bar — controls dynamically collapse into an overflow menu based on available width
-- Add overflow menu (⋯) that groups secondary controls (ambient light, PiP, playback speed, capture) when space is limited
+- Add overflow menu (⋯) that groups secondary controls (PiP, playback speed, capture) when space is limited
 - Split capture button into separate `CopyCaptureButton` and `SaveCaptureButton` controls
 - Add `useFeedback` hook for transient action feedback (e.g. "Copied!")
 - Add `useMediaQuery` and `useElementWidths` hooks for responsive layout
@@ -601,7 +600,6 @@ MIT
 
 ### Styles
 
-- Fix ambient light mode rendering
 - Reposition timestamp display
 
 ## 1.1.0
@@ -688,7 +686,6 @@ MIT
 - Playback speed control
 - Volume control with mute toggle
 - Fullscreen support
-- Ambient light effect
 - Multiple source selector
 - Customizable theming via CSS variables
 - Error handling with retry
