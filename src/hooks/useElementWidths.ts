@@ -16,8 +16,8 @@ export function useElementWidths(): {
   const elemToKeyRef = useRef(new Map<HTMLElement, string>());
   const callbacksRef = useRef(new Map<string, RefCallback>());
 
-  // Create observer lazily (once)
-  if (!observerRef.current) {
+  // Create observer lazily (once), guarded for SSR
+  if (!observerRef.current && typeof ResizeObserver !== 'undefined') {
     observerRef.current = new ResizeObserver((entries) => {
       setWidths((prev) => {
         let next = prev;
