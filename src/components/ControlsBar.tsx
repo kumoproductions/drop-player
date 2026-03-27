@@ -9,6 +9,7 @@ import type {
   TimeDisplayFormat,
   TranslationKey,
 } from '../types';
+import { computeVisibleKeys } from '../utils/computeVisibleKeys';
 import { AmbientLightButton } from './controls/AmbientLightButton';
 import { CopyCaptureButton } from './controls/CopyCaptureButton';
 import { FullscreenButton } from './controls/FullscreenButton';
@@ -34,9 +35,9 @@ const F_SOURCE_NAV = 112;
 const F_PAGE_NAV = 112;
 const F_ZOOM = 164;
 const F_TIME_DISPLAY = 120;
+const F_VOLUME_SLIDER = 96;
 
 const GAP = 4;
-const W_OVERFLOW_BTN = F_BTN + GAP;
 
 interface OverflowEntry {
   key: string;
@@ -361,6 +362,7 @@ export function ControlsBar({
   const volumeSliderEl =
     isVideoOrAudio && features.volume && showVolumeSlider ? (
       <input
+        ref={refFor('volumeSlider') as React.RefCallback<HTMLInputElement>}
         type="range"
         min={0}
         max={1}
@@ -378,7 +380,6 @@ export function ControlsBar({
   // Single priority list for all modes. Controls that don't apply
   // to the current mode are null and excluded automatically.
   // Highest priority (hidden last) → lowest (hidden first).
-  // TimeDisplay goes to seekbar startSlot when overflowed, not the panel.
 
   const overflowable: OverflowEntry[] = useMemo(() => {
     const entries: OverflowEntry[] = [];
@@ -386,13 +387,22 @@ export function ControlsBar({
       if (el) entries.push({ key, element: el, width: w(key, fallback) });
     };
     // — High priority —
-    push('volume', volumeEl, F_BTN);
+    // Volume button + slider are a unit: when the button overflows, the slider hides too.
+    if (volumeEl) {
+      const sliderW = showVolumeSlider
+        ? (measured.volumeSlider ?? F_VOLUME_SLIDER) + GAP
+        : 0;
+      entries.push({
+        key: 'volume',
+        element: volumeEl,
+        width: w('volume', F_BTN) + sliderW,
+      });
+    }
     push('zoom', zoomEl, F_ZOOM);
     push('seekStep', seekStepEl, F_SEEK_STEP);
     push('sourceNav', sourceNavEl, F_SOURCE_NAV);
     push('pageNav', pageNavEl, F_PAGE_NAV);
     push('loop', loopEl, F_BTN);
-    push('timeDisplay', timeDisplayEl, F_TIME_DISPLAY);
     // — Medium priority —
     push('speed', speedEl, F_BTN);
     push('quality', qualityEl, F_BTN);
@@ -401,83 +411,49 @@ export function ControlsBar({
     // — Low priority —
     push('ambient', ambientEl, F_BTN);
     push('pip', pipEl, F_BTN);
+    // — Lowest priority (first to move to seekbar chip) —
+    push('timeDisplay', timeDisplayEl, F_TIME_DISPLAY);
     return entries;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     volumeEl,
+    showVolumeSlider,
+    measured.volumeSlider,
     zoomEl,
     seekStepEl,
     sourceNavEl,
     pageNavEl,
     loopEl,
-    timeDisplayEl,
     speedEl,
     qualityEl,
     saveCaptureEl,
     copyCaptureEl,
     ambientEl,
     pipEl,
+    timeDisplayEl,
     w,
   ]);
 
-  const visibleKeys = useMemo(() => {
-    if (barWidth === 0 || overflowable.length === 0) {
-      return new Set(overflowable.map((c) => c.key));
-    }
+  const fixedWidth = useMemo(() => {
+    let fw = GAP * 2;
+    if (isVideoOrAudio && features.playButton) fw += F_BTN + GAP;
+    if (features.fullscreen) fw += F_BTN + GAP;
+    return fw;
+  }, [isVideoOrAudio, features.playButton, features.fullscreen]);
 
-    // Base width: always-visible controls (Play + Fullscreen) + gap overhead
-    let baseWidth = GAP * 2;
-    if (isVideoOrAudio && features.playButton) baseWidth += F_BTN + GAP;
-    if (features.fullscreen) baseWidth += F_BTN + GAP;
+  const visibleKeys = useMemo(
+    () => computeVisibleKeys({ barWidth, fixedWidth, overflowable }),
+    [barWidth, fixedWidth, overflowable]
+  );
 
-    const totalNeeded =
-      overflowable.reduce((sum, c) => sum + c.width, 0) + baseWidth;
-
-    if (totalNeeded <= barWidth) {
-      return new Set(overflowable.map((c) => c.key));
-    }
-
-    // Greedy packing: iterate by priority (highest first) and add
-    // each control if it fits. A large high-priority control that
-    // doesn't fit is skipped, but smaller lower-priority ones can
-    // still be shown inline.
-    const visible = new Set<string>();
-    let remaining = barWidth - baseWidth - W_OVERFLOW_BTN;
-
-    for (const control of overflowable) {
-      if (control.width <= remaining) {
-        visible.add(control.key);
-        remaining -= control.width;
-      }
-    }
-
-    // If only 1 item would go to the overflow panel (excluding
-    // timeDisplay which goes to startSlot), the overflow button
-    // itself wastes more space than it saves — keep everything inline.
-    const panelCount = overflowable.filter(
-      (c) => !visible.has(c.key) && c.key !== 'timeDisplay'
-    ).length;
-    if (panelCount <= 1) {
-      return new Set(overflowable.map((c) => c.key));
-    }
-
-    return visible;
-  }, [
-    barWidth,
-    overflowable,
-    isVideoOrAudio,
-    features.playButton,
-    features.fullscreen,
-  ]);
-
-  // TimeDisplay goes to startSlot when overflowed, not the overflow panel
+  // TimeDisplay goes to seekbar chip when overflowed, not the overflow panel.
   const overflowItems = overflowable.filter(
     (c) => !visibleKeys.has(c.key) && c.key !== 'timeDisplay'
   );
   const isVisible = (key: string) => visibleKeys.has(key);
   const showInlineTimeDisplay = isVisible('timeDisplay');
 
-  // Notify parent so it can show/hide the startSlot
+  // Notify parent so it can show/hide the seekbar startSlot
   useEffect(() => {
     onTimeDisplayInline?.(showInlineTimeDisplay);
   }, [showInlineTimeDisplay, onTimeDisplayInline]);
@@ -509,14 +485,16 @@ export function ControlsBar({
           {isVisible('pageNav') && item('pageNav', pageNavEl)}
           {isVisible('zoom') && item('zoom', zoomEl)}
           {isVisible('loop') && item('loop', loopEl)}
-          {showInlineTimeDisplay && item('timeDisplay', timeDisplayEl)}
+          {showInlineTimeDisplay &&
+            timeDisplayEl &&
+            item('timeDisplay', timeDisplayEl)}
           {controlsStart}
         </div>
 
         {/* ── Right group ── */}
         <div className="drop-player-controls-group">
           {isVisible('volume') && item('volume', volumeEl)}
-          {volumeSliderEl}
+          {isVisible('volume') && volumeSliderEl}
           {isVisible('speed') && item('speed', speedEl)}
           {isVisible('ambient') && item('ambient', ambientEl)}
           {isVisible('saveCapture') && item('saveCapture', saveCaptureEl)}
