@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+### Breaking Changes
+
+- **Remove ambient light feature** — `ambientLight` has been removed from `PlayerFeatures`, `VideoState`, `VideoCoreRef`, and all related UI/CSS. If you were using `features={{ ambientLight: true }}`, remove it.
+
 ## 1.4.0
 
 ### Features
