@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.2
+
+### Bug Fixes
+
+- Fix SSR safety: guard `ResizeObserver` usage in `useElementWidths` hook with `typeof` check to prevent `ReferenceError` in server-side rendering environments
+
 ## 1.5.0
 
 ### Breaking Changes
