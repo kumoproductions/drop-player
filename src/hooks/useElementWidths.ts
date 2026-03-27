@@ -11,7 +11,7 @@ export function useElementWidths(): {
   widths: Record<string, number>;
 } {
   const [widths, setWidths] = useState<Record<string, number>>({});
-  const observerRef = useRef<ResizeObserver>();
+  const observerRef = useRef<ResizeObserver>(null);
   const keyToElemRef = useRef(new Map<string, HTMLElement>());
   const elemToKeyRef = useRef(new Map<HTMLElement, string>());
   const callbacksRef = useRef(new Map<string, RefCallback>());

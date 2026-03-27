@@ -18,6 +18,7 @@
     "rootDir": ".",
     "customConditions": ["development"]
   },
-  "include": ["src/**/*", "demo/**/*"],
+  "include": ["src/**/*"],
+  "references": [{ "path": "./demo" }],
   "exclude": ["node_modules", "dist"]
 }
