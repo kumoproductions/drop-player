@@ -149,11 +149,17 @@ async function main() {
     },
   ];
 
+  const changelog = readFileSync(resolve(root, 'CHANGELOG.md'), 'utf8');
+  // Demote changelog headings: # → ##, ## → ###, etc.
+  const changelogDemoted = changelog.replace(/^(#{1,5}) /gm, '#$1 ');
+
   for (const { locale, readmePath, htmlPath } of configs) {
     const readme = readFileSync(readmePath, 'utf8');
     const navItems = extractNavItems(readme);
+    navItems.push({ id: 'changelog', label: 'Changelog' });
     const navHtml = buildNav(navItems);
-    const contentHtml = await markdownToHtml(readme);
+    const contentHtml =
+      (await markdownToHtml(readme)) + (await markdownToHtml(changelogDemoted));
     const staticHtml = buildStaticHtml(
       contentHtml,
       navHtml,

@@ -40,6 +40,17 @@ function collapseTable(block) {
     .join('\n');
 }
 
+/** Read and clean CHANGELOG.md for appending to llms.txt. */
+function getChangelog() {
+  const changelogPath = resolve(root, 'CHANGELOG.md');
+  if (!existsSync(changelogPath)) return '';
+  let cl = readFileSync(changelogPath, 'utf8').replace(/\r\n/g, '\n');
+  // Strip markdown bold/strikethrough for plain-text readability
+  cl = cl.replace(/\*\*(.+?)\*\*/g, '$1');
+  cl = cl.replace(/~~(.+?)~~/g, '$1');
+  return cl;
+}
+
 function generateLlmsTxt(readmePath, outputPath, headerOverride) {
   if (!existsSync(readmePath)) return null;
 
@@ -70,6 +81,13 @@ function generateLlmsTxt(readmePath, outputPath, headerOverride) {
 `;
 
   out = out.replace(/^# drop-player[\s\S]*?## /m, '## ');
+
+  // Append changelog
+  const changelog = getChangelog();
+  if (changelog) {
+    out = `${out.trim()}\n\n${changelog.trim()}\n`;
+  }
+
   out = `${header}${out.trim()}\n`;
 
   writeFileSync(outputPath, out);

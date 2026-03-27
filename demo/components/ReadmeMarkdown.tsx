@@ -115,6 +115,17 @@ const components: Components = {
   strong: ({ children }) => (
     <strong className="text-zinc-100">{children}</strong>
   ),
+  ul: ({ children }) => (
+    <ul className="list-disc list-outside ml-5 space-y-1 text-zinc-300">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }) => (
+    <ol className="list-decimal list-outside ml-5 space-y-1 text-zinc-300">
+      {children}
+    </ol>
+  ),
+  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
   a: ({ href, children }) => (
     <a
       href={href}

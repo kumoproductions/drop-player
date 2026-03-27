@@ -1,3 +1,4 @@
+import changelogRaw from '../../CHANGELOG.md?raw';
 import readmeRawEn from '../../README.md?raw';
 import readmeRawJa from '../../README_JA.md?raw';
 import type { Locale } from './locale';
@@ -33,7 +34,8 @@ function getReadme(locale: Locale): string {
 
 /**
  * Extract nav items from README h2 headings
- * plus headings from interactive components.
+ * plus headings from interactive components,
+ * plus a Changelog entry.
  */
 export function extractNavItems(locale: Locale = 'en'): NavItem[] {
   const readmeRaw = getReadme(locale);
@@ -62,7 +64,12 @@ export function extractNavItems(locale: Locale = 'en'): NavItem[] {
   }
 
   entries.sort((a, b) => a.index - b.index);
-  return entries.map((e) => e.item);
+  const items = entries.map((e) => e.item);
+
+  // Append Changelog as a top-level nav item
+  items.push({ id: 'changelog', label: 'Changelog', indent: false });
+
+  return items;
 }
 
 /**
@@ -72,6 +79,17 @@ export function extractNavItems(locale: Locale = 'en'): NavItem[] {
 function splitByHeadings(md: string): string[] {
   const raw = md.split(/\r?\n(?=#{1,2} )/);
   return raw.map((s) => s.trim()).filter(Boolean);
+}
+
+/**
+ * Demote changelog headings by one level so they fit
+ * below the README content hierarchy:
+ *   # Changelog  → ## Changelog
+ *   ## 1.4.0     → ### 1.4.0
+ *   ### Features  → #### Features
+ */
+function demoteChangelogHeadings(md: string): string {
+  return md.replace(/^(#{1,5}) /gm, '#$1 ');
 }
 
 export function parseReadme(locale: Locale = 'en'): ReadmeSegment[] {
@@ -96,6 +114,12 @@ export function parseReadme(locale: Locale = 'en'): ReadmeSegment[] {
     for (const part of splitByHeadings(remaining)) {
       segments.push({ type: 'markdown', content: part });
     }
+  }
+
+  // Append changelog
+  const changelog = demoteChangelogHeadings(changelogRaw);
+  for (const part of splitByHeadings(changelog)) {
+    segments.push({ type: 'markdown', content: part });
   }
 
   return segments;

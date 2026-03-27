@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.4.0
+
+### Features
+
+- Add responsive controls bar — controls dynamically collapse into an overflow menu based on available width
+- Add overflow menu (⋯) that groups secondary controls (ambient light, PiP, playback speed, capture) when space is limited
+- Split capture button into separate `CopyCaptureButton` and `SaveCaptureButton` controls
+- Add `useFeedback` hook for transient action feedback (e.g. "Copied!")
+- Add `useMediaQuery` and `useElementWidths` hooks for responsive layout
+
+### Bug Fixes
+
+- Fix marker positions not rendering correctly on the seekbar
+- Fix SEO: add prerender script for demo site, update `llms.txt` / `llms-ja.txt`
+
 ## 1.3.0
 
 ### Breaking Changes
@@ -31,6 +46,20 @@
 
 - Fix controls overlay not recoverable on mobile for Image, PDF, and Audio modes — tapping the content area now toggles controls visibility, matching Video behavior
 - Fix player blocking page scroll on mobile — allow vertical scrolling (`pan-y`) for all media types; only block scroll when Image/PDF is zoomed in
+
+## 1.2.2
+
+### Bug Fixes
+
+- Fix controls UI not showing on tap for Image, PDF, and Audio modes
+
+## 1.2.1
+
+### Bug Fixes
+
+- Fix PDF cleanup on unmount (add `destroyWorker` call)
+- Improve `StatusOverlay` accessibility and translation handling
+- Fix re-exported types from package root
 
 ## 1.2.0
 
