@@ -134,6 +134,13 @@
 /* ------------------------------------------------------------ */
 /* Overlay slot positions                                       */
 /* ------------------------------------------------------------ */
+.drop-player-slot-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
 .drop-player-slot-top-left {
   position: absolute;
   top: 40px;

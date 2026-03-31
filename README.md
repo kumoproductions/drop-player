@@ -186,12 +186,15 @@ const markers: Marker[] = [
 
 | Slot | Type | Position |
 |------|------|----------|
+| `overlay` | `ReactNode` | Full-area overlay between media and controls |
 | `controlsStart` | `ReactNode` | Left of control bar |
 | `controlsEnd` | `ReactNode` | Right of control bar (before fullscreen) |
 | `topLeftOverlay` | `ReactNode` | Top-left corner |
 | `topRightOverlay` | `ReactNode` | Top-right corner |
 | `loadingIndicator` | `ReactNode` | Centre (while loading) |
 | `errorDisplay` | `(error: Error) => ReactNode` | Centre (on error) |
+
+> **Note:** `overlay` has `pointer-events: none` by default. Add `pointer-events: auto` to child elements that need to be interactive.
 
 ### `events` — `PlayerEvents`
 

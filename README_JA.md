@@ -186,12 +186,15 @@ const markers: Marker[] = [
 
 | スロット | 型 | 配置位置 |
 |------|------|----------|
+| `overlay` | `ReactNode` | メディアとコントロールの間の全面オーバーレイ |
 | `controlsStart` | `ReactNode` | コントロールバーの左側 |
 | `controlsEnd` | `ReactNode` | コントロールバーの右側（フルスクリーンボタンの前） |
 | `topLeftOverlay` | `ReactNode` | 左上隅 |
 | `topRightOverlay` | `ReactNode` | 右上隅 |
 | `loadingIndicator` | `ReactNode` | 中央（読み込み中） |
 | `errorDisplay` | `(error: Error) => ReactNode` | 中央（エラー時） |
+
+> **Note:** `overlay` はデフォルトで `pointer-events: none` です。操作可能にしたい子要素には `pointer-events: auto` を指定してください。
 
 ### `events` — `PlayerEvents`
 

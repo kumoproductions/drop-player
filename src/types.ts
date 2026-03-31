@@ -295,6 +295,9 @@ export interface PlayerSlots {
   /** Add to the right of the controls bar (before fullscreen button) */
   controlsEnd?: ReactNode;
 
+  /** Full overlay between media and controls (covers entire player area, behind SeekBar/ControlsBar) */
+  overlay?: ReactNode;
+
   /** Overlay on the top-left of the player */
   topLeftOverlay?: ReactNode;
 

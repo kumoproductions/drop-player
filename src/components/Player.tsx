@@ -1499,6 +1499,11 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
           {/* Status overlay (pill) */}
           {showStatusOverlay && <StatusOverlay state={statusOverlay.state} />}
 
+          {/* User overlay slot (full-area, behind controls) */}
+          {slots?.overlay && (
+            <div className="drop-player-slot-overlay">{slots.overlay}</div>
+          )}
+
           {/* Controls overlay */}
           {showControlsProp && (
             <div
