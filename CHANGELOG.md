@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.4
+
+### Features
+
+- Add `overlay` slot — full-area overlay layer between media and controls (`pointer-events: none` by default)
+
 ## 1.5.2
 
 ### Bug Fixes
