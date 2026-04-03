@@ -26,9 +26,11 @@ export default defineConfig(({ command }) => {
       ? {
           build: {
             lib: {
-              entry: resolve(__dirname, 'src/index.ts'),
+              entry: {
+                index: resolve(__dirname, 'src/index.ts'),
+                utils: resolve(__dirname, 'src/utils-entry.ts'),
+              },
               formats: ['es'] as const,
-              fileName: 'index',
             },
             rollupOptions: {
               external: [
@@ -43,7 +45,7 @@ export default defineConfig(({ command }) => {
               ],
               output: {
                 assetFileNames: (assetInfo) => {
-                  if (assetInfo.name === 'style.css') {
+                  if (assetInfo.name?.endsWith('.css')) {
                     return 'index.css';
                   }
                   return assetInfo.name ?? 'asset';
