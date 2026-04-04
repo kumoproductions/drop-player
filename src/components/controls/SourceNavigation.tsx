@@ -7,6 +7,8 @@ interface SourceNavigationProps {
   sourceCount: number;
   onPrev: () => void;
   onNext: () => void;
+  showPrev?: boolean;
+  showNext?: boolean;
   t: (key: TranslationKey) => string;
 }
 
@@ -15,6 +17,8 @@ export function SourceNavigation({
   sourceCount,
   onPrev,
   onNext,
+  showPrev = true,
+  showNext = true,
   t,
 }: SourceNavigationProps) {
   if (sourceCount < 2) return null;
@@ -24,33 +28,37 @@ export function SourceNavigation({
 
   return (
     <div className="drop-player-source-nav">
-      <Tooltip content={t('previous')}>
-        <button
-          type="button"
-          onClick={onPrev}
-          disabled={isFirst}
-          className="drop-player-button"
-          aria-label={t('previous')}
-        >
-          <SkipBack size={18} />
-        </button>
-      </Tooltip>
+      {showPrev && (
+        <Tooltip content={t('previous')}>
+          <button
+            type="button"
+            onClick={onPrev}
+            disabled={isFirst}
+            className="drop-player-button"
+            aria-label={t('previous')}
+          >
+            <SkipBack size={18} />
+          </button>
+        </Tooltip>
+      )}
 
       <span className="drop-player-source-nav-indicator" aria-live="polite">
         {activeIndex + 1} / {sourceCount}
       </span>
 
-      <Tooltip content={t('next')}>
-        <button
-          type="button"
-          onClick={onNext}
-          disabled={isLast}
-          className="drop-player-button"
-          aria-label={t('next')}
-        >
-          <SkipForward size={18} />
-        </button>
-      </Tooltip>
+      {showNext && (
+        <Tooltip content={t('next')}>
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={isLast}
+            className="drop-player-button"
+            aria-label={t('next')}
+          >
+            <SkipForward size={18} />
+          </button>
+        </Tooltip>
+      )}
     </div>
   );
 }

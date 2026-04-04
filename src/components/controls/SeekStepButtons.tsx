@@ -6,6 +6,8 @@ interface SeekStepButtonsProps {
   seekStep: number;
   onSeekBackward: () => void;
   onSeekForward: () => void;
+  showBackward?: boolean;
+  showForward?: boolean;
   t: (key: TranslationKey) => string;
 }
 
@@ -13,6 +15,8 @@ export function SeekStepButtons({
   seekStep,
   onSeekBackward,
   onSeekForward,
+  showBackward = true,
+  showForward = true,
   t,
 }: SeekStepButtonsProps) {
   const backLabel = `${t('seekBackward')} ${seekStep}s`;
@@ -20,26 +24,30 @@ export function SeekStepButtons({
 
   return (
     <>
-      <Tooltip content={backLabel}>
-        <button
-          type="button"
-          onClick={onSeekBackward}
-          className="drop-player-button"
-          aria-label={backLabel}
-        >
-          <StepBack size={18} />
-        </button>
-      </Tooltip>
-      <Tooltip content={fwdLabel}>
-        <button
-          type="button"
-          onClick={onSeekForward}
-          className="drop-player-button"
-          aria-label={fwdLabel}
-        >
-          <StepForward size={18} />
-        </button>
-      </Tooltip>
+      {showBackward && (
+        <Tooltip content={backLabel}>
+          <button
+            type="button"
+            onClick={onSeekBackward}
+            className="drop-player-button"
+            aria-label={backLabel}
+          >
+            <StepBack size={18} />
+          </button>
+        </Tooltip>
+      )}
+      {showForward && (
+        <Tooltip content={fwdLabel}>
+          <button
+            type="button"
+            onClick={onSeekForward}
+            className="drop-player-button"
+            aria-label={fwdLabel}
+          >
+            <StepForward size={18} />
+          </button>
+        </Tooltip>
+      )}
     </>
   );
 }

@@ -1,4 +1,27 @@
-import type { PlayerFeatures, TimeDisplayFormat } from './types';
+import type {
+  DirectionalToggle,
+  PlayerFeatures,
+  ResolvedDirectional,
+  TimeDisplayFormat,
+} from './types';
+
+// ============================================================================
+// Resolved Features (internal use — directional toggles fully expanded)
+// ============================================================================
+
+/** Internal type where directional toggles are resolved to `ResolvedDirectional`. */
+export interface ResolvedPlayerFeatures
+  extends Omit<
+    Required<PlayerFeatures>,
+    'seekStepButtons' | 'sourceNavigation'
+  > {
+  seekStepButtons: ResolvedDirectional;
+  sourceNavigation: ResolvedDirectional;
+}
+
+// ============================================================================
+// Feature Presets
+// ============================================================================
 
 /**
  * Sensible defaults: most controls enabled, opt-in features off.
@@ -72,12 +95,55 @@ export const allTimeDisplayFormats: TimeDisplayFormat[] = [
   'bars-beats',
 ];
 
+// ============================================================================
+// Resolvers
+// ============================================================================
+
+/**
+ * Resolve a `DirectionalToggle` into a fully-specified `ResolvedDirectional`.
+ * - `undefined` → both directions use `defaultValue`
+ * - `boolean`   → both directions use that boolean
+ * - object      → omitted keys default to `true` (providing an object enables the feature)
+ */
+export function resolveDirectional(
+  value: DirectionalToggle | undefined,
+  defaultValue: boolean
+): ResolvedDirectional {
+  if (value === undefined)
+    return { backward: defaultValue, forward: defaultValue };
+  if (typeof value === 'boolean') return { backward: value, forward: value };
+  return { backward: value.backward ?? true, forward: value.forward ?? true };
+}
+
 /**
  * Resolve partial features into a fully-specified object.
  * Omitted keys inherit from `defaultFeatures`.
  */
 export function resolveFeatures(
   features?: PlayerFeatures
-): Required<PlayerFeatures> {
-  return { ...defaultFeatures, ...features };
+): ResolvedPlayerFeatures {
+  const merged = { ...defaultFeatures, ...features };
+  return {
+    playButton: merged.playButton,
+    loop: merged.loop,
+    timeDisplay: merged.timeDisplay,
+    seekBar: merged.seekBar,
+    volume: merged.volume,
+    saveCapture: merged.saveCapture,
+    copyCapture: merged.copyCapture,
+    qualitySelector: merged.qualitySelector,
+    fullscreen: merged.fullscreen,
+    zoom: merged.zoom,
+    keyboardShortcuts: merged.keyboardShortcuts,
+    playbackSpeed: merged.playbackSpeed,
+    pip: merged.pip,
+    seekStepButtons: resolveDirectional(
+      merged.seekStepButtons,
+      defaultFeatures.seekStepButtons as boolean
+    ),
+    sourceNavigation: resolveDirectional(
+      merged.sourceNavigation,
+      defaultFeatures.sourceNavigation as boolean
+    ),
+  };
 }

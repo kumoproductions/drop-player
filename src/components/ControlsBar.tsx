@@ -1,10 +1,10 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import type { ResolvedPlayerFeatures } from '../features';
 import { useElementWidths } from '../hooks/useElementWidths';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import type {
   HlsLevelInfo,
   MediaMode,
-  PlayerFeatures,
   QualityLevel,
   TimeDisplayFormat,
   TranslationKey,
@@ -45,7 +45,7 @@ interface OverflowEntry {
 }
 
 interface ControlsBarProps {
-  features: Required<PlayerFeatures>;
+  features: ResolvedPlayerFeatures;
   mediaMode: MediaMode;
 
   // Video/Audio playback state
@@ -212,21 +212,25 @@ export function ControlsBar({
 
   // ── Control elements (null when not applicable to current mode) ─
 
+  const seekStepDir = features.seekStepButtons;
   const seekStepEl =
     isVideoOrAudio &&
-    features.seekStepButtons &&
+    (seekStepDir.backward || seekStepDir.forward) &&
     onSeekBackward &&
     onSeekForward ? (
       <SeekStepButtons
         seekStep={seekStep}
         onSeekBackward={onSeekBackward}
         onSeekForward={onSeekForward}
+        showBackward={seekStepDir.backward}
+        showForward={seekStepDir.forward}
         t={t}
       />
     ) : null;
 
+  const sourceNavDir = features.sourceNavigation;
   const sourceNavEl =
-    features.sourceNavigation &&
+    (sourceNavDir.backward || sourceNavDir.forward) &&
     sourceCount > 1 &&
     onPrevSource &&
     onNextSource ? (
@@ -235,6 +239,8 @@ export function ControlsBar({
         sourceCount={sourceCount}
         onPrev={onPrevSource}
         onNext={onNextSource}
+        showPrev={sourceNavDir.backward}
+        showNext={sourceNavDir.forward}
         t={t}
       />
     ) : null;

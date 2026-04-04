@@ -1,4 +1,5 @@
 import type {
+  DirectionalToggle,
   Marker,
   PlayerFeatures,
   PlayerPlaybackConfig,
@@ -48,8 +49,6 @@ interface FeatureToggle {
 
 const FEATURE_TOGGLES: FeatureToggle[] = [
   { key: 'playButton', label: 'playButton', default: true },
-  { key: 'seekStepButtons', label: 'seekStepButtons', default: false },
-  { key: 'sourceNavigation', label: 'sourceNavigation', default: true },
   { key: 'loop', label: 'loop', default: true },
   { key: 'seekBar', label: 'seekBar', default: true },
   { key: 'timeDisplay', label: 'timeDisplay', default: true },
@@ -62,6 +61,17 @@ const FEATURE_TOGGLES: FeatureToggle[] = [
   { key: 'keyboardShortcuts', label: 'keyboardShortcuts', default: true },
   { key: 'fullscreen', label: 'fullscreen', default: true },
 ];
+
+interface DirectionalState {
+  backward: boolean;
+  forward: boolean;
+}
+
+function toDirectionalToggle(s: DirectionalState): DirectionalToggle {
+  if (s.backward && s.forward) return true;
+  if (!s.backward && !s.forward) return false;
+  return { backward: s.backward, forward: s.forward };
+}
 
 const LOCALE_OPTIONS = [
   { value: 'en', label: 'English' },
@@ -92,6 +102,15 @@ export function ThemePlayground() {
   const [features, setFeatures] = useState<Record<string, boolean>>(
     Object.fromEntries(FEATURE_TOGGLES.map((f) => [f.key, f.default]))
   );
+
+  const [seekStepButtons, setSeekStepButtons] = useState<DirectionalState>({
+    backward: false,
+    forward: false,
+  });
+  const [sourceNavigation, setSourceNavigation] = useState<DirectionalState>({
+    backward: true,
+    forward: true,
+  });
 
   const [showControls, setShowControls] = useState(true);
   const [showTitle, setShowTitle] = useState(true);
@@ -164,7 +183,11 @@ export function ThemePlayground() {
     showTitle,
     showStatusOverlay,
     locale,
-    features: features as PlayerFeatures,
+    features: {
+      ...features,
+      seekStepButtons: toDirectionalToggle(seekStepButtons),
+      sourceNavigation: toDirectionalToggle(sourceNavigation),
+    } as PlayerFeatures,
     timeDisplayFormats:
       timeDisplayFormats.length > 0 ? timeDisplayFormats : undefined,
     frameRate,
@@ -313,6 +336,59 @@ export function ThemePlayground() {
           Features
         </h4>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
+          {/* Directional toggles */}
+          {(
+            [
+              {
+                label: 'seekStepButtons',
+                state: seekStepButtons,
+                setter: setSeekStepButtons,
+              },
+              {
+                label: 'sourceNavigation',
+                state: sourceNavigation,
+                setter: setSourceNavigation,
+              },
+            ] as const
+          ).map(({ label, state, setter }) => (
+            <div
+              key={label}
+              className="flex items-center gap-2 text-sm text-zinc-400"
+            >
+              <span
+                className={
+                  state.backward || state.forward
+                    ? 'text-zinc-400'
+                    : 'text-zinc-600'
+                }
+              >
+                {label}
+              </span>
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={state.backward}
+                  onChange={(e) =>
+                    setter({ ...state, backward: e.target.checked })
+                  }
+                  className="rounded border-zinc-700"
+                />
+                <span className="text-xs text-zinc-500">←</span>
+              </label>
+              <label className="flex items-center gap-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={state.forward}
+                  onChange={(e) =>
+                    setter({ ...state, forward: e.target.checked })
+                  }
+                  className="rounded border-zinc-700"
+                />
+                <span className="text-xs text-zinc-500">→</span>
+              </label>
+            </div>
+          ))}
+          {/* Simple boolean toggles */}
           {FEATURE_TOGGLES.map((f) => (
             <label
               key={f.key}

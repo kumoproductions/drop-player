@@ -19,6 +19,7 @@ export {
   defaultFeatures,
   defaultTimeDisplayFormats,
   noFeatures,
+  resolveDirectional,
 } from './features';
 
 // Types
@@ -27,6 +28,8 @@ export type {
   // Marker types
   CircleMarker,
   CustomMarker,
+  // Directional toggle
+  DirectionalToggle,
   FallbackEvent,
   FallbackReason,
   // Capture types
@@ -54,6 +57,7 @@ export type {
   PlayerState,
   PlayerUiConfig,
   QualityLevel,
+  ResolvedDirectional,
   SquareMarker,
   // Storage
   StorageAdapter,

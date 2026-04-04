@@ -247,6 +247,22 @@ export type TimeDisplayFormat =
 // ============================================================================
 
 /**
+ * Directional toggle for button pairs.
+ * - `true` / `false` — show or hide both buttons (backward-compatible).
+ * - `{ backward?, forward? }` — control each button individually.
+ *   Omitted keys default to `true` (providing an object enables the feature).
+ */
+export type DirectionalToggle =
+  | boolean
+  | { backward?: boolean; forward?: boolean };
+
+/** Fully resolved directional toggle (no optionals). */
+export interface ResolvedDirectional {
+  backward: boolean;
+  forward: boolean;
+}
+
+/**
  * Toggle individual player UI features on/off.
  * All properties default to `false` when omitted.
  * Use `defaultFeatures` spread to enable all, then override selectively.
@@ -279,9 +295,9 @@ export interface PlayerFeatures {
   /** Picture-in-Picture button (video) */
   pip?: boolean;
   /** Seek step buttons (skip forward/backward by seekStep seconds) */
-  seekStepButtons?: boolean;
+  seekStepButtons?: DirectionalToggle;
   /** Source navigation (prev/next) buttons (multi-source) */
-  sourceNavigation?: boolean;
+  sourceNavigation?: DirectionalToggle;
 }
 
 // ============================================================================
