@@ -463,10 +463,17 @@ The `StorageAdapter` interface requires three methods: `getItem`, `setItem`, and
 Helper functions exported for use outside the player (custom UI, playlists, timecode overlays, etc.):
 
 ```tsx
+// From the main entry (includes React)
 import {
   formatTime, formatTimecode, secondsToFrames, parseFrameRate,
   formatFeetFrames, formatSecondsFrames, formatBarsBeats,
 } from 'drop-player';
+
+// From the lightweight sub-path (no React dependency — safe for Server Components)
+import {
+  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
+  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+} from 'drop-player/utils';
 
 formatTime(125);                    // "02:05"
 formatTime(3661);                   // "01:01:01"

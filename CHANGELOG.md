@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.5
+
+### Features
+
+- Add `drop-player/utils` sub-path export — pure formatter functions (`formatTime`, `formatTimecode`, `secondsToFrames`, `parseFrameRate`, `formatSecondsFrames`, `formatFeetFrames`, `formatBarsBeats`) importable without React, safe for Server Components
+
 ## 1.5.4
 
 ### Features
