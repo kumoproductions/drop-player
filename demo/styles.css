@@ -8,6 +8,11 @@
   --font-mono: "Geist Mono", monospace;
 }
 
+html,
+body {
+  background-color: #09090b; /* zinc-950 — paints Safari/Mac overscroll area */
+}
+
 html {
   scroll-behavior: smooth;
 }

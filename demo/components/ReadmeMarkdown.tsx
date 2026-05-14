@@ -41,7 +41,7 @@ const components: Components = {
     return (
       <h2
         id={id}
-        className="text-2xl font-bold text-zinc-100 mb-6 pb-2 border-b border-zinc-800 scroll-mt-6"
+        className="text-2xl font-bold text-zinc-100 mb-6 pb-2 border-b border-zinc-600 scroll-mt-6"
       >
         {children}
       </h2>
