@@ -74,6 +74,11 @@
   z-index: 10;
 }
 
+.drop-player-overlay--buffering {
+  background-color: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
 /* ------------------------------------------------------------ */
 /* Loading spinner                                              */
 /* ------------------------------------------------------------ */

@@ -191,7 +191,7 @@ const markers: Marker[] = [
 | `controlsEnd` | `ReactNode` | コントロールバーの右側（フルスクリーンボタンの前） |
 | `topLeftOverlay` | `ReactNode` | 左上隅 |
 | `topRightOverlay` | `ReactNode` | 右上隅 |
-| `loadingIndicator` | `ReactNode` | 中央（読み込み中） |
+| `loadingIndicator` | `ReactNode` | 中央（読み込み中・再生中のバッファリング時） |
 | `errorDisplay` | `(error: Error) => ReactNode` | 中央（エラー時） |
 
 > **Note:** `overlay` はデフォルトで `pointer-events: none` です。操作可能にしたい子要素には `pointer-events: auto` を指定してください。

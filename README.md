@@ -191,7 +191,7 @@ const markers: Marker[] = [
 | `controlsEnd` | `ReactNode` | Right of control bar (before fullscreen) |
 | `topLeftOverlay` | `ReactNode` | Top-left corner |
 | `topRightOverlay` | `ReactNode` | Top-right corner |
-| `loadingIndicator` | `ReactNode` | Centre (while loading) |
+| `loadingIndicator` | `ReactNode` | Centre (while loading or buffering mid-playback) |
 | `errorDisplay` | `(error: Error) => ReactNode` | Centre (on error) |
 
 > **Note:** `overlay` has `pointer-events: none` by default. Add `pointer-events: auto` to child elements that need to be interactive.

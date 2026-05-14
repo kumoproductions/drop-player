@@ -693,6 +693,7 @@ export interface UseMediaPlayerStateReturn {
     isLoop: boolean;
     isSeeking: boolean;
     seekValue: number;
+    isBuffering: boolean;
   };
   handlers: {
     togglePlayPause: () => void;
@@ -749,6 +750,9 @@ export interface VideoState {
 
   // Loop
   isLoop: boolean;
+
+  // Buffering
+  isBuffering: boolean;
 
   // Source/Quality
   isPlayingOriginal: boolean;
@@ -1054,6 +1058,9 @@ export interface AudioState {
 
   // Loop
   isLoop: boolean;
+
+  // Buffering
+  isBuffering: boolean;
 
   // Waveform
   waveformReady: boolean;

@@ -90,6 +90,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       isLoop,
       isSeeking,
       seekValue,
+      isBuffering,
     } = state;
 
     const [waveformData, setWaveformData] = useState<WaveformData | null>(null);
@@ -113,6 +114,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
         isSeeking,
         seekValue,
         isLoop,
+        isBuffering,
         waveformReady,
         waveformFailedFallback,
       };
@@ -127,6 +129,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       isSeeking,
       seekValue,
       isLoop,
+      isBuffering,
       waveformReady,
       waveformFailedFallback,
       onStateChange,

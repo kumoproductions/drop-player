@@ -108,6 +108,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       isLoop,
       isSeeking,
       seekValue,
+      isBuffering,
     } = state;
 
     const [qualityLevel, setQualityLevel] = useState<
@@ -189,6 +190,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
         isSeeking,
         seekValue,
         isLoop,
+        isBuffering,
         isPlayingOriginal,
         qualityLevel,
         hlsLevels: hlsLevelInfos,
@@ -206,6 +208,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       isSeeking,
       seekValue,
       isLoop,
+      isBuffering,
       isPlayingOriginal,
       qualityLevel,
       hlsLevelInfos,

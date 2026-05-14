@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.5.7
+
+### Features
+
+- Add buffering spinner overlay — when playback stalls mid-stream (HTML media `waiting` event), a translucent overlay with the loading spinner is shown over the media while the player remains in the playing state. Cleared on `playing` / `canplay` / `pause` / `ended` / `error`. The `slots.loadingIndicator` slot is reused for the buffering indicator.
+
+## 1.5.6
+
+### Features
+
+- `features.seekStepButtons` and `features.sourceNavigation` accept a `DirectionalToggle` — pass `{ backward, forward }` to enable only one direction (e.g. `sourceNavigation: { backward: false }` for forward-only navigation). Boolean values still work as before. `DirectionalToggle` and `ResolvedDirectional` are exported from the package root.
+
 ## 1.5.5
 
 ### Features

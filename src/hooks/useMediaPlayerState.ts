@@ -93,6 +93,7 @@ export function useMediaPlayerState(
   );
   const [isSeeking, setIsSeeking] = useState(false);
   const [seekValue, setSeekValue] = useState(0);
+  const [isBuffering, setIsBuffering] = useState(false);
 
   const wasPlayingBeforeSeekRef = useRef(false);
   const initialPositionRef = useRef<number | null>(null);
@@ -176,11 +177,13 @@ export function useMediaPlayerState(
       },
       pause: () => {
         setIsPlaying(false);
+        setIsBuffering(false);
         onPause?.();
       },
       ended: () => {
         setIsEnded(true);
         setIsPlaying(false);
+        setIsBuffering(false);
         onEnded?.();
       },
       timeupdate: () => {
@@ -200,13 +203,19 @@ export function useMediaPlayerState(
         onLoadStart?.();
       },
       canplay: () => {
+        setIsBuffering(false);
         onCanPlay?.();
+      },
+      waiting: () => {
+        setIsBuffering(true);
       },
       playing: () => {
         setIsEnded(false);
+        setIsBuffering(false);
         onPlaying?.();
       },
       error: () => {
+        setIsBuffering(false);
         const mediaError = media.error;
         if (mediaError) {
           onError?.(mediaErrorFromCode(mediaError));
@@ -457,6 +466,7 @@ export function useMediaPlayerState(
       isLoop,
       isSeeking,
       seekValue,
+      isBuffering,
     },
     handlers: {
       togglePlayPause,

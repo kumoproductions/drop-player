@@ -217,6 +217,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       isSeeking: false,
       seekValue: 0,
       isLoop: initialLoop,
+      isBuffering: false,
       waveformReady: false,
       waveformFailedFallback: false,
     });
@@ -232,6 +233,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       isSeeking: false,
       seekValue: 0,
       isLoop: initialLoop,
+      isBuffering: false,
       isPlayingOriginal: false,
       qualityLevel: undefined,
       hlsLevels: [],
@@ -1461,6 +1463,26 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               )}
             </div>
           )}
+
+          {/* Buffering overlay (shown over the media while playing) */}
+          {isReady &&
+            !lastError &&
+            ((mediaMode === 'video' &&
+              videoState.isPlaying &&
+              videoState.isBuffering) ||
+              (mediaMode === 'audio' &&
+                audioState.isPlaying &&
+                audioState.isBuffering)) && (
+              <div
+                role="status"
+                aria-label="Buffering"
+                className="drop-player-overlay drop-player-overlay--buffering"
+              >
+                {slots?.loadingIndicator ?? (
+                  <div className="drop-player-spinner" aria-hidden />
+                )}
+              </div>
+            )}
 
           {/* Source Selector (top-left, YouTube title style) */}
           {showTitle && (
