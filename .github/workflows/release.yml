@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  github-release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Create or update GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            echo "release ${GITHUB_REF_NAME} already exists — leaving as-is"
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              --generate-notes \
+              --title "${GITHUB_REF_NAME}"
+          fi
+
+  npm-publish:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    # Trusted Publishing on npm (OIDC) — configure the trusted publisher on
+    # npmjs.com for the drop-player package, pointing to this repo + workflow.
+    # https://docs.npmjs.com/trusted-publishers
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Verify tag matches package.json
+        run: |
+          set -eu
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::version mismatch: tag=$TAG_VERSION package.json=$PKG_VERSION"
+            exit 1
+          fi
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Verify npm CLI supports Trusted Publishing
+        run: |
+          set -eu
+          NPM_VERSION="$(npm --version)"
+          REQUIRED="11.5.1"
+          if [ "$(printf '%s\n%s\n' "$REQUIRED" "$NPM_VERSION" | sort -V | head -n1)" != "$REQUIRED" ]; then
+            echo "::error::npm $NPM_VERSION < $REQUIRED — Trusted Publishing requires 11.5.1+"
+            exit 1
+          fi
+
+      - name: Publish (Trusted Publishing via OIDC)
+        run: |
+          set -eu
+          VERSION="${GITHUB_REF_NAME#v}"
+          if npm view "drop-player@${VERSION}" version >/dev/null 2>&1; then
+            echo "drop-player@${VERSION} already on npm — skipping publish"
+            exit 0
+          fi
+          npm publish --access public
