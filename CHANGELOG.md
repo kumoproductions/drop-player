@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.8
+
+### Improvements
+
+- Audio waveform no longer stretches taller than 120px, keeping it visually balanced inside large audio containers.
+
+### Bug Fixes
+
+- Scrolling the mouse wheel over the volume slider now adjusts volume, matching the existing behavior over the volume icon.
+
 ## 1.5.7
 
 ### Features
