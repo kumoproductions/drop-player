@@ -2,6 +2,7 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { ResolvedPlayerFeatures } from '../features';
 import { useElementWidths } from '../hooks/useElementWidths';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { useVolumeWheel } from '../hooks/useVolumeWheel';
 import type {
   HlsLevelInfo,
   MediaMode,
@@ -24,7 +25,8 @@ import { SeekStepButtons } from './controls/SeekStepButtons';
 import { SourceNavigation } from './controls/SourceNavigation';
 import { TimeDisplay } from './controls/TimeDisplay';
 import { TooltipContainerContext } from './controls/Tooltip';
-import { VolumeControl } from './controls/VolumeControl';
+import { VolumeButton } from './controls/VolumeButton';
+import { VolumeSlider } from './controls/VolumeSlider';
 import { ZoomControls } from './controls/ZoomControls';
 
 // Fallback width estimates (px) used before the first measurement.
@@ -188,7 +190,10 @@ export function ControlsBar({
   onTimeDisplayInline,
 }: ControlsBarProps) {
   const controlsRef = useRef<HTMLDivElement>(null);
+  const volumeWheelRef = useRef<HTMLDivElement>(null);
   const { refFor, widths: measured } = useElementWidths();
+
+  useVolumeWheel(volumeWheelRef, volume, onVolumeChange);
   const barWidth = measured.bar ?? 0;
 
   const barRef = useCallback(
@@ -339,11 +344,9 @@ export function ControlsBar({
 
   const volumeEl =
     isVideoOrAudio && features.volume ? (
-      <VolumeControl
+      <VolumeButton
         volume={volume}
         isMuted={isMuted}
-        showSlider={false}
-        onVolumeChange={onVolumeChange ?? (() => {})}
         onMuteToggle={onMuteToggle ?? (() => {})}
         t={t}
       />
@@ -351,18 +354,12 @@ export function ControlsBar({
 
   const volumeSliderEl =
     isVideoOrAudio && features.volume && showVolumeSlider ? (
-      <input
-        ref={refFor('volumeSlider') as React.RefCallback<HTMLInputElement>}
-        type="range"
-        min={0}
-        max={1}
-        step={0.01}
-        value={isMuted ? 0 : volume}
-        onChange={(e) =>
-          (onVolumeChange ?? (() => {}))(parseFloat(e.target.value))
-        }
-        className="drop-player-slider drop-player-volume-slider"
-        aria-label={t('volume')}
+      <VolumeSlider
+        inputRef={refFor('volumeSlider') as React.RefCallback<HTMLInputElement>}
+        volume={volume}
+        isMuted={isMuted}
+        onVolumeChange={onVolumeChange ?? (() => {})}
+        t={t}
       />
     ) : null;
 
@@ -481,8 +478,12 @@ export function ControlsBar({
 
         {/* ── Right group ── */}
         <div className="drop-player-controls-group">
-          {isVisible('volume') && item('volume', volumeEl)}
-          {isVisible('volume') && volumeSliderEl}
+          {isVisible('volume') && (
+            <div ref={volumeWheelRef} className="drop-player-controls-group">
+              {item('volume', volumeEl)}
+              {volumeSliderEl}
+            </div>
+          )}
           {isVisible('speed') && item('speed', speedEl)}
           {isVisible('saveCapture') && item('saveCapture', saveCaptureEl)}
           {isVisible('copyCapture') && item('copyCapture', copyCaptureEl)}
