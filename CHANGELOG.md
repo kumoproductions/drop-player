@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.10
+
+### Improvements
+
+- Long audio files (multi-hour MP3s and similar) now load without exhausting browser memory. Waveform rendering for these files is significantly more reliable.
+- When a waveform can't be generated (e.g. very large files), the player falls back to a music icon and continues to play normally instead of showing an error.
+
 ## 1.5.9
 
 ### Bug Fixes

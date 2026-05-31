@@ -13,6 +13,10 @@ import { useMediaPlayerState } from '../hooks/useMediaPlayerState';
 import type { AudioCoreProps, AudioCoreRef, AudioState } from '../types';
 import { WaveformCanvas } from './WaveformCanvas';
 
+// 8 kHz is the safe cross-browser minimum (Firefox/Safari floor).
+const WAVEFORM_DECODE_SAMPLE_RATE = 8000;
+const MAX_AUDIO_FILE_BYTES = 256 * 1024 * 1024;
+
 export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
   function AudioCore(props, ref) {
     const {
@@ -46,7 +50,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
     } = props;
 
     const audioRef = useRef<HTMLAudioElement>(null);
-    const audioContextRef = useRef<AudioContext | null>(null);
     const waveformAreaRef = useRef<HTMLDivElement>(null);
 
     const dragWasPlayingRef = useRef(false);
@@ -155,18 +158,37 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
           );
         }
 
-        const arrayBuffer = await response.arrayBuffer();
-        if (signal.aborted) return null;
-
-        if (!audioContextRef.current) {
-          audioContextRef.current = new AudioContext();
+        const contentLength = Number(response.headers.get('content-length'));
+        if (
+          Number.isFinite(contentLength) &&
+          contentLength > MAX_AUDIO_FILE_BYTES
+        ) {
+          console.warn(
+            `[drop-player] Audio file ${contentLength} bytes exceeds waveform size limit (${MAX_AUDIO_FILE_BYTES}); skipping waveform generation.`
+          );
+          throw new Error('Audio file too large for waveform generation');
         }
 
-        const audioContext = audioContextRef.current;
+        const arrayBuffer = await response.arrayBuffer();
+        if (signal.aborted) return null;
+        if (arrayBuffer.byteLength > MAX_AUDIO_FILE_BYTES) {
+          console.warn(
+            `[drop-player] Audio file ${arrayBuffer.byteLength} bytes exceeds waveform size limit (${MAX_AUDIO_FILE_BYTES}); skipping waveform generation.`
+          );
+          throw new Error('Audio file too large for waveform generation');
+        }
+
+        // length=1 is fine — decodeAudioData sizes the output by the source.
+        const offlineCtx = new OfflineAudioContext(
+          1,
+          1,
+          WAVEFORM_DECODE_SAMPLE_RATE
+        );
+
         return new Promise<WaveformData>((resolve, reject) => {
           WaveformDataModule.createFromAudio(
             {
-              audio_context: audioContext,
+              audio_context: offlineCtx as unknown as AudioContext,
               array_buffer: arrayBuffer,
               scale: waveformScale,
             },
@@ -211,15 +233,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
         controller.abort();
       };
     }, [src, generateWaveform]);
-
-    useEffect(() => {
-      return () => {
-        if (audioContextRef.current) {
-          audioContextRef.current.close();
-          audioContextRef.current = null;
-        }
-      };
-    }, []);
 
     useEffect(() => {
       const audio = audioRef.current;
@@ -340,14 +353,6 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
               waveColor={waveColor}
               progressColor={progressColor}
             />
-          ) : waveformFailedFallback ? (
-            <div
-              role="status"
-              aria-live="polite"
-              className="drop-player-audio-fallback"
-            >
-              Waveform unavailable
-            </div>
           ) : (
             <Music
               size={32}

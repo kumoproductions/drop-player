@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type WaveformData from 'waveform-data';
 
 interface WaveformCanvasProps {
@@ -34,6 +34,21 @@ export function WaveformCanvas({
   const displayTime = isSeeking ? seekValue : currentTime;
   const progress = duration > 0 ? displayTime / duration : 0;
 
+  // Memoized so we don't rescan the full sample array on every progress tick.
+  const normDivisor = useMemo(() => {
+    if (!waveformData) return 1;
+    const channel = waveformData.channel(0);
+    const length = waveformData.length;
+    let globalMaxAmp = 0;
+    for (let i = 0; i < length; i++) {
+      const min = Math.abs(channel.min_sample(i));
+      const max = Math.abs(channel.max_sample(i));
+      if (min > globalMaxAmp) globalMaxAmp = min;
+      if (max > globalMaxAmp) globalMaxAmp = max;
+    }
+    return Math.max(globalMaxAmp, 1);
+  }, [waveformData]);
+
   // Draw waveform to canvas
   const drawWaveform = useCallback(() => {
     const canvas = canvasRef.current;
@@ -64,16 +79,6 @@ export function WaveformCanvas({
     const length = waveformData.length;
 
     if (length === 0) return;
-
-    // First pass: find global max amplitude (waveform-data can be 8-bit or 16-bit depending on source)
-    let globalMaxAmp = 0;
-    for (let i = 0; i < length; i++) {
-      const min = Math.abs(channel.min_sample(i));
-      const max = Math.abs(channel.max_sample(i));
-      globalMaxAmp = Math.max(globalMaxAmp, min, max);
-    }
-    // Normalize by global max so waveform fills vertical space; avoid division by zero
-    const normDivisor = Math.max(globalMaxAmp, 1);
 
     // Calculate samples per pixel
     const samplesPerPixel = length / width;
@@ -114,7 +119,7 @@ export function WaveformCanvas({
       ctx.roundRect(x, y, barWidth, barHeight, 1);
       ctx.fill();
     }
-  }, [waveformData, progress, waveColor, progressColor]);
+  }, [waveformData, progress, waveColor, progressColor, normDivisor]);
 
   // Draw on waveform data or progress change
   useEffect(() => {
