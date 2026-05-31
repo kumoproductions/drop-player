@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.9
+
+### Bug Fixes
+
+- Fix Safari layout bug where `aspect-ratio` combined with `min-height` on the inner container caused incorrect sizing. The player container is now a flex column, and `.drop-player-inner` uses `flex: 1; min-height: 0` so its block-size resolves correctly under Safari.
+
 ## 1.5.8
 
 ### Improvements
