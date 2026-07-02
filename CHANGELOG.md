@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.11
+
+### Features
+
+- Export `ControlButton` — a controls-bar button component with a built-in tooltip and accessible `aria-label`, for building custom buttons inside the `controlsStart` / `controlsEnd` slots that match the look of the built-in controls. `ControlButtonProps` is exported alongside it.
+- Export `Tooltip` and `TooltipProps` from the package root, for wrapping arbitrary custom elements with the same tooltip behavior used by the built-in controls.
+
 ## 1.5.10
 
 ### Improvements

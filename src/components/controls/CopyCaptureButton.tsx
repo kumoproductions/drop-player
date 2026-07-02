@@ -2,7 +2,7 @@ import { Check, Copy, X } from 'lucide-react';
 import type { FeedbackState } from '../../hooks/useFeedback';
 import { useFeedback } from '../../hooks/useFeedback';
 import type { TranslationKey } from '../../types';
-import { Tooltip } from './Tooltip';
+import { ControlButton } from './ControlButton';
 
 const feedbackColor: Record<FeedbackState, string> = {
   idle: '',
@@ -31,15 +31,12 @@ export function CopyCaptureButton({ onAction, t }: CopyCaptureButtonProps) {
   const label = t('copyCapture');
 
   return (
-    <Tooltip content={label}>
-      <button
-        type="button"
-        onClick={() => trigger(onAction)}
-        className={`drop-player-button ${feedbackColor[state]}`}
-        aria-label={label}
-      >
-        <Icon state={state} />
-      </button>
-    </Tooltip>
+    <ControlButton
+      label={label}
+      className={feedbackColor[state]}
+      onClick={() => trigger(onAction)}
+    >
+      <Icon state={state} />
+    </ControlButton>
   );
 }

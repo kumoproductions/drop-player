@@ -159,12 +159,49 @@ const markers: Marker[] = [
 
 ### `slots` — `PlayerSlots`
 
+- overlay: Full-area overlay between media and controls
 - controlsStart: Left of control bar
 - controlsEnd: Right of control bar (before fullscreen)
 - topLeftOverlay: Top-left corner
 - topRightOverlay: Top-right corner
-- loadingIndicator: Centre (while loading)
+- loadingIndicator: Centre (while loading or buffering mid-playback)
 - errorDisplay: Centre (on error)
+> **Note:** `overlay` has `pointer-events: none` by default. Add `pointer-events: auto` to child elements that need to be interactive.
+
+#### Custom control buttons
+
+Use the exported `ControlButton` in `controlsStart` / `controlsEnd` to add buttons that match the built-in controls, including tooltip and `aria-label`:
+
+```tsx
+import { ControlButton, VideoPlayer } from 'drop-player';
+import { Share2 } from 'lucide-react';
+
+<VideoPlayer
+  sources={url}
+  slots={{
+    controlsEnd: (
+      <ControlButton label="Share" onClick={handleShare}>
+        <Share2 size={20} />
+      </ControlButton>
+    ),
+  }}
+/>
+```
+
+- `label`: tooltip text, also used as the button's `aria-label`
+- `active`: highlights the button (same style as the active loop button)
+- Other `<button>` props (`disabled`, `className`, ...) pass through
+
+For arbitrary elements, the lower-level `Tooltip` is also exported. Rendered inside the control bar it automatically clamps to the bar's bounds:
+
+```tsx
+import { Tooltip } from 'drop-player';
+
+<Tooltip content="Description">
+  <span>...</span>
+</Tooltip>
+```
+
 ### `events` — `PlayerEvents`
 
 - onStateChange: Any state change (consolidated snapshot)
@@ -407,10 +444,17 @@ The `StorageAdapter` interface requires three methods: `getItem`, `setItem`, and
 Helper functions exported for use outside the player (custom UI, playlists, timecode overlays, etc.):
 
 ```tsx
+// From the main entry (includes React)
 import {
   formatTime, formatTimecode, secondsToFrames, parseFrameRate,
   formatFeetFrames, formatSecondsFrames, formatBarsBeats,
 } from 'drop-player';
+
+// From the lightweight sub-path (no React dependency — safe for Server Components)
+import {
+  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
+  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+} from 'drop-player/utils';
 
 formatTime(125);                    // "02:05"
 formatTime(3661);                   // "01:01:01"
@@ -436,12 +480,78 @@ MIT
 
 # Changelog
 
+## 1.5.11
+
+### Features
+
+- Export `ControlButton` — a controls-bar button component with a built-in tooltip and accessible `aria-label`, for building custom buttons inside the `controlsStart` / `controlsEnd` slots that match the look of the built-in controls. `ControlButtonProps` is exported alongside it.
+- Export `Tooltip` and `TooltipProps` from the package root, for wrapping arbitrary custom elements with the same tooltip behavior used by the built-in controls.
+
+## 1.5.10
+
+### Improvements
+
+- Long audio files (multi-hour MP3s and similar) now load without exhausting browser memory. Waveform rendering for these files is significantly more reliable.
+- When a waveform can't be generated (e.g. very large files), the player falls back to a music icon and continues to play normally instead of showing an error.
+
+## 1.5.9
+
+### Bug Fixes
+
+- Fix Safari layout bug where `aspect-ratio` combined with `min-height` on the inner container caused incorrect sizing. The player container is now a flex column, and `.drop-player-inner` uses `flex: 1; min-height: 0` so its block-size resolves correctly under Safari.
+
+## 1.5.8
+
+### Improvements
+
+- Audio waveform no longer stretches taller than 120px, keeping it visually balanced inside large audio containers.
+
+### Bug Fixes
+
+- Scrolling the mouse wheel over the volume slider now adjusts volume, matching the existing behavior over the volume icon.
+
+## 1.5.7
+
+### Features
+
+- Add buffering spinner overlay — when playback stalls mid-stream (HTML media `waiting` event), a translucent overlay with the loading spinner is shown over the media while the player remains in the playing state. Cleared on `playing` / `canplay` / `pause` / `ended` / `error`. The `slots.loadingIndicator` slot is reused for the buffering indicator.
+
+## 1.5.6
+
+### Features
+
+- `features.seekStepButtons` and `features.sourceNavigation` accept a `DirectionalToggle` — pass `{ backward, forward }` to enable only one direction (e.g. `sourceNavigation: { backward: false }` for forward-only navigation). Boolean values still work as before. `DirectionalToggle` and `ResolvedDirectional` are exported from the package root.
+
+## 1.5.5
+
+### Features
+
+- Add `drop-player/utils` sub-path export — pure formatter functions (`formatTime`, `formatTimecode`, `secondsToFrames`, `parseFrameRate`, `formatSecondsFrames`, `formatFeetFrames`, `formatBarsBeats`) importable without React, safe for Server Components
+
+## 1.5.4
+
+### Features
+
+- Add `overlay` slot — full-area overlay layer between media and controls (`pointer-events: none` by default)
+
+## 1.5.2
+
+### Bug Fixes
+
+- Fix SSR safety: guard `ResizeObserver` usage in `useElementWidths` hook with `typeof` check to prevent `ReferenceError` in server-side rendering environments
+
+## 1.5.0
+
+### Breaking Changes
+
+- Remove ambient light feature — `ambientLight` has been removed from `PlayerFeatures`, `VideoState`, `VideoCoreRef`, and all related UI/CSS. If you were using `features={{ ambientLight: true }}`, remove it.
+
 ## 1.4.0
 
 ### Features
 
 - Add responsive controls bar — controls dynamically collapse into an overflow menu based on available width
-- Add overflow menu (⋯) that groups secondary controls (PiP, playback speed, capture) when space is limited
+- Add overflow menu (⋯) that groups secondary controls (ambient light, PiP, playback speed, capture) when space is limited
 - Split capture button into separate `CopyCaptureButton` and `SaveCaptureButton` controls
 - Add `useFeedback` hook for transient action feedback (e.g. "Copied!")
 - Add `useMediaQuery` and `useElementWidths` hooks for responsive layout
@@ -601,6 +711,7 @@ MIT
 
 ### Styles
 
+- Fix ambient light mode rendering
 - Reposition timestamp display
 
 ## 1.1.0
@@ -687,6 +798,7 @@ MIT
 - Playback speed control
 - Volume control with mute toggle
 - Fullscreen support
+- Ambient light effect
 - Multiple source selector
 - Customizable theming via CSS variables
 - Error handling with retry

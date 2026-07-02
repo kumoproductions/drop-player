@@ -1,6 +1,6 @@
 import { Repeat } from 'lucide-react';
 import type { TranslationKey } from '../../types';
-import { Tooltip } from './Tooltip';
+import { ControlButton } from './ControlButton';
 
 interface LoopButtonProps {
   isLoop: boolean;
@@ -11,15 +11,8 @@ interface LoopButtonProps {
 export function LoopButton({ isLoop, onToggle, t }: LoopButtonProps) {
   const label = isLoop ? t('disableRepeat') : t('enableRepeat');
   return (
-    <Tooltip content={label}>
-      <button
-        type="button"
-        onClick={onToggle}
-        className={`drop-player-button ${isLoop ? 'drop-player-color-blue' : ''}`}
-        aria-label={label}
-      >
-        <Repeat size={20} />
-      </button>
-    </Tooltip>
+    <ControlButton label={label} active={isLoop} onClick={onToggle}>
+      <Repeat size={20} />
+    </ControlButton>
   );
 }

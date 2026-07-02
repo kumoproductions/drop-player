@@ -196,6 +196,40 @@ const markers: Marker[] = [
 
 > **Note:** `overlay` has `pointer-events: none` by default. Add `pointer-events: auto` to child elements that need to be interactive.
 
+#### Custom control buttons
+
+Use the exported `ControlButton` in `controlsStart` / `controlsEnd` to add buttons that match the built-in controls, including tooltip and `aria-label`:
+
+```tsx
+import { ControlButton, VideoPlayer } from 'drop-player';
+import { Share2 } from 'lucide-react';
+
+<VideoPlayer
+  sources={url}
+  slots={{
+    controlsEnd: (
+      <ControlButton label="Share" onClick={handleShare}>
+        <Share2 size={20} />
+      </ControlButton>
+    ),
+  }}
+/>
+```
+
+- `label`: tooltip text, also used as the button's `aria-label`
+- `active`: highlights the button (same style as the active loop button)
+- Other `<button>` props (`disabled`, `className`, ...) pass through
+
+For arbitrary elements, the lower-level `Tooltip` is also exported. Rendered inside the control bar it automatically clamps to the bar's bounds:
+
+```tsx
+import { Tooltip } from 'drop-player';
+
+<Tooltip content="Description">
+  <span>...</span>
+</Tooltip>
+```
+
 ### `events` — `PlayerEvents`
 
 | Event | Payload | When |

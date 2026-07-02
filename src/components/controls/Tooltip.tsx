@@ -32,10 +32,13 @@ function unregisterTooltip(dismiss: () => void): void {
 
 const AUTO_DISMISS_MS = 2500;
 
-interface TooltipProps {
+export interface TooltipProps {
+  /** Tooltip text (announced via aria-describedby) */
   content: string;
   children: ReactNode;
+  /** Placement relative to the wrapped element */
   position?: 'top' | 'bottom';
+  /** Bounds for clamping; defaults to the controls bar when rendered inside it */
   containerRef?: RefObject<HTMLElement | null>;
 }
 

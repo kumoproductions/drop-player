@@ -1,6 +1,6 @@
 import { Maximize, Minimize } from 'lucide-react';
 import type { TranslationKey } from '../../types';
-import { Tooltip } from './Tooltip';
+import { ControlButton } from './ControlButton';
 
 interface FullscreenButtonProps {
   isFullscreen: boolean;
@@ -15,15 +15,8 @@ export function FullscreenButton({
 }: FullscreenButtonProps) {
   const label = isFullscreen ? t('exitFullscreen') : t('fullscreen');
   return (
-    <Tooltip content={label}>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="drop-player-button"
-        aria-label={label}
-      >
-        {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
-      </button>
-    </Tooltip>
+    <ControlButton label={label} onClick={onToggle}>
+      {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+    </ControlButton>
   );
 }

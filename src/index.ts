@@ -1,5 +1,10 @@
 // Components
 export { AudioCore } from './components/AudioCore';
+export {
+  ControlButton,
+  type ControlButtonProps,
+} from './components/controls/ControlButton';
+export { Tooltip, type TooltipProps } from './components/controls/Tooltip';
 export { ImageCore } from './components/ImageCore';
 export { PdfCore } from './components/PdfCore';
 export { Player } from './components/Player';

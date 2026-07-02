@@ -1,6 +1,6 @@
 import { PictureInPicture, PictureInPicture2 } from 'lucide-react';
 import type { TranslationKey } from '../../types';
-import { Tooltip } from './Tooltip';
+import { ControlButton } from './ControlButton';
 
 interface PipButtonProps {
   isPip: boolean;
@@ -11,19 +11,8 @@ interface PipButtonProps {
 export function PipButton({ isPip, onToggle, t }: PipButtonProps) {
   const label = isPip ? t('exitPip') : t('pip');
   return (
-    <Tooltip content={label}>
-      <button
-        type="button"
-        onClick={onToggle}
-        className="drop-player-button"
-        aria-label={label}
-      >
-        {isPip ? (
-          <PictureInPicture size={20} />
-        ) : (
-          <PictureInPicture2 size={20} />
-        )}
-      </button>
-    </Tooltip>
+    <ControlButton label={label} onClick={onToggle}>
+      {isPip ? <PictureInPicture size={20} /> : <PictureInPicture2 size={20} />}
+    </ControlButton>
   );
 }

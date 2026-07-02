@@ -196,6 +196,40 @@ const markers: Marker[] = [
 
 > **Note:** `overlay` はデフォルトで `pointer-events: none` です。操作可能にしたい子要素には `pointer-events: auto` を指定してください。
 
+#### カスタムコントロールボタン
+
+エクスポートされている `ControlButton` を `controlsStart` / `controlsEnd` で使うと、ツールチップと `aria-label` を含め、組み込みコントロールと同じ見た目・挙動のボタンを追加できます:
+
+```tsx
+import { ControlButton, VideoPlayer } from 'drop-player';
+import { Share2 } from 'lucide-react';
+
+<VideoPlayer
+  sources={url}
+  slots={{
+    controlsEnd: (
+      <ControlButton label="共有" onClick={handleShare}>
+        <Share2 size={20} />
+      </ControlButton>
+    ),
+  }}
+/>
+```
+
+- `label`: ツールチップの文言。ボタンの `aria-label` にも使われます
+- `active`: ボタンをハイライト表示します（ループボタンのアクティブ時と同じスタイル）
+- その他の `<button>` の props（`disabled`、`className` など）はそのまま渡せます
+
+任意の要素にツールチップを付けたい場合は、低レベルの `Tooltip` もエクスポートされています。コントロールバー内で描画すると、バーの範囲内に収まるよう自動で位置調整されます:
+
+```tsx
+import { Tooltip } from 'drop-player';
+
+<Tooltip content="説明文">
+  <span>...</span>
+</Tooltip>
+```
+
 ### `events` — `PlayerEvents`
 
 | イベント | ペイロード | タイミング |
