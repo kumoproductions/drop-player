@@ -41,6 +41,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
     const wheelTouchContainerRef = useRef<HTMLDivElement>(null);
     const isFocusedRef = useRef(false);
     const isDraggingRef = useRef(false);
+    const [isDragging, setIsDragging] = useState(false);
     const dragStartRef = useRef({ x: 0, y: 0 });
     const panStartRef = useRef({ x: 0, y: 0 });
 
@@ -98,20 +99,15 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
       onStateChange,
     ]);
 
-    useEffect(() => {
+    // Reset view state during render when the source changes.
+    const [prevSrc, setPrevSrc] = useState(src);
+    if (prevSrc !== src) {
+      setPrevSrc(src);
       setZoom(1);
       setPanX(0);
       setPanY(0);
       setIsLoaded(false);
-
-      const img = imageRef.current;
-      if (img && src && img.complete && img.naturalWidth > 0) {
-        setNaturalWidth(img.naturalWidth);
-        setNaturalHeight(img.naturalHeight);
-        setIsLoaded(true);
-        onLoad?.();
-      }
-    }, [src, onLoad]);
+    }
 
     const handleLoad = useCallback(() => {
       const image = imageRef.current;
@@ -122,6 +118,17 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
         onLoad?.();
       }
     }, [onLoad]);
+
+    // An image that finished loading before hydration never fires onLoad.
+    // Kept stable so React does not detach/re-attach the ref on every render.
+    const handleLoadRef = useRef(handleLoad);
+    useEffect(() => {
+      handleLoadRef.current = handleLoad;
+    });
+    const handleImageRef = useCallback((img: HTMLImageElement | null) => {
+      imageRef.current = img;
+      if (img?.complete && img.naturalWidth > 0) handleLoadRef.current();
+    }, []);
 
     const handleError = useCallback(() => {
       onError?.(new Error('Failed to load image'));
@@ -213,6 +220,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
         if (e.button !== 0) return;
 
         isDraggingRef.current = true;
+        setIsDragging(true);
         dragStartRef.current = { x: e.clientX, y: e.clientY };
         panStartRef.current = { x: panX, y: panY };
 
@@ -241,6 +249,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
     useEffect(() => {
       const handleGlobalMouseUp = () => {
         isDraggingRef.current = false;
+        setIsDragging(false);
       };
 
       document.addEventListener('mouseup', handleGlobalMouseUp);
@@ -309,6 +318,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
           };
           if (zoom > 1) {
             isDraggingRef.current = true;
+            setIsDragging(true);
             dragStartRef.current = {
               x: e.touches[0].clientX,
               y: e.touches[0].clientY,
@@ -409,6 +419,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
         lastTouchCenterRef.current = null;
         touchStartPosRef.current = null;
         isDraggingRef.current = false;
+        setIsDragging(false);
       },
       [onToggleControls]
     );
@@ -578,11 +589,12 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
     );
 
     return (
+      // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- role="application" container owns pan/zoom pointer input
       <div
         ref={wheelTouchContainerRef}
         role="application"
         aria-label="Image viewer"
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: role="application" makes this interactive
+        // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- role="application" makes this interactive
         tabIndex={0}
         className="drop-player-image-container"
         onFocus={() => {
@@ -597,17 +609,12 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         style={{
-          cursor:
-            zoom > 1
-              ? isDraggingRef.current
-                ? 'grabbing'
-                : 'grab'
-              : 'default',
+          cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
           touchAction: zoom > 1 ? 'none' : 'pan-y',
         }}
       >
         <img
-          ref={imageRef}
+          ref={handleImageRef}
           src={src}
           alt={alt}
           crossOrigin={crossOrigin}
@@ -620,9 +627,7 @@ export const ImageCore = forwardRef<ImageCoreRef, ImageCoreProps>(
             objectFit: 'contain',
             transform: `scale(${zoom}) translate(${panX / zoom}px, ${panY / zoom}px)`,
             transformOrigin: 'center center',
-            transition: isDraggingRef.current
-              ? 'none'
-              : 'transform 0.1s ease-out',
+            transition: isDragging ? 'none' : 'transform 0.1s ease-out',
             userSelect: 'none',
           }}
         />

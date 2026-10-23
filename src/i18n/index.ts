@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { TranslationKey, Translations } from '../types';
 import { en } from './en';
@@ -36,11 +36,10 @@ export function usePlayerTranslation(
   locale: string = 'en',
   customTranslations?: Partial<Translations>
 ) {
-  const prevRef = useRef(customTranslations);
-  if (!shallowEqual(prevRef.current, customTranslations)) {
-    prevRef.current = customTranslations;
+  const [stableCustom, setStableCustom] = useState(customTranslations);
+  if (!shallowEqual(stableCustom, customTranslations)) {
+    setStableCustom(customTranslations);
   }
-  const stableCustom = prevRef.current;
 
   const mergedTranslations = useMemo(() => {
     const base = getTranslations(locale);

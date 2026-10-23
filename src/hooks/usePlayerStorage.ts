@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import type { StorageAdapter } from '../types';
 
@@ -41,7 +41,9 @@ export function usePlayerStorage(
 ): UsePlayerStorageReturn {
   const { storageKey, storage = defaultStorage } = options;
   const storageRef = useRef(storage);
-  storageRef.current = storage;
+  useEffect(() => {
+    storageRef.current = storage;
+  });
 
   const prefix = storageKey ? `${storageKey}_` : STORAGE_PREFIX;
 

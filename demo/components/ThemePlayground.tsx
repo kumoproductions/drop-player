@@ -219,7 +219,7 @@ export function ThemePlayground() {
         </h4>
         <div className="flex flex-wrap items-center gap-4">
           {THEME_VARS.map((v) => (
-            // biome-ignore lint/a11y/noLabelWithoutControl: input is nested
+            // oxlint-disable-next-line jsx-a11y/label-has-associated-control -- input is nested
             <label key={v.key} className="space-y-1.5">
               <span className="block text-xs text-zinc-400">{v.label}</span>
               {v.type === 'range' ? (

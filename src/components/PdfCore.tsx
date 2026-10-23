@@ -106,13 +106,13 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     }, [zoom, panX, panY, docLoaded, currentPage, totalPages, onStateChange]);
 
     // ── Reset state on src change ──
-    // biome-ignore lint/correctness/useExhaustiveDependencies: src is intentional trigger for reset
     useEffect(() => {
       setCurrentPage(1);
       setZoom(1);
 
       setPanX(0);
       setPanY(0);
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- src is intentional trigger for reset
     }, [src]);
 
     // ── Canvas rendering ──
@@ -120,7 +120,6 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     // Canvas CSS size is always BASE size (scale=1) — visual zoom is via CSS transform.
     // This means the canvas has zoom*dpr pixels displayed in base CSS size, then
     // CSS transform: scale(zoom) expands it => effective pixel density = dpr (crisp).
-    // biome-ignore lint/correctness/useExhaustiveDependencies: containerRef is a stable ref
     const renderPage = useCallback(
       async (doc: PDFDocumentProxy, pageNum: number, scale: number) => {
         const canvas = canvasRef.current;
@@ -191,6 +190,7 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
           // Render cancelled or failed
         }
       },
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- containerRef is a stable ref
       []
     );
 
@@ -207,14 +207,13 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     }, [containerRef, pdfDocument, docLoaded, currentPage, zoom, renderPage]);
 
     // Render on page change (immediate, at current zoom)
-    // biome-ignore lint/correctness/useExhaustiveDependencies: zoom changes handled by debounced effect below
     useEffect(() => {
       if (!pdfDocument || !docLoaded) return;
       renderPage(pdfDocument, currentPage, zoom);
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- zoom changes handled by debounced effect below
     }, [pdfDocument, docLoaded, currentPage, renderPage]);
 
     // Debounced re-render on zoom change only (for crisp text at new zoom level)
-    // biome-ignore lint/correctness/useExhaustiveDependencies: currentPage handled by immediate render effect above
     useEffect(() => {
       if (!pdfDocument || !docLoaded) return;
 
@@ -232,6 +231,7 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
           clearTimeout(renderDebounceRef.current);
         }
       };
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- currentPage handled by immediate render effect above
     }, [zoom, pdfDocument, docLoaded, renderPage]);
 
     // ── Zoom methods ──
@@ -609,11 +609,12 @@ export const PdfCore = forwardRef<PdfCoreRef, PdfCoreProps>(
     }
 
     return (
+      // oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- role="application" container owns pan/zoom pointer input
       <div
         ref={wheelTouchContainerRef}
         role="application"
         aria-label="PDF viewer"
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: role="application" makes this interactive
+        // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- role="application" makes this interactive
         tabIndex={0}
         className="drop-player-pdf-container"
         onFocus={() => {

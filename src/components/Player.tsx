@@ -164,9 +164,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
     const [activeSourceIndex, setActiveSourceIndex] = useState(0);
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: reset index when entries change
     useEffect(() => {
       setActiveSourceIndex(0);
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- reset index when entries change
     }, [entries]);
 
     const activeEntry = entries[activeSourceIndex];
@@ -174,9 +174,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const [lastError, setLastError] = useState<Error | null>(null);
     const [isTimeDisplayInline, setIsTimeDisplayInline] = useState(true);
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: reset error when source changes
     useEffect(() => {
       setLastError(null);
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- reset error when source changes
     }, [entries, activeSourceIndex]);
 
     const handleError = useCallback(
@@ -254,9 +254,9 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const [playbackRate, setPlaybackRate] = useState(1);
 
     // Reset playback rate when sources or media mode change
-    // biome-ignore lint/correctness/useExhaustiveDependencies: reset rate on source/mode change
     useEffect(() => {
       setPlaybackRate(1);
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- reset rate on source/mode change
     }, [entries, activeSourceIndex, mediaMode]);
 
     // PIP state
@@ -314,12 +314,15 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       [globalStorage, onTimeDisplayFormatChange]
     );
 
-    const mediaElement =
-      mediaMode === 'video'
-        ? (videoCoreRef.current?.getVideoElement() ?? null)
-        : mediaMode === 'audio'
-          ? (audioCoreRef.current?.getAudioElement() ?? null)
-          : null;
+    const getMediaElement = useCallback(
+      (): HTMLMediaElement | null =>
+        mediaMode === 'video'
+          ? (videoCoreRef.current?.getVideoElement() ?? null)
+          : mediaMode === 'audio'
+            ? (audioCoreRef.current?.getAudioElement() ?? null)
+            : null,
+      [mediaMode]
+    );
 
     const {
       isFullscreen,
@@ -335,7 +338,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       onFullscreenChange,
     });
     const { handleKeyDown } = useKeyboardShortcuts({
-      mediaElement,
+      getMediaElement,
       containerElement: containerRef.current,
       frameRate: mediaMode === 'audio' ? 1 : frameRate,
       seekStep,
@@ -436,7 +439,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
       qualityLabel?: string;
     }>({});
 
-    // biome-ignore lint/correctness/useExhaustiveDependencies: overlay driven by state diffs
     useEffect(() => {
       if (!showStatusOverlay) return;
 
@@ -554,6 +556,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         zoom,
         qualityLabel,
       };
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- overlay driven by state diffs
     }, [
       showStatusOverlay,
       mediaMode,
@@ -717,20 +720,22 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     const resolvedSeekStep = seekStep ?? 10;
 
     const handleSeekBackward = useCallback(() => {
+      const mediaElement = getMediaElement();
       if (!mediaElement) return;
       mediaElement.currentTime = Math.max(
         0,
         mediaElement.currentTime - resolvedSeekStep
       );
-    }, [mediaElement, resolvedSeekStep]);
+    }, [getMediaElement, resolvedSeekStep]);
 
     const handleSeekForward = useCallback(() => {
+      const mediaElement = getMediaElement();
       if (!mediaElement) return;
       mediaElement.currentTime = Math.min(
         mediaElement.duration || 0,
         mediaElement.currentTime + resolvedSeekStep
       );
-    }, [mediaElement, resolvedSeekStep]);
+    }, [getMediaElement, resolvedSeekStep]);
 
     const handlePlayToggle = useCallback(() => {
       switch (mediaMode) {
@@ -877,7 +882,6 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
     }, [mediaMode]);
 
     // Sync PIP state with browser events
-    // biome-ignore lint/correctness/useExhaustiveDependencies: videoState.duration ensures re-attach after video element ready
     useEffect(() => {
       if (mediaMode !== 'video') return;
       const video = videoCoreRef.current?.getVideoElement();
@@ -898,6 +902,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         video.removeEventListener('enterpictureinpicture', handleEnterPip);
         video.removeEventListener('leavepictureinpicture', handleLeavePip);
       };
+      // oxlint-disable-next-line react-hooks/exhaustive-deps -- videoState.duration ensures re-attach after video element ready
     }, [mediaMode, onPipChange, videoState.duration]); // videoState.duration ensures re-attach after video element ready
 
     const handleQualityChangeFromUI = useCallback(
@@ -1427,7 +1432,7 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
         onTouchStart={handleSwipeTouchStart}
         onTouchEnd={handleSwipeTouchEnd}
         onTouchCancel={handleSwipeTouchCancel}
-        // biome-ignore lint/a11y/noNoninteractiveTabindex: Media player needs tabIndex for keyboard shortcuts
+        // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Media player needs tabIndex for keyboard shortcuts
         tabIndex={0}
       >
         <div className="drop-player-inner">
@@ -1454,15 +1459,11 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
 
           {/* Loading overlay */}
           {!isReady && !lastError && (
-            <div
-              role="status"
-              aria-label="Loading"
-              className="drop-player-overlay"
-            >
+            <output aria-label="Loading" className="drop-player-overlay">
               {slots?.loadingIndicator ?? (
-                <div className="drop-player-spinner" aria-hidden />
+                <span className="drop-player-spinner" aria-hidden />
               )}
-            </div>
+            </output>
           )}
 
           {/* Buffering overlay (shown over the media while playing) */}
@@ -1474,15 +1475,14 @@ export const Player = forwardRef<PlayerRef, PlayerProps>(
               (mediaMode === 'audio' &&
                 audioState.isPlaying &&
                 audioState.isBuffering)) && (
-              <div
-                role="status"
+              <output
                 aria-label="Buffering"
                 className="drop-player-overlay drop-player-overlay--buffering"
               >
                 {slots?.loadingIndicator ?? (
-                  <div className="drop-player-spinner" aria-hidden />
+                  <span className="drop-player-spinner" aria-hidden />
                 )}
-              </div>
+              </output>
             )}
 
           {/* Source Selector (top-left, YouTube title style) */}

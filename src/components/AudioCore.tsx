@@ -97,14 +97,21 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
       isBuffering,
     } = state;
 
-    const [waveformData, setWaveformData] = useState<WaveformData | null>(null);
-    const [waveformReady, setWaveformReady] = useState(false);
-    const [waveformFailedFallback, setWaveformFailedFallback] = useState(false);
+    // Result is tagged with its src so a stale waveform is never shown for a new source.
+    const [waveformResult, setWaveformResult] = useState<{
+      src: string;
+      data: WaveformData | null;
+    } | null>(null);
+    const currentWaveform = waveformResult?.src === src ? waveformResult : null;
+    const waveformData = currentWaveform?.data ?? null;
+    const waveformReady = waveformData !== null;
+    const waveformFailedFallback =
+      currentWaveform !== null && currentWaveform.data === null;
 
-    const onErrorRef = useRef(onError);
-    onErrorRef.current = onError;
     const onWaveformReadyRef = useRef(onWaveformReady);
-    onWaveformReadyRef.current = onWaveformReady;
+    useEffect(() => {
+      onWaveformReadyRef.current = onWaveformReady;
+    });
 
     useEffect(() => {
       const stateSnapshot: AudioState = {
@@ -205,29 +212,19 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
     );
 
     useEffect(() => {
-      if (!src) {
-        setWaveformReady(false);
-        setWaveformData(null);
-        setWaveformFailedFallback(false);
-        return;
-      }
-
-      setWaveformReady(false);
-      setWaveformData(null);
-      setWaveformFailedFallback(false);
+      if (!src) return;
 
       const controller = new AbortController();
 
       generateWaveform(src, controller.signal)
         .then((waveform) => {
           if (controller.signal.aborted || !waveform) return;
-          setWaveformData(waveform);
-          setWaveformReady(true);
+          setWaveformResult({ src, data: waveform });
           onWaveformReadyRef.current?.();
         })
         .catch(() => {
           if (controller.signal.aborted) return;
-          setWaveformFailedFallback(true);
+          setWaveformResult({ src, data: null });
         });
 
       return () => {
@@ -334,6 +331,7 @@ export const AudioCore = forwardRef<AudioCoreRef, AudioCoreProps>(
 
         <div
           ref={waveformAreaRef}
+          // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- custom-drawn track; a native range input cannot host the rendered children
           role="slider"
           aria-label="Audio progress"
           aria-valuemin={0}

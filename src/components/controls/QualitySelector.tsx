@@ -158,7 +158,7 @@ export function QualitySelector({
 
       {isOpen && (
         <>
-          {/* biome-ignore lint/a11y/noStaticElementInteractions: Backdrop for closing dropdown */}
+          {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Backdrop for closing dropdown */}
           <div
             className="drop-player-backdrop"
             onClick={() => setIsOpen(false)}

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 interface UseKeyboardShortcutsOptions {
   /** Video or audio element (shared API: play, pause, currentTime, volume, muted) */
-  mediaElement: HTMLMediaElement | null;
+  getMediaElement: () => HTMLMediaElement | null;
   containerElement: HTMLElement | null;
   /** Seconds per "frame" when using modifier key (e.g. 1/30 for video; 1 for audio) */
   frameRate: number;
@@ -20,7 +20,7 @@ interface UseKeyboardShortcutsOptions {
  */
 export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions) {
   const {
-    mediaElement,
+    getMediaElement,
     containerElement,
     frameRate,
     seekStep = 10,
@@ -32,6 +32,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions) {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLElement>) => {
+      const mediaElement = getMediaElement();
       if (!mediaElement || !containerElement) return;
 
       const target = e.target as HTMLElement;
@@ -125,7 +126,7 @@ export function useKeyboardShortcuts(options: UseKeyboardShortcutsOptions) {
       }
     },
     [
-      mediaElement,
+      getMediaElement,
       containerElement,
       frameRate,
       seekStep,

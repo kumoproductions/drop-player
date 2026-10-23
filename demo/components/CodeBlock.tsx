@@ -34,7 +34,7 @@ export function CodeBlock({ code, lang = 'tsx' }: CodeBlockProps) {
       {html ? (
         <div
           className="text-sm [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:p-4"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: shiki output
+          // oxlint-disable-next-line react/no-danger -- shiki output
           dangerouslySetInnerHTML={{ __html: html }}
         />
       ) : (

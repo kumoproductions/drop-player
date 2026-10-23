@@ -272,6 +272,7 @@ export function SeekBar({
       <div
         ref={sliderRef}
         className="drop-player-seekbar-track"
+        // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- custom-drawn track; a native range input cannot host the rendered children
         role="slider"
         aria-label={t('seek')}
         aria-valuemin={0}

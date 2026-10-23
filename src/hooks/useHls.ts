@@ -1,12 +1,18 @@
 import type Hls from 'hls.js';
 import type { HlsConfig, Level } from 'hls.js';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type RefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import type { FallbackReason, QualityLevel } from '../types';
 
 interface UseHlsOptions {
   hlsUrl: string | null;
-  videoElement: HTMLVideoElement | null;
+  videoRef: RefObject<HTMLVideoElement | null>;
   /** URL to fall back to when HLS fails (e.g. originalUrl from MediaSource) */
   originalUrl?: string | null;
   enabled: boolean;
@@ -64,7 +70,7 @@ async function importHls(
 export function useHls(options: UseHlsOptions): UseHlsReturn {
   const {
     hlsUrl,
-    videoElement,
+    videoRef,
     originalUrl,
     enabled,
     hlsConfig,
@@ -119,6 +125,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
   }, []);
 
   useEffect(() => {
+    const videoElement = videoRef.current;
     if (!hlsUrl || !videoElement || !enabled) return;
 
     let hls: Hls | null = null;
@@ -254,7 +261,7 @@ export function useHls(options: UseHlsOptions): UseHlsReturn {
       // (enabled=false), we need to keep them so QualitySelector can show
       // HLS options for switching back.
     };
-  }, [hlsUrl, videoElement, enabled, hlsConfig, fallbackToOriginal]);
+  }, [hlsUrl, videoRef, enabled, hlsConfig, fallbackToOriginal]);
 
   /** Use nextLevel for smooth switching without buffer flush */
   const setQualityLevel = useCallback((level: number | 'auto') => {

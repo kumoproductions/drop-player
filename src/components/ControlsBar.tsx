@@ -369,56 +369,31 @@ export function ControlsBar({
   // to the current mode are null and excluded automatically.
   // Highest priority (hidden last) → lowest (hidden first).
 
-  const overflowable: OverflowEntry[] = useMemo(() => {
-    const entries: OverflowEntry[] = [];
-    const push = (key: string, el: ReactNode, fallback: number) => {
-      if (el) entries.push({ key, element: el, width: w(key, fallback) });
-    };
+  const sliderW = showVolumeSlider
+    ? (measured.volumeSlider ?? F_VOLUME_SLIDER) + GAP
+    : 0;
+  const candidates: [key: string, element: ReactNode, width: number][] = [
     // — High priority —
     // Volume button + slider are a unit: when the button overflows, the slider hides too.
-    if (volumeEl) {
-      const sliderW = showVolumeSlider
-        ? (measured.volumeSlider ?? F_VOLUME_SLIDER) + GAP
-        : 0;
-      entries.push({
-        key: 'volume',
-        element: volumeEl,
-        width: w('volume', F_BTN) + sliderW,
-      });
-    }
-    push('zoom', zoomEl, F_ZOOM);
-    push('seekStep', seekStepEl, F_SEEK_STEP);
-    push('sourceNav', sourceNavEl, F_SOURCE_NAV);
-    push('pageNav', pageNavEl, F_PAGE_NAV);
-    push('loop', loopEl, F_BTN);
+    ['volume', volumeEl, w('volume', F_BTN) + sliderW],
+    ['zoom', zoomEl, w('zoom', F_ZOOM)],
+    ['seekStep', seekStepEl, w('seekStep', F_SEEK_STEP)],
+    ['sourceNav', sourceNavEl, w('sourceNav', F_SOURCE_NAV)],
+    ['pageNav', pageNavEl, w('pageNav', F_PAGE_NAV)],
+    ['loop', loopEl, w('loop', F_BTN)],
     // — Medium priority —
-    push('speed', speedEl, F_BTN);
-    push('quality', qualityEl, F_BTN);
-    push('saveCapture', saveCaptureEl, F_BTN);
-    push('copyCapture', copyCaptureEl, F_BTN);
+    ['speed', speedEl, w('speed', F_BTN)],
+    ['quality', qualityEl, w('quality', F_BTN)],
+    ['saveCapture', saveCaptureEl, w('saveCapture', F_BTN)],
+    ['copyCapture', copyCaptureEl, w('copyCapture', F_BTN)],
     // — Low priority —
-    push('pip', pipEl, F_BTN);
+    ['pip', pipEl, w('pip', F_BTN)],
     // — Lowest priority (first to move to seekbar chip) —
-    push('timeDisplay', timeDisplayEl, F_TIME_DISPLAY);
-    return entries;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    volumeEl,
-    showVolumeSlider,
-    measured.volumeSlider,
-    zoomEl,
-    seekStepEl,
-    sourceNavEl,
-    pageNavEl,
-    loopEl,
-    speedEl,
-    qualityEl,
-    saveCaptureEl,
-    copyCaptureEl,
-    pipEl,
-    timeDisplayEl,
-    w,
-  ]);
+    ['timeDisplay', timeDisplayEl, w('timeDisplay', F_TIME_DISPLAY)],
+  ];
+  const overflowable: OverflowEntry[] = candidates.flatMap(
+    ([key, element, width]) => (element ? [{ key, element, width }] : [])
+  );
 
   const fixedWidth = useMemo(() => {
     let fw = GAP * 2;
@@ -427,10 +402,11 @@ export function ControlsBar({
     return fw;
   }, [isVideoOrAudio, features.playButton, features.fullscreen]);
 
-  const visibleKeys = useMemo(
-    () => computeVisibleKeys({ barWidth, fixedWidth, overflowable }),
-    [barWidth, fixedWidth, overflowable]
-  );
+  const visibleKeys = computeVisibleKeys({
+    barWidth,
+    fixedWidth,
+    overflowable,
+  });
 
   // TimeDisplay goes to seekbar chip when overflowed, not the overflow panel.
   const overflowItems = overflowable.filter(

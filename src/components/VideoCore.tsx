@@ -69,7 +69,6 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
     const {
       state,
       handlers,
-      storage,
       setSeeking,
       setCurrentTime,
       setSeekValue,
@@ -159,7 +158,7 @@ export const VideoCore = forwardRef<VideoCoreRef, VideoCoreProps>(
       setQualityLevel: setHlsQualityLevel,
     } = useHls({
       hlsUrl,
-      videoElement: videoRef.current,
+      videoRef,
       originalUrl: activeEntry?.originalUrl,
       enabled: isHlsSource && !isPlayingOriginal,
       hlsConfig,

@@ -116,7 +116,6 @@ export function Tooltip({
   }, [show, startAutoDismiss]);
 
   // Position the tooltip within container bounds after render
-  // biome-ignore lint/correctness/useExhaustiveDependencies: content changes require repositioning
   useLayoutEffect(() => {
     const tooltip = tooltipRef.current;
     const container = containerRef?.current;
@@ -153,6 +152,7 @@ export function Tooltip({
 
     tooltip.style.left = `${left}px`;
     tooltip.style.transform = 'none';
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- content changes require repositioning
   }, [isVisible, content, containerRef]);
 
   // Handle Escape key to close tooltip
@@ -172,7 +172,7 @@ export function Tooltip({
   }, [isVisible, dismiss]);
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Tooltip wrapper for mouse events
+    // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Tooltip wrapper for mouse events
     <div
       className="drop-player-tooltip-wrapper"
       onMouseEnter={handleMouseEnter}

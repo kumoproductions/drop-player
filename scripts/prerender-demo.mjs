@@ -90,7 +90,6 @@ function buildNav(navItems) {
 }
 
 function buildStaticHtml(contentHtml, navHtml, version, locale) {
-  const otherLocale = locale === 'en' ? 'ja' : 'en';
   const otherLabel = locale === 'en' ? '日本語' : 'English';
   const otherPath = locale === 'en' ? '/ja' : '/';
 
