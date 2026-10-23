@@ -57,18 +57,16 @@
     "postbuild:demo": "node scripts/prerender-demo.mjs",
     "preview:demo": "vite preview --config demo/vite.config.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "lint:fix:unsafe": "biome check --write --unsafe .",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
     "test": "vitest run",
     "test:watch": "vitest",
     "generate:llms": "node scripts/generate-llms-txt.mjs",
     "prebuild:demo": "node scripts/generate-llms-txt.mjs",
     "prepublishOnly": "npm run build",
-    "prepare": "node -e \"try{require('fs').statSync('.husky')}catch{process.exit(1)}\" && npx husky || true"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,jsonc,css}": "biome check --write"
+    "prepare": "lefthook install || true",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
   "peerDependencies": {
     "hls.js": "^1.4.0",
@@ -95,8 +93,6 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.7",
-    "@cumuloworks/configs": "^2.0.0",
     "@tailwindcss/vite": "^4.2.1",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
@@ -104,9 +100,10 @@
     "@vercel/analytics": "^2.0.1",
     "@vitejs/plugin-react": "^6.0.1",
     "hls.js": "^1.6.15",
-    "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
+    "lefthook": "^2.2.2",
     "lucide-react": "^0.577.0",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
     "pdfjs-dist": "^5.5.207",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
