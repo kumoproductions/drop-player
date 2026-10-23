@@ -1,4 +1,5 @@
 import { Camera, Check, X } from 'lucide-react';
+
 import type { FeedbackState } from '../../hooks/useFeedback';
 import { useFeedback } from '../../hooks/useFeedback';
 import type { TranslationKey } from '../../types';

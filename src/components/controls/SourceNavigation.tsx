@@ -1,4 +1,5 @@
 import { SkipBack, SkipForward } from 'lucide-react';
+
 import type { TranslationKey } from '../../types';
 import { Tooltip } from './Tooltip';
 

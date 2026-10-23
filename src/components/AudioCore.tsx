@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import type WaveformData from 'waveform-data';
+
 import { useDragToSeek } from '../hooks/useDragToSeek';
 import { useMediaPlayerState } from '../hooks/useMediaPlayerState';
 import type { AudioCoreProps, AudioCoreRef, AudioState } from '../types';

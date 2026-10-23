@@ -1,4 +1,5 @@
 import { type ReactNode, useCallback, useRef, useState } from 'react';
+
 import type { CustomMarker, Marker, TranslationKey } from '../../types';
 import { formatTime } from '../../utils/formatters';
 

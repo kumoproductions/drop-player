@@ -1,4 +1,5 @@
 import { Repeat } from 'lucide-react';
+
 import type { TranslationKey } from '../../types';
 import { ControlButton } from './ControlButton';
 

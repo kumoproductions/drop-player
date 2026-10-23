@@ -1,5 +1,6 @@
 import { Ellipsis, X } from 'lucide-react';
 import { type ReactNode, useEffect, useState } from 'react';
+
 import type { TranslationKey } from '../../types';
 import { Tooltip } from './Tooltip';
 

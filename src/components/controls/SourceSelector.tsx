@@ -1,5 +1,6 @@
 import { Check, ChevronDown } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+
 import type { SourceEntry } from '../../types';
 
 interface SourceSelectorProps {

@@ -10,11 +10,10 @@ import type {
 // ============================================================================
 
 /** Internal type where directional toggles are resolved to `ResolvedDirectional`. */
-export interface ResolvedPlayerFeatures
-  extends Omit<
-    Required<PlayerFeatures>,
-    'seekStepButtons' | 'sourceNavigation'
-  > {
+export interface ResolvedPlayerFeatures extends Omit<
+  Required<PlayerFeatures>,
+  'seekStepButtons' | 'sourceNavigation'
+> {
   seekStepButtons: ResolvedDirectional;
   sourceNavigation: ResolvedDirectional;
 }

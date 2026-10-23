@@ -18,12 +18,12 @@ export function Sidebar({ activeId, onNavigate }: SidebarProps) {
             key={item.id}
             href={`#${item.id}`}
             onClick={onNavigate}
-            className={`block py-1.5 text-sm transition-colors border-l-2 ${
+            className={`block border-l-2 py-1.5 text-sm transition-colors ${
               item.indent ? 'pl-6' : 'pl-3'
             } ${
               isActive
-                ? 'border-blue-500 text-blue-400 font-medium'
-                : 'border-transparent text-zinc-400 hover:text-zinc-200 hover:border-zinc-600'
+                ? 'border-blue-500 font-medium text-blue-400'
+                : 'border-transparent text-zinc-400 hover:border-zinc-600 hover:text-zinc-200'
             }`}
           >
             {item.label}

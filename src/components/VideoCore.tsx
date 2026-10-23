@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { useDragToSeek } from '../hooks/useDragToSeek';
 import { useHls } from '../hooks/useHls';
 import { useMediaPlayerState } from '../hooks/useMediaPlayerState';

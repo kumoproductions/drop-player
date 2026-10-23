@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef } from 'react';
+
 import type { StorageAdapter } from '../types';
 
 // Storage key prefix

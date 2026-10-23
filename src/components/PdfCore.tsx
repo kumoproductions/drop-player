@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { usePdfJs } from '../hooks/usePdfJs';
 import type { PdfCoreProps, PdfCoreRef, PdfState } from '../types';
 

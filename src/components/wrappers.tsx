@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+
 import type { PlayerProps, PlayerRef } from '../types';
 import { Player } from './Player';
 

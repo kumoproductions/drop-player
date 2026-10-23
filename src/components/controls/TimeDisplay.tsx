@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+
 import type { TimeDisplayFormat, TranslationKey } from '../../types';
 import {
   formatBarsBeats,

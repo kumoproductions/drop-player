@@ -1,4 +1,5 @@
 import { type Ref, useCallback } from 'react';
+
 import type { TranslationKey } from '../../types';
 
 interface VolumeSliderProps {

@@ -1,5 +1,6 @@
 import { Check, Gauge } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+
 import type { TranslationKey } from '../../types';
 import { Tooltip } from './Tooltip';
 

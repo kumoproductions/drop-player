@@ -511,7 +511,7 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-.drop-player-dropdown-item[data-selected="true"] {
+.drop-player-dropdown-item[data-selected='true'] {
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -706,7 +706,7 @@
 }
 
 .drop-player-seekbar-thumb::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: -10px;
   border-radius: 9999px;

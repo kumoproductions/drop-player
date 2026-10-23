@@ -15,16 +15,17 @@ npm i drop-player lucide-react
 
 **オプション**（必要な場合のみ）:
 
-| パッケージ | 用途 |
-|---------|------|
-| `hls.js` >=1.4 | HLS動画 (`.m3u8`) |
-| `pdfjs-dist` >=4.0 | PDFキャンバスレンダリング（ズーム、パン、ページ送り） |
-| `waveform-data` >=4.5 | 音声波形表示 |
+| パッケージ            | 用途                                                  |
+| --------------------- | ----------------------------------------------------- |
+| `hls.js` >=1.4        | HLS動画 (`.m3u8`)                                     |
+| `pdfjs-dist` >=4.0    | PDFキャンバスレンダリング（ズーム、パン、ページ送り） |
+| `waveform-data` >=4.5 | 音声波形表示                                          |
 
 ## クイックスタート
 
 ```tsx
 import { Player } from 'drop-player';
+
 import 'drop-player/styles.css';
 
 function App() {
@@ -40,13 +41,13 @@ function App() {
 
 ## コンポーネント
 
-| エクスポート | 用途 |
-|--------|--------|
-| `Player` | 汎用 — URLからモードを自動判定 |
-| `VideoPlayer` | 動画 |
-| `AudioPlayer` | 音声 |
-| `ImageViewer` | 画像 |
-| `PdfViewer` | PDF |
+| エクスポート  | 用途                           |
+| ------------- | ------------------------------ |
+| `Player`      | 汎用 — URLからモードを自動判定 |
+| `VideoPlayer` | 動画                           |
+| `AudioPlayer` | 音声                           |
+| `ImageViewer` | 画像                           |
+| `PdfViewer`   | PDF                            |
 
 `VideoPlayer` や `AudioPlayer` などは可読性のためのエイリアスです。すべて同じ `PlayerProps` / `PlayerRef` を共有し、メディアモードはソースURLから自動判定されます。種別が混在する場合や不明な場合は `Player` を使ってください。
 
@@ -54,12 +55,12 @@ function App() {
 
 ## 対応メディア
 
-| モード | フォーマット |
-|------|---------|
-| 動画 | HLS (`.m3u8`), MP4, WebM |
-| 音声 | MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus |
-| 画像 | JPEG, PNG, GIF, WebP, AVIF, SVG |
-| PDF | pdf.jsによるキャンバスレンダリング（ズーム、パン、ページ送り）。`pdfjs-dist` 未インストール時はブラウザ標準の `<object>` にフォールバック |
+| モード | フォーマット                                                                                                                              |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 動画   | HLS (`.m3u8`), MP4, WebM                                                                                                                  |
+| 音声   | MP3, WAV, Ogg, AAC, FLAC, M4A, WebM, Opus                                                                                                 |
+| 画像   | JPEG, PNG, GIF, WebP, AVIF, SVG                                                                                                           |
+| PDF    | pdf.jsによるキャンバスレンダリング（ズーム、パン、ページ送り）。`pdfjs-dist` 未インストール時はブラウザ標準の `<object>` にフォールバック |
 
 ブラウザ専用のランタイムです。SSRフレームワーク（Next.js, Remix, Astro 等）での import は安全で、サーバー上では何も描画せず、クライアントで有効化されます。
 
@@ -107,63 +108,63 @@ Propsは4つのグループに分かれています:
 
 ### トップレベル
 
-| Prop | 型 | デフォルト | 説明 |
-|------|------|---------|-------------|
-| `sources` | `string \| MediaSource \| MediaSource[] \| null` | — | メディアソース |
-| `className` | `string` | — | ルートコンテナのCSSクラス |
-| `crossOrigin` | `'anonymous' \| 'use-credentials'` | `'anonymous'` | メディア要素のCORS設定 |
-| `poster` | `string` | — | ポスター画像（動画用） |
-| `storageKey` | `string` | — | localStorageキーのプレフィックス（デフォルト: `drop_player_`、指定時: `<storageKey>_`）。ミュート状態は自動保存されます。 |
-| `storage` | `StorageAdapter` | — | 独自のストレージバックエンド（`getItem`, `setItem`, `removeItem` を実装）。デフォルトは localStorage（SSRセーフ）。 |
-| `hlsConfig` | `Partial<HlsConfig>` | — | [hls.js の設定](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning)を上書き |
+| Prop          | 型                                               | デフォルト    | 説明                                                                                                                      |
+| ------------- | ------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `sources`     | `string \| MediaSource \| MediaSource[] \| null` | —             | メディアソース                                                                                                            |
+| `className`   | `string`                                         | —             | ルートコンテナのCSSクラス                                                                                                 |
+| `crossOrigin` | `'anonymous' \| 'use-credentials'`               | `'anonymous'` | メディア要素のCORS設定                                                                                                    |
+| `poster`      | `string`                                         | —             | ポスター画像（動画用）                                                                                                    |
+| `storageKey`  | `string`                                         | —             | localStorageキーのプレフィックス（デフォルト: `drop_player_`、指定時: `<storageKey>_`）。ミュート状態は自動保存されます。 |
+| `storage`     | `StorageAdapter`                                 | —             | 独自のストレージバックエンド（`getItem`, `setItem`, `removeItem` を実装）。デフォルトは localStorage（SSRセーフ）。       |
+| `hlsConfig`   | `Partial<HlsConfig>`                             | —             | [hls.js の設定](https://github.com/video-dev/hls.js/blob/master/docs/API.md#fine-tuning)を上書き                          |
 
 ### `playback` — `PlayerPlaybackConfig`
 
-| キー | 型 | デフォルト | 説明 |
-|-----|------|---------|-------------|
-| `autoPlay` | `boolean` | `false` | 即座に再生を開始 |
-| `loop` | `boolean` | `false` | ループ再生 |
-| `muted` | `boolean` | `false` | ミュート状態で開始 |
-| `volume` | `number` | `1` | 初期音量 (0–1) |
-| `initialTime` | `number` | `0` | 開始位置（秒） |
-| `seekStep` | `number` | `10` | 左右キーでスキップする秒数 |
+| キー          | 型        | デフォルト | 説明                       |
+| ------------- | --------- | ---------- | -------------------------- |
+| `autoPlay`    | `boolean` | `false`    | 即座に再生を開始           |
+| `loop`        | `boolean` | `false`    | ループ再生                 |
+| `muted`       | `boolean` | `false`    | ミュート状態で開始         |
+| `volume`      | `number`  | `1`        | 初期音量 (0–1)             |
+| `initialTime` | `number`  | `0`        | 開始位置（秒）             |
+| `seekStep`    | `number`  | `10`       | 左右キーでスキップする秒数 |
 
 ### `ui` — `PlayerUiConfig`
 
-| キー | 型 | デフォルト | 説明 |
-|-----|------|---------|-------------|
-| `showControls` | `boolean` | `true` | 下部コントロールバーを表示 |
-| `showTitle` | `boolean` | auto | ソースタイトル/セレクターを表示 |
-| `showStatusOverlay` | `boolean` | `false` | 操作時にステータスPillオーバーレイを表示（再生、シーク、音量など） |
-| `features` | `PlayerFeatures` | `defaultFeatures` | 個別コントロールの切り替え |
-| `locale` | `string` | `'en'` | 表示言語（組み込み: `'en'`, `'ja'`） |
-| `translations` | `Partial<Translations>` | — | 翻訳の部分上書き。ロケールの組み込み文字列に対して差分を指定 |
-| `frameRate` | `number` | auto / `30` | タイムコード/フレーム表示用のフレームレート。HLSマニフェストから自動検出（利用可能な場合）、フォールバック: `30` |
-| `timeDisplayFormats` | `TimeDisplayFormat[]` | `defaultTimeDisplayFormats` | クリックで切り替える時間表示形式 |
-| `filmGauge` | `number` | `16` | `'feet-frames'` 表示のフィート当たりフレーム数（例: 35mm=`16`, 16mm=`40`） |
-| `bpm` | `number` | `120` | `'bars-beats'` 表示のBPM |
-| `timeSignature` | `string` | `'4/4'` | `'bars-beats'` 表示の拍子記号（例: `'3/4'`, `'6/8'`） |
-| `markers` | `Marker[]` | `[]` | シークバーマーカー — [マーカータイプ](#マーカータイプ)を参照 |
+| キー                 | 型                      | デフォルト                  | 説明                                                                                                             |
+| -------------------- | ----------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `showControls`       | `boolean`               | `true`                      | 下部コントロールバーを表示                                                                                       |
+| `showTitle`          | `boolean`               | auto                        | ソースタイトル/セレクターを表示                                                                                  |
+| `showStatusOverlay`  | `boolean`               | `false`                     | 操作時にステータスPillオーバーレイを表示（再生、シーク、音量など）                                               |
+| `features`           | `PlayerFeatures`        | `defaultFeatures`           | 個別コントロールの切り替え                                                                                       |
+| `locale`             | `string`                | `'en'`                      | 表示言語（組み込み: `'en'`, `'ja'`）                                                                             |
+| `translations`       | `Partial<Translations>` | —                           | 翻訳の部分上書き。ロケールの組み込み文字列に対して差分を指定                                                     |
+| `frameRate`          | `number`                | auto / `30`                 | タイムコード/フレーム表示用のフレームレート。HLSマニフェストから自動検出（利用可能な場合）、フォールバック: `30` |
+| `timeDisplayFormats` | `TimeDisplayFormat[]`   | `defaultTimeDisplayFormats` | クリックで切り替える時間表示形式                                                                                 |
+| `filmGauge`          | `number`                | `16`                        | `'feet-frames'` 表示のフィート当たりフレーム数（例: 35mm=`16`, 16mm=`40`）                                       |
+| `bpm`                | `number`                | `120`                       | `'bars-beats'` 表示のBPM                                                                                         |
+| `timeSignature`      | `string`                | `'4/4'`                     | `'bars-beats'` 表示の拍子記号（例: `'3/4'`, `'6/8'`）                                                            |
+| `markers`            | `Marker[]`              | `[]`                        | シークバーマーカー — [マーカータイプ](#マーカータイプ)を参照                                                     |
 
 ### マーカータイプ
 
 `Marker` は判別ユニオン型です。`type` によってシークバートラック上の表示形状が変わります:
 
-| `type` | 形状 | 追加フィールド |
-|--------|------|-------------|
-| `'circle'`（デフォルト） | 塗りつぶし円 | — |
-| `'line'` | 縦線 | — |
-| `'square'` | 塗りつぶし正方形 | — |
-| `'custom'` | 任意のReactNode | `content: ReactNode`（必須） |
+| `type`                   | 形状             | 追加フィールド               |
+| ------------------------ | ---------------- | ---------------------------- |
+| `'circle'`（デフォルト） | 塗りつぶし円     | —                            |
+| `'line'`                 | 縦線             | —                            |
+| `'square'`               | 塗りつぶし正方形 | —                            |
+| `'custom'`               | 任意のReactNode  | `content: ReactNode`（必須） |
 
 共通フィールド:
 
-| フィールド | 型 | デフォルト | 説明 |
-|-------|------|---------|-------------|
-| `time` | `number` | — | 位置（秒） |
-| `color` | `string` | CSS変数 | CSS色値 |
-| `snap` | `boolean` | `false` | シーク時にスナップを有効化 |
-| `snapThreshold` | `number` | `12` | スナップ距離（px）`snap: true` のときのみ使用 |
+| フィールド      | 型        | デフォルト | 説明                                          |
+| --------------- | --------- | ---------- | --------------------------------------------- |
+| `time`          | `number`  | —          | 位置（秒）                                    |
+| `color`         | `string`  | CSS変数    | CSS色値                                       |
+| `snap`          | `boolean` | `false`    | シーク時にスナップを有効化                    |
+| `snapThreshold` | `number`  | `12`       | スナップ距離（px）`snap: true` のときのみ使用 |
 
 ```tsx
 import type { Marker } from 'drop-player';
@@ -184,15 +185,15 @@ const markers: Marker[] = [
 
 ### `slots` — `PlayerSlots`
 
-| スロット | 型 | 配置位置 |
-|------|------|----------|
-| `overlay` | `ReactNode` | メディアとコントロールの間の全面オーバーレイ |
-| `controlsStart` | `ReactNode` | コントロールバーの左側 |
-| `controlsEnd` | `ReactNode` | コントロールバーの右側（フルスクリーンボタンの前） |
-| `topLeftOverlay` | `ReactNode` | 左上隅 |
-| `topRightOverlay` | `ReactNode` | 右上隅 |
-| `loadingIndicator` | `ReactNode` | 中央（読み込み中・再生中のバッファリング時） |
-| `errorDisplay` | `(error: Error) => ReactNode` | 中央（エラー時） |
+| スロット           | 型                            | 配置位置                                           |
+| ------------------ | ----------------------------- | -------------------------------------------------- |
+| `overlay`          | `ReactNode`                   | メディアとコントロールの間の全面オーバーレイ       |
+| `controlsStart`    | `ReactNode`                   | コントロールバーの左側                             |
+| `controlsEnd`      | `ReactNode`                   | コントロールバーの右側（フルスクリーンボタンの前） |
+| `topLeftOverlay`   | `ReactNode`                   | 左上隅                                             |
+| `topRightOverlay`  | `ReactNode`                   | 右上隅                                             |
+| `loadingIndicator` | `ReactNode`                   | 中央（読み込み中・再生中のバッファリング時）       |
+| `errorDisplay`     | `(error: Error) => ReactNode` | 中央（エラー時）                                   |
 
 > **Note:** `overlay` はデフォルトで `pointer-events: none` です。操作可能にしたい子要素には `pointer-events: auto` を指定してください。
 
@@ -213,7 +214,7 @@ import { Share2 } from 'lucide-react';
       </ControlButton>
     ),
   }}
-/>
+/>;
 ```
 
 - `label`: ツールチップの文言。ボタンの `aria-label` にも使われます
@@ -227,37 +228,37 @@ import { Tooltip } from 'drop-player';
 
 <Tooltip content="説明文">
   <span>...</span>
-</Tooltip>
+</Tooltip>;
 ```
 
 ### `events` — `PlayerEvents`
 
-| イベント | ペイロード | タイミング |
-|-------|---------|------|
-| `onStateChange` | `PlayerState` | 状態変更（まとめてスナップショット） |
-| `onPlay` | — | 再生開始 |
-| `onPause` | — | 一時停止 |
-| `onEnded` | — | 再生終了 |
-| `onTimeUpdate` | `time` | 再生位置の更新 |
-| `onDurationChange` | `duration` | 長さの確定/変更 |
-| `onVolumeChange` | `volume, muted` | 音量/ミュート変更 |
-| `onPlaybackRateChange` | `rate` | 再生速度変更 |
-| `onError` | `Error` | エラー発生 |
-| `onLoadedMetadata` | `VideoMetadata` | メタデータ取得 |
-| `onLoadStart` | — | 読み込み開始 |
-| `onProgress` | `TimeRanges` | バッファリング進行 |
-| `onWaiting` | — | データ待ち |
-| `onCanPlay` | — | 再生可能 |
-| `onPlaying` | — | 実際に再生中 |
-| `onSeekStart` | `time` | シーク開始 |
-| `onSeeking` | `time` | シーク中 |
-| `onSeekEnd` | `time` | シーク完了 |
-| `onFullscreenChange` | `boolean` | フルスクリーン切り替え |
-| `onFrameCapture` | `FrameCapture` | フレームキャプチャ |
-| `onActiveSourceChange` | `index` | アクティブソース変更 |
-| `onQualityLevelChange` | `QualityLevel` | 画質レベル変更 |
-| `onFallback` | `FallbackEvent` | オリジナルURLへフォールバック |
-| `onTimeDisplayFormatChange` | `TimeDisplayFormat` | 時間表示形式の変更 |
+| イベント                    | ペイロード          | タイミング                           |
+| --------------------------- | ------------------- | ------------------------------------ |
+| `onStateChange`             | `PlayerState`       | 状態変更（まとめてスナップショット） |
+| `onPlay`                    | —                   | 再生開始                             |
+| `onPause`                   | —                   | 一時停止                             |
+| `onEnded`                   | —                   | 再生終了                             |
+| `onTimeUpdate`              | `time`              | 再生位置の更新                       |
+| `onDurationChange`          | `duration`          | 長さの確定/変更                      |
+| `onVolumeChange`            | `volume, muted`     | 音量/ミュート変更                    |
+| `onPlaybackRateChange`      | `rate`              | 再生速度変更                         |
+| `onError`                   | `Error`             | エラー発生                           |
+| `onLoadedMetadata`          | `VideoMetadata`     | メタデータ取得                       |
+| `onLoadStart`               | —                   | 読み込み開始                         |
+| `onProgress`                | `TimeRanges`        | バッファリング進行                   |
+| `onWaiting`                 | —                   | データ待ち                           |
+| `onCanPlay`                 | —                   | 再生可能                             |
+| `onPlaying`                 | —                   | 実際に再生中                         |
+| `onSeekStart`               | `time`              | シーク開始                           |
+| `onSeeking`                 | `time`              | シーク中                             |
+| `onSeekEnd`                 | `time`              | シーク完了                           |
+| `onFullscreenChange`        | `boolean`           | フルスクリーン切り替え               |
+| `onFrameCapture`            | `FrameCapture`      | フレームキャプチャ                   |
+| `onActiveSourceChange`      | `index`             | アクティブソース変更                 |
+| `onQualityLevelChange`      | `QualityLevel`      | 画質レベル変更                       |
+| `onFallback`                | `FallbackEvent`     | オリジナルURLへフォールバック        |
+| `onTimeDisplayFormatChange` | `TimeDisplayFormat` | 時間表示形式の変更                   |
 
 ## Features
 
@@ -265,10 +266,10 @@ import { Tooltip } from 'drop-player';
 
 2つのプリセットをエクスポートしています:
 
-| エクスポート | 説明 |
-|--------|-------------|
+| エクスポート      | 説明                                    |
+| ----------------- | --------------------------------------- |
 | `defaultFeatures` | 主要コントロールON、オプトイン機能はOFF |
-| `noFeatures` | すべてOFF — 最小構成のベースに |
+| `noFeatures`      | すべてOFF — 最小構成のベースに          |
 
 ```tsx
 import { noFeatures } from 'drop-player';
@@ -286,30 +287,30 @@ import { noFeatures } from 'drop-player';
 <VideoPlayer sources={url} ui={{ features: { ...noFeatures, playButton: true, fullscreen: true } }} />
 ```
 
-| フラグ | デフォルト | 適用対象 |
-|------|---------|------------|
-| `playButton` | `true` | 動画, 音声 |
-| `loop` | `true` | 動画, 音声 |
-| `timeDisplay` | `true` | 動画, 音声 |
-| `seekBar` | `true` | 動画, 音声 |
-| `volume` | `true` | 動画, 音声 |
-| `saveCapture` | `false` | 動画, 画像 |
-| `copyCapture` | `false` | 動画, 画像 |
-| `qualitySelector` | `true` | 動画 (HLS) |
-| `fullscreen` | `true` | すべて |
-| `zoom` | `true` | 画像, PDF |
-| `playbackSpeed` | `true` | 動画, 音声 |
-| `pip` | `true` | 動画（ブラウザPiP APIが必要） |
-| `keyboardShortcuts` | `true` | 動画, 音声 |
+| フラグ              | デフォルト | 適用対象                      |
+| ------------------- | ---------- | ----------------------------- |
+| `playButton`        | `true`     | 動画, 音声                    |
+| `loop`              | `true`     | 動画, 音声                    |
+| `timeDisplay`       | `true`     | 動画, 音声                    |
+| `seekBar`           | `true`     | 動画, 音声                    |
+| `volume`            | `true`     | 動画, 音声                    |
+| `saveCapture`       | `false`    | 動画, 画像                    |
+| `copyCapture`       | `false`    | 動画, 画像                    |
+| `qualitySelector`   | `true`     | 動画 (HLS)                    |
+| `fullscreen`        | `true`     | すべて                        |
+| `zoom`              | `true`     | 画像, PDF                     |
+| `playbackSpeed`     | `true`     | 動画, 音声                    |
+| `pip`               | `true`     | 動画（ブラウザPiP APIが必要） |
+| `keyboardShortcuts` | `true`     | 動画, 音声                    |
 
 ## 時間表示形式
 
 `ui.timeDisplayFormats` で、時間表示をクリックした際に切り替わる形式を制御します。2つのプリセットをエクスポートしています:
 
-| エクスポート | 形式 |
-|--------|---------|
-| `defaultTimeDisplayFormats` | `['elapsed-total', 'remaining']` |
-| `allTimeDisplayFormats` | `['elapsed-total', 'remaining', 'timecode', 'frames', 'seconds-frames', 'feet-frames', 'bars-beats']` |
+| エクスポート                | 形式                                                                                                  |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `defaultTimeDisplayFormats` | `['elapsed-total', 'remaining']`                                                                      |
+| `allTimeDisplayFormats`     | `['elapsed-total', 'remaining', 'timecode', 'frames', 'seconds-frames', 'feet-frames', 'bars-beats']` |
 
 ```tsx
 import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
@@ -337,15 +338,15 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 <VideoPlayer sources={url} ui={{ timeDisplayFormats: ['timecode'] }} />
 ```
 
-| 形式 | 表示例 | 追加props |
-|--------|---------|-------------|
-| `'elapsed-total'` | `1:23 / 5:00` | — |
-| `'remaining'` | `-3:37` | — |
-| `'timecode'` | `00:01:23:15` | `frameRate` |
-| `'frames'` | `2475 / 9000` | `frameRate` |
-| `'seconds-frames'` | `83+15 / 300+00` | `frameRate` |
-| `'feet-frames'` | `154+11 / 562+08` | `frameRate`, `filmGauge` |
-| `'bars-beats'` | `47:4 / 192:1` | `bpm`, `timeSignature` |
+| 形式               | 表示例            | 追加props                |
+| ------------------ | ----------------- | ------------------------ |
+| `'elapsed-total'`  | `1:23 / 5:00`     | —                        |
+| `'remaining'`      | `-3:37`           | —                        |
+| `'timecode'`       | `00:01:23:15`     | `frameRate`              |
+| `'frames'`         | `2475 / 9000`     | `frameRate`              |
+| `'seconds-frames'` | `83+15 / 300+00`  | `frameRate`              |
+| `'feet-frames'`    | `154+11 / 562+08` | `frameRate`, `filmGauge` |
+| `'bars-beats'`     | `47:4 / 192:1`    | `bpm`, `timeSignature`   |
 
 フレームレートはHLSマニフェストから自動検出されます。プログレッシブソースの場合は `ui.frameRate` を明示的に設定してください。
 
@@ -367,16 +368,16 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 }
 ```
 
-| 変数 | デフォルト | 説明 |
-|----------|---------|-------------|
-| `--drop-player-blue` | `oklch(70.7% 0.165 254.624)` | アクセントカラー（アクティブ状態、フォーカスリング） |
-| `--drop-player-yellow` | `oklch(85.2% 0.199 91.936)` | ハイライトカラー |
-| `--drop-player-green` | `oklch(79.2% 0.209 151.711)` | ポジティブカラー（チェックマーク、最高画質） |
-| `--drop-player-red` | `oklch(70.4% 0.191 22.216)` | ネガティブカラー（エラー） |
-| `--drop-player-muted` | `oklch(55.2% 0.016 285.938)` | ミュート / 非アクティブカラー |
-| `--drop-player-marker-circle` | `var(--drop-player-yellow)` | マーカーの色（circle・line・square） |
-| `--drop-player-border-radius` | `0` | コンテナの角丸 |
-| `--drop-player-aspect-ratio` | 可変 | アスペクト比（動画: 16/9, 音声: 32/9, 画像: 4/3, PDF: 1/1.414） |
+| 変数                          | デフォルト                   | 説明                                                            |
+| ----------------------------- | ---------------------------- | --------------------------------------------------------------- |
+| `--drop-player-blue`          | `oklch(70.7% 0.165 254.624)` | アクセントカラー（アクティブ状態、フォーカスリング）            |
+| `--drop-player-yellow`        | `oklch(85.2% 0.199 91.936)`  | ハイライトカラー                                                |
+| `--drop-player-green`         | `oklch(79.2% 0.209 151.711)` | ポジティブカラー（チェックマーク、最高画質）                    |
+| `--drop-player-red`           | `oklch(70.4% 0.191 22.216)`  | ネガティブカラー（エラー）                                      |
+| `--drop-player-muted`         | `oklch(55.2% 0.016 285.938)` | ミュート / 非アクティブカラー                                   |
+| `--drop-player-marker-circle` | `var(--drop-player-yellow)`  | マーカーの色（circle・line・square）                            |
+| `--drop-player-border-radius` | `0`                          | コンテナの角丸                                                  |
+| `--drop-player-aspect-ratio`  | 可変                         | アスペクト比（動画: 16/9, 音声: 32/9, 画像: 4/3, PDF: 1/1.414） |
 
 <!-- interactive:playground -->
 
@@ -387,52 +388,52 @@ import { defaultTimeDisplayFormats, allTimeDisplayFormats } from 'drop-player';
 ```tsx
 const ref = useRef<PlayerRef>(null);
 
-<VideoPlayer ref={ref} sources={url} />
+<VideoPlayer ref={ref} sources={url} />;
 
 // Later:
 ref.current?.play();
 ref.current?.seek(30);
 ```
 
-| メソッド | 戻り値 | 備考 |
-|--------|---------|-------|
-| `play()` | `Promise<void>` | |
-| `pause()` | `void` | |
-| `toggle()` | `void` | |
-| `seek(time)` | `void` | |
-| `seekRelative(delta)` | `void` | |
-| `seekToFrame(frame)` | `void` | 動画のみ |
-| `getCurrentTime()` | `number` | |
-| `getDuration()` | `number` | |
-| `getVolume()` | `number` | |
-| `isMuted()` | `boolean` | |
-| `isPaused()` | `boolean` | |
-| `isFullscreen()` | `boolean` | |
-| `getPlaybackRate()` | `number` | |
-| `setVolume(n)` | `void` | |
-| `setMuted(bool)` | `void` | |
-| `setPlaybackRate(rate)` | `void` | |
-| `getTimeDisplayFormat()` | `TimeDisplayFormat` | |
-| `setTimeDisplayFormat(format)` | `void` | |
-| `captureFrame(opts?)` | `Promise<FrameCapture>` | 動画/画像のみ。音声/PDFではエラーをスロー |
-| `requestFullscreen()` | `Promise<void>` | |
-| `exitFullscreen()` | `Promise<void>` | |
-| `toggleFullscreen()` | `void` | |
-| `getVideoElement()` | `HTMLVideoElement \| null` | |
-| `getContainerElement()` | `HTMLDivElement \| null` | |
+| メソッド                       | 戻り値                     | 備考                                      |
+| ------------------------------ | -------------------------- | ----------------------------------------- |
+| `play()`                       | `Promise<void>`            |                                           |
+| `pause()`                      | `void`                     |                                           |
+| `toggle()`                     | `void`                     |                                           |
+| `seek(time)`                   | `void`                     |                                           |
+| `seekRelative(delta)`          | `void`                     |                                           |
+| `seekToFrame(frame)`           | `void`                     | 動画のみ                                  |
+| `getCurrentTime()`             | `number`                   |                                           |
+| `getDuration()`                | `number`                   |                                           |
+| `getVolume()`                  | `number`                   |                                           |
+| `isMuted()`                    | `boolean`                  |                                           |
+| `isPaused()`                   | `boolean`                  |                                           |
+| `isFullscreen()`               | `boolean`                  |                                           |
+| `getPlaybackRate()`            | `number`                   |                                           |
+| `setVolume(n)`                 | `void`                     |                                           |
+| `setMuted(bool)`               | `void`                     |                                           |
+| `setPlaybackRate(rate)`        | `void`                     |                                           |
+| `getTimeDisplayFormat()`       | `TimeDisplayFormat`        |                                           |
+| `setTimeDisplayFormat(format)` | `void`                     |                                           |
+| `captureFrame(opts?)`          | `Promise<FrameCapture>`    | 動画/画像のみ。音声/PDFではエラーをスロー |
+| `requestFullscreen()`          | `Promise<void>`            |                                           |
+| `exitFullscreen()`             | `Promise<void>`            |                                           |
+| `toggleFullscreen()`           | `void`                     |                                           |
+| `getVideoElement()`            | `HTMLVideoElement \| null` |                                           |
+| `getContainerElement()`        | `HTMLDivElement \| null`   |                                           |
 
 ## エラーハンドリング
 
 `events.onError` と `slots.errorDisplay` は `name` で種別を判別できる `Error` を受け取ります:
 
-| `error.name` | 意味 |
-|--------------|---------|
-| `errorNoSources` | `sources`がnullまたは空 |
-| `errorAborted` | 再生が中断された |
-| `errorNetwork` | ネットワークエラー |
-| `errorDecode` | デコード失敗 |
+| `error.name`        | 意味                               |
+| ------------------- | ---------------------------------- |
+| `errorNoSources`    | `sources`がnullまたは空            |
+| `errorAborted`      | 再生が中断された                   |
+| `errorNetwork`      | ネットワークエラー                 |
+| `errorDecode`       | デコード失敗                       |
 | `errorNotSupported` | フォーマットがサポートされていない |
-| `errorUnknown` | 不明なエラー |
+| `errorUnknown`      | 不明なエラー                       |
 
 組み込みUIは `ui.locale` に従ってエラーメッセージをローカライズします。独自の表示にするには `slots.errorDisplay` を使ってください。
 
@@ -467,7 +468,7 @@ ref.current?.seek(30);
 
 ```tsx
 // Custom namespace
-<VideoPlayer sources="video.mp4" storageKey="my_app" />
+<VideoPlayer sources="video.mp4" storageKey="my_app" />;
 // Keys stored as: my_app_muted, my_app_volume, etc.
 
 // Custom backend (e.g. Supabase)
@@ -486,7 +487,7 @@ const supabaseStorage = {
   },
 };
 
-<VideoPlayer sources="video.mp4" storage={supabaseStorage} />
+<VideoPlayer sources="video.mp4" storage={supabaseStorage} />;
 ```
 
 `StorageAdapter` は `getItem`・`setItem`・`removeItem` の3メソッドを実装します。戻り値は同期的に返す必要があるため、リモートバックエンドの場合はローカルキャッシュ経由で非同期に同期してください。
@@ -497,30 +498,35 @@ const supabaseStorage = {
 
 ```tsx
 import {
-  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
-  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+  formatTime,
+  formatTimecode,
+  secondsToFrames,
+  parseFrameRate,
+  formatFeetFrames,
+  formatSecondsFrames,
+  formatBarsBeats,
 } from 'drop-player';
 
-formatTime(125);                    // "02:05"
-formatTime(3661);                   // "01:01:01"
-formatTimecode(125.5, 30);          // "00:02:05:15"
-formatTimecode(125.5, '30000/1001');// "00:02:05:14" (29.97fps)
-secondsToFrames(10, 24);           // 240
-parseFrameRate('30000/1001');       // 29.97...
-formatSecondsFrames(83.5, 30);     // "83+15"
-formatFeetFrames(10, 24, 16);      // "15+00"
-formatBarsBeats(10, 120, '4/4');   // "5:1"
+formatTime(125); // "02:05"
+formatTime(3661); // "01:01:01"
+formatTimecode(125.5, 30); // "00:02:05:15"
+formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
+secondsToFrames(10, 24); // 240
+parseFrameRate('30000/1001'); // 29.97...
+formatSecondsFrames(83.5, 30); // "83+15"
+formatFeetFrames(10, 24, 16); // "15+00"
+formatBarsBeats(10, 120, '4/4'); // "5:1"
 ```
 
-| 関数 | シグネチャ | 説明 |
-|----------|-----------|-------------|
-| `formatTime` | `(seconds?) => string` | `MM:SS`または`HH:MM:SS`形式にフォーマット |
-| `formatTimecode` | `(seconds?, frameRate?) => string` | SMPTEタイムコード`HH:MM:SS:FF`形式にフォーマット |
-| `secondsToFrames` | `(seconds?, frameRate?) => number` | 秒をフレーム番号に変換 |
-| `parseFrameRate` | `(frameRate?) => number` | フレームレート文字列（例: `"30000/1001"`）を数値にパース |
-| `formatSecondsFrames` | `(seconds?, frameRate?) => string` | 秒+フレーム `S+FF` 形式にフォーマット |
-| `formatFeetFrames` | `(seconds?, frameRate?, filmGauge?) => string` | フィート+フレーム `FFF+FF` 形式にフォーマット |
-| `formatBarsBeats` | `(seconds?, bpm?, timeSignature?) => string` | 小節:拍 `B:b` 形式にフォーマット |
+| 関数                  | シグネチャ                                     | 説明                                                     |
+| --------------------- | ---------------------------------------------- | -------------------------------------------------------- |
+| `formatTime`          | `(seconds?) => string`                         | `MM:SS`または`HH:MM:SS`形式にフォーマット                |
+| `formatTimecode`      | `(seconds?, frameRate?) => string`             | SMPTEタイムコード`HH:MM:SS:FF`形式にフォーマット         |
+| `secondsToFrames`     | `(seconds?, frameRate?) => number`             | 秒をフレーム番号に変換                                   |
+| `parseFrameRate`      | `(frameRate?) => number`                       | フレームレート文字列（例: `"30000/1001"`）を数値にパース |
+| `formatSecondsFrames` | `(seconds?, frameRate?) => string`             | 秒+フレーム `S+FF` 形式にフォーマット                    |
+| `formatFeetFrames`    | `(seconds?, frameRate?, filmGauge?) => string` | フィート+フレーム `FFF+FF` 形式にフォーマット            |
+| `formatBarsBeats`     | `(seconds?, bpm?, timeSignature?) => string`   | 小節:拍 `B:b` 形式にフォーマット                         |
 
 ## ライセンス
 

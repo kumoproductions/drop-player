@@ -1,4 +1,5 @@
 import { PictureInPicture, PictureInPicture2 } from 'lucide-react';
+
 import type { TranslationKey } from '../../types';
 import { ControlButton } from './ControlButton';
 

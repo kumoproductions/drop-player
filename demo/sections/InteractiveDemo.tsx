@@ -5,6 +5,7 @@ import {
   PdfViewer,
   VideoPlayer,
 } from 'drop-player';
+
 import { DemoCard } from '../components/DemoCard';
 import { MEDIA } from '../data/media';
 
@@ -67,7 +68,7 @@ export function InteractiveDemo() {
     <div className="space-y-10">
       <h2
         id="interactive-demo"
-        className="text-2xl font-bold text-zinc-100 mb-6 pb-2 border-b border-zinc-800 scroll-mt-6"
+        className="mb-6 scroll-mt-6 border-b border-zinc-800 pb-2 text-2xl font-bold text-zinc-100"
       >
         Interactive Demo
       </h2>

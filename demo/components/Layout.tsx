@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import pkg from '../../package.json';
 import { detectLocale, getLocalePath } from '../utils/locale';
 import { NAV_ITEMS, Sidebar } from './Sidebar';
@@ -22,7 +23,7 @@ function LanguageSwitcher() {
   return (
     <a
       href={getLocalePath(otherLocale)}
-      className="inline-flex items-center gap-0.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+      className="inline-flex items-center gap-0.5 text-xs text-zinc-500 transition-colors hover:text-zinc-300"
     >
       {label}
       <ArrowUpRight size={12} />
@@ -129,7 +130,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-300">
       {/* Mobile header */}
-      <header className="lg:hidden sticky top-0 z-50 bg-zinc-950/80 backdrop-blur border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-950/80 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center gap-3">
           <span className="font-bold text-zinc-100">drop-player</span>
           <span className="text-xs text-zinc-500">v{pkg.version}</span>
@@ -146,10 +147,10 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Mobile sidebar overlay — positioned below the header */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-[49px] z-40 bg-zinc-950/60 backdrop-blur-sm">
-          <div className="w-64 h-full bg-zinc-950 border-r border-zinc-800 p-6 flex flex-col overflow-y-auto">
+        <div className="fixed inset-0 top-[49px] z-40 bg-zinc-950/60 backdrop-blur-sm lg:hidden">
+          <div className="flex h-full w-64 flex-col overflow-y-auto border-r border-zinc-800 bg-zinc-950 p-6">
             <Sidebar activeId={activeId} onNavigate={closeMobile} />
-            <div className="mt-8 pt-6 border-t border-zinc-800">
+            <div className="mt-8 border-t border-zinc-800 pt-6">
               <SidebarLinks />
             </div>
             <div className="mt-auto pt-6">
@@ -159,7 +160,7 @@ export function Layout({ children }: LayoutProps) {
           <button
             type="button"
             onClick={closeMobile}
-            className="absolute inset-0 w-full h-full -z-10"
+            className="absolute inset-0 -z-10 h-full w-full"
             aria-label="Close menu"
           />
         </div>
@@ -167,18 +168,18 @@ export function Layout({ children }: LayoutProps) {
 
       <div className="flex">
         {/* Desktop sidebar */}
-        <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 sticky top-0 h-screen overflow-y-auto border-r border-zinc-800 p-6">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 overflow-y-auto border-r border-zinc-800 p-6 lg:flex lg:flex-col">
           <div className="mb-8">
             <a href="#drop-player" className="text-lg font-bold text-zinc-100">
               drop-player
             </a>
-            <div className="flex items-center gap-3 mt-1">
+            <div className="mt-1 flex items-center gap-3">
               <span className="text-xs text-zinc-500">v{pkg.version}</span>
               <LanguageSwitcher />
             </div>
           </div>
           <Sidebar activeId={activeId} />
-          <div className="mt-8 pt-6 border-t border-zinc-800">
+          <div className="mt-8 border-t border-zinc-800 pt-6">
             <SidebarLinks />
           </div>
           <div className="mt-auto pt-6">
@@ -189,7 +190,7 @@ export function Layout({ children }: LayoutProps) {
         {/* Main content */}
         <main
           ref={mainRef}
-          className="flex-1 min-w-0 max-w-4xl mx-auto px-6 lg:px-12 py-10 space-y-16"
+          className="mx-auto max-w-4xl min-w-0 flex-1 space-y-16 px-6 py-10 lg:px-12"
         >
           {children}
         </main>

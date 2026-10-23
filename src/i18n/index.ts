@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+
 import type { TranslationKey, Translations } from '../types';
 import { en } from './en';
 import { ja } from './ja';

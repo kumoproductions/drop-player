@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+
 import { InteractiveDemo } from '../sections/InteractiveDemo';
 import { detectLocale } from '../utils/locale';
 import { parseReadme } from '../utils/readmeParser';

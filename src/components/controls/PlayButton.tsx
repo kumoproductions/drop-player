@@ -1,4 +1,5 @@
 import { Pause, Play } from 'lucide-react';
+
 import type { TranslationKey } from '../../types';
 import { ControlButton } from './ControlButton';
 

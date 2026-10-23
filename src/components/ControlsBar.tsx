@@ -1,4 +1,5 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+
 import type { ResolvedPlayerFeatures } from '../features';
 import { useElementWidths } from '../hooks/useElementWidths';
 import { useMediaQuery } from '../hooks/useMediaQuery';
@@ -17,8 +18,8 @@ import { LoopButton } from './controls/LoopButton';
 import { OverflowMenu } from './controls/OverflowMenu';
 import { PageNavigation } from './controls/PageNavigation';
 import { PipButton } from './controls/PipButton';
-import { PlayButton } from './controls/PlayButton';
 import { PlaybackSpeedSelector } from './controls/PlaybackSpeedSelector';
+import { PlayButton } from './controls/PlayButton';
 import { QualitySelector } from './controls/QualitySelector';
 import { SaveCaptureButton } from './controls/SaveCaptureButton';
 import { SeekStepButtons } from './controls/SeekStepButtons';

@@ -8,6 +8,7 @@ import type {
 } from 'drop-player';
 import { VideoPlayer } from 'drop-player';
 import { useCallback, useState } from 'react';
+
 import { MEDIA } from '../data/media';
 
 const MARKER_TYPES = ['circle', 'line', 'square'] as const;
@@ -207,13 +208,13 @@ export function ThemePlayground() {
     <div className="space-y-6">
       <h2
         id="playground"
-        className="text-2xl font-bold text-zinc-100 mb-6 pb-2 border-b border-zinc-800 scroll-mt-6"
+        className="mb-6 scroll-mt-6 border-b border-zinc-800 pb-2 text-2xl font-bold text-zinc-100"
       >
         Playground
       </h2>
       {/* CSS Variables */}
       <div>
-        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+        <h4 className="mb-3 text-xs font-medium tracking-wider text-zinc-500 uppercase">
           CSS Variables
         </h4>
         <div className="flex flex-wrap items-center gap-4">
@@ -233,7 +234,7 @@ export function ThemePlayground() {
                     }
                     className="flex-1"
                   />
-                  <span className="text-xs text-zinc-500 w-8">
+                  <span className="w-8 text-xs text-zinc-500">
                     {vars[v.key]}
                   </span>
                 </div>
@@ -245,9 +246,9 @@ export function ThemePlayground() {
                     onChange={(e) =>
                       setVars({ ...vars, [v.key]: e.target.value })
                     }
-                    className="w-8 h-8 rounded border border-zinc-700 cursor-pointer bg-transparent"
+                    className="h-8 w-8 cursor-pointer rounded border border-zinc-700 bg-transparent"
                   />
-                  <span className="text-xs font-mono text-zinc-500">
+                  <span className="font-mono text-xs text-zinc-500">
                     {vars[v.key]}
                   </span>
                 </div>
@@ -259,7 +260,7 @@ export function ThemePlayground() {
 
       {/* Playback Options */}
       <div>
-        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+        <h4 className="mb-3 text-xs font-medium tracking-wider text-zinc-500 uppercase">
           Playback Options
         </h4>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
@@ -273,7 +274,7 @@ export function ThemePlayground() {
               onChange={(e) =>
                 setSeekStep(Math.max(1, Number(e.target.value) || 10))
               }
-              className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+              className="w-16 rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
             />
             <span className="text-xs text-zinc-600">sec</span>
           </label>
@@ -282,11 +283,11 @@ export function ThemePlayground() {
 
       {/* UI Options */}
       <div>
-        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+        <h4 className="mb-3 text-xs font-medium tracking-wider text-zinc-500 uppercase">
           UI Options
         </h4>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
-          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
             <input
               type="checkbox"
               checked={showControls}
@@ -295,7 +296,7 @@ export function ThemePlayground() {
             />
             showControls
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
             <input
               type="checkbox"
               checked={showTitle}
@@ -304,7 +305,7 @@ export function ThemePlayground() {
             />
             showTitle
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
             <input
               type="checkbox"
               checked={showStatusOverlay}
@@ -313,12 +314,12 @@ export function ThemePlayground() {
             />
             showStatusOverlay
           </label>
-          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
             <span>locale</span>
             <select
               value={locale}
               onChange={(e) => setLocale(e.target.value)}
-              className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300"
+              className="rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
             >
               {LOCALE_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -332,7 +333,7 @@ export function ThemePlayground() {
 
       {/* Features */}
       <div>
-        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+        <h4 className="mb-3 text-xs font-medium tracking-wider text-zinc-500 uppercase">
           Features
         </h4>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
@@ -364,7 +365,7 @@ export function ThemePlayground() {
               >
                 {label}
               </span>
-              <label className="flex items-center gap-1 cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-1">
                 <input
                   type="checkbox"
                   checked={state.backward}
@@ -375,7 +376,7 @@ export function ThemePlayground() {
                 />
                 <span className="text-xs text-zinc-500">←</span>
               </label>
-              <label className="flex items-center gap-1 cursor-pointer">
+              <label className="flex cursor-pointer items-center gap-1">
                 <input
                   type="checkbox"
                   checked={state.forward}
@@ -392,7 +393,7 @@ export function ThemePlayground() {
           {FEATURE_TOGGLES.map((f) => (
             <label
               key={f.key}
-              className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400"
             >
               <input
                 type="checkbox"
@@ -410,14 +411,14 @@ export function ThemePlayground() {
 
       {/* Time Display Formats */}
       <div>
-        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+        <h4 className="mb-3 text-xs font-medium tracking-wider text-zinc-500 uppercase">
           Time Display Formats
         </h4>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           {TIME_FORMAT_OPTIONS.map((f) => (
             <label
               key={f.value}
-              className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400"
             >
               <input
                 type="checkbox"
@@ -434,7 +435,7 @@ export function ThemePlayground() {
             </label>
           ))}
         </div>
-        <div className="flex flex-wrap gap-x-6 gap-y-2 mt-3">
+        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
           {needsFrameRate && (
             <label className="flex items-center gap-2 text-sm text-zinc-400">
               <span>frameRate</span>
@@ -446,7 +447,7 @@ export function ThemePlayground() {
                 onChange={(e) =>
                   setFrameRate(Math.max(1, Number(e.target.value) || 30))
                 }
-                className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+                className="w-16 rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
               />
             </label>
           )}
@@ -460,7 +461,7 @@ export function ThemePlayground() {
                 onChange={(e) =>
                   setFilmGauge(Math.max(1, Number(e.target.value) || 16))
                 }
-                className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+                className="w-16 rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
               />
               <span className="text-xs text-zinc-600">fpf</span>
             </label>
@@ -477,7 +478,7 @@ export function ThemePlayground() {
                   onChange={(e) =>
                     setBpm(Math.max(1, Number(e.target.value) || 120))
                   }
-                  className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+                  className="w-16 rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
                 />
               </label>
               <label className="flex items-center gap-2 text-sm text-zinc-400">
@@ -485,7 +486,7 @@ export function ThemePlayground() {
                 <select
                   value={timeSignature}
                   onChange={(e) => setTimeSignature(e.target.value)}
-                  className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300"
+                  className="rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
                 >
                   <option value="4/4">4/4</option>
                   <option value="3/4">3/4</option>
@@ -502,11 +503,11 @@ export function ThemePlayground() {
 
       {/* Markers */}
       <div>
-        <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-3">
+        <h4 className="mb-3 text-xs font-medium tracking-wider text-zinc-500 uppercase">
           Markers
         </h4>
-        <div className="flex items-center gap-4 mb-3">
-          <label className="flex items-center gap-2 text-sm text-zinc-400 cursor-pointer">
+        <div className="mb-3 flex items-center gap-4">
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-zinc-400">
             <input
               type="checkbox"
               checked={markersEnabled}
@@ -519,7 +520,7 @@ export function ThemePlayground() {
             type="button"
             onClick={addMarker}
             disabled={!markersEnabled}
-            className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="rounded border border-zinc-700 px-2 py-1 text-xs text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
           >
             + Add
           </button>
@@ -543,7 +544,7 @@ export function ThemePlayground() {
                         time: Math.max(0, Number(e.target.value) || 0),
                       })
                     }
-                    className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300 w-16"
+                    className="w-16 rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
                   />
                 </label>
                 <label className="flex items-center gap-1.5">
@@ -555,7 +556,7 @@ export function ThemePlayground() {
                         type: e.target.value as MarkerType,
                       })
                     }
-                    className="bg-zinc-800 border border-zinc-700 rounded px-2 py-0.5 text-xs text-zinc-300"
+                    className="rounded border border-zinc-700 bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
                   >
                     {MARKER_TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -572,10 +573,10 @@ export function ThemePlayground() {
                     onChange={(e) =>
                       updateMarker(m.id, { color: e.target.value })
                     }
-                    className="w-6 h-6 rounded border border-zinc-700 cursor-pointer bg-transparent"
+                    className="h-6 w-6 cursor-pointer rounded border border-zinc-700 bg-transparent"
                   />
                 </label>
-                <label className="flex items-center gap-1.5 cursor-pointer">
+                <label className="flex cursor-pointer items-center gap-1.5">
                   <input
                     type="checkbox"
                     checked={m.snap}
@@ -589,7 +590,7 @@ export function ThemePlayground() {
                 <button
                   type="button"
                   onClick={() => removeMarker(m.id)}
-                  className="text-xs text-zinc-600 hover:text-red-400 transition-colors ml-auto"
+                  className="ml-auto text-xs text-zinc-600 transition-colors hover:text-red-400"
                 >
                   Remove
                 </button>

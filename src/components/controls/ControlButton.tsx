@@ -1,8 +1,11 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+
 import { Tooltip } from './Tooltip';
 
-export interface ControlButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
+export interface ControlButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'aria-label'
+> {
   /** Tooltip text, also used as the button's aria-label */
   label: string;
   /** Highlight the button with the active (blue) color */

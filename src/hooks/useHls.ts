@@ -1,6 +1,7 @@
 import type Hls from 'hls.js';
 import type { HlsConfig, Level } from 'hls.js';
 import { useCallback, useEffect, useRef, useState } from 'react';
+
 import type { FallbackReason, QualityLevel } from '../types';
 
 interface UseHlsOptions {

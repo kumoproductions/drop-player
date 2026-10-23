@@ -2,11 +2,31 @@
   "name": "drop-player",
   "version": "1.5.11",
   "description": "A comprehensive, universal, open-source React media player powering drop.mov.",
+  "keywords": [
+    "audio-player",
+    "component",
+    "hls",
+    "image-viewer",
+    "media-player",
+    "pdf-viewer",
+    "player",
+    "react",
+    "video-player"
+  ],
+  "homepage": "https://github.com/kumoproductions/drop-player#readme",
+  "bugs": {
+    "url": "https://github.com/kumoproductions/drop-player/issues"
+  },
   "license": "MIT",
   "author": "kumo.productions™",
   "repository": "github:kumoproductions/drop-player",
+  "files": [
+    "dist"
+  ],
   "type": "module",
-  "packageManager": "pnpm@10.25.0",
+  "sideEffects": [
+    "./dist/index.css"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -24,30 +44,6 @@
       "default": "./dist/utils.js"
     },
     "./styles.css": "./dist/index.css"
-  },
-  "files": [
-    "dist"
-  ],
-  "sideEffects": [
-    "./dist/index.css"
-  ],
-  "keywords": [
-    "react",
-    "player",
-    "media-player",
-    "video-player",
-    "audio-player",
-    "hls",
-    "pdf-viewer",
-    "image-viewer",
-    "component"
-  ],
-  "homepage": "https://github.com/kumoproductions/drop-player#readme",
-  "bugs": {
-    "url": "https://github.com/kumoproductions/drop-player/issues"
-  },
-  "engines": {
-    "node": ">=18"
   },
   "scripts": {
     "dev": "vite",
@@ -67,30 +63,6 @@
     "prepare": "lefthook install || true",
     "format": "oxfmt .",
     "format:check": "oxfmt --check ."
-  },
-  "peerDependencies": {
-    "hls.js": "^1.4.0",
-    "lucide-react": ">=0.300.0",
-    "pdfjs-dist": "^5.0.0",
-    "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0",
-    "waveform-data": "^4.5.0"
-  },
-  "peerDependenciesMeta": {
-    "hls.js": {
-      "optional": true
-    },
-    "pdfjs-dist": {
-      "optional": true
-    },
-    "waveform-data": {
-      "optional": true
-    }
-  },
-  "overrides": {
-    "@tailwindcss/vite": {
-      "vite": "$vite"
-    }
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.1",
@@ -121,5 +93,33 @@
     "vite-plugin-dts": "^4.5.4",
     "vitest": "^4.1.0",
     "waveform-data": "^4.5.2"
-  }
+  },
+  "peerDependencies": {
+    "hls.js": "^1.4.0",
+    "lucide-react": ">=0.300.0",
+    "pdfjs-dist": "^5.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "waveform-data": "^4.5.0"
+  },
+  "peerDependenciesMeta": {
+    "hls.js": {
+      "optional": true
+    },
+    "pdfjs-dist": {
+      "optional": true
+    },
+    "waveform-data": {
+      "optional": true
+    }
+  },
+  "overrides": {
+    "@tailwindcss/vite": {
+      "vite": "$vite"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.25.0"
 }

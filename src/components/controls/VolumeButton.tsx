@@ -1,4 +1,5 @@
 import { Volume2, VolumeX } from 'lucide-react';
+
 import type { TranslationKey } from '../../types';
 import { ControlButton } from './ControlButton';
 

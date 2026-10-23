@@ -1,5 +1,6 @@
 import { Check, Settings2 } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
+
 import type { HlsLevelInfo, QualityLevel, TranslationKey } from '../../types';
 import { Tooltip } from './Tooltip';
 

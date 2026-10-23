@@ -1,4 +1,5 @@
 import { Maximize, Minimize } from 'lucide-react';
+
 import type { TranslationKey } from '../../types';
 import { ControlButton } from './ControlButton';
 

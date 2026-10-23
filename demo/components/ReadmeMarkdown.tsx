@@ -1,6 +1,7 @@
 import type { Components } from 'react-markdown';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+
 import { CodeBlock } from './CodeBlock';
 
 function slugify(text: string): string {
@@ -29,7 +30,7 @@ const components: Components = {
     return (
       <h1
         id={id}
-        className="text-3xl font-bold text-zinc-100 mb-10 scroll-mt-6"
+        className="mb-10 scroll-mt-6 text-3xl font-bold text-zinc-100"
       >
         {children}
       </h1>
@@ -41,7 +42,7 @@ const components: Components = {
     return (
       <h2
         id={id}
-        className="text-2xl font-bold text-zinc-100 mb-6 pb-2 border-b border-zinc-600 scroll-mt-6"
+        className="mb-6 scroll-mt-6 border-b border-zinc-600 pb-2 text-2xl font-bold text-zinc-100"
       >
         {children}
       </h2>
@@ -53,7 +54,7 @@ const components: Components = {
     return (
       <h3
         id={id}
-        className="text-lg font-semibold text-zinc-200 mb-4 scroll-mt-6"
+        className="mb-4 scroll-mt-6 text-lg font-semibold text-zinc-200"
       >
         {children}
       </h3>
@@ -89,7 +90,7 @@ const components: Components = {
 
     if (isCode) {
       return (
-        <td className="py-2 pr-4 font-mono text-blue-400 whitespace-nowrap text-xs">
+        <td className="py-2 pr-4 font-mono text-xs whitespace-nowrap text-blue-400">
           {children}
         </td>
       );
@@ -103,25 +104,25 @@ const components: Components = {
       return <CodeBlock code={String(children).trimEnd()} lang={match[1]} />;
     }
     return (
-      <code className="px-1.5 py-0.5 bg-zinc-800 rounded text-sm text-zinc-300">
+      <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-sm text-zinc-300">
         {children}
       </code>
     );
   },
   pre: ({ children }) => <>{children}</>,
   p: ({ children }) => (
-    <p className="text-zinc-300 leading-relaxed">{children}</p>
+    <p className="leading-relaxed text-zinc-300">{children}</p>
   ),
   strong: ({ children }) => (
     <strong className="text-zinc-100">{children}</strong>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc list-outside ml-5 space-y-1 text-zinc-300">
+    <ul className="ml-5 list-outside list-disc space-y-1 text-zinc-300">
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-outside ml-5 space-y-1 text-zinc-300">
+    <ol className="ml-5 list-outside list-decimal space-y-1 text-zinc-300">
       {children}
     </ol>
   ),

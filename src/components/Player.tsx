@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { resolveFeatures } from '../features';
 import { useFullscreen } from '../hooks/useFullscreen';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
@@ -53,7 +54,6 @@ import { defaultTimeDisplayFormats } from '../features';
 import type { TimeDisplayFormat } from '../types';
 import { normalizeSources } from '../utils/sources';
 import { AudioCore } from './AudioCore';
-import { ControlsBar } from './ControlsBar';
 import { SeekBar } from './controls/SeekBar';
 import { SourceSelector } from './controls/SourceSelector';
 import {
@@ -61,6 +61,7 @@ import {
   getNextTimeDisplayFormat,
   TimeDisplay,
 } from './controls/TimeDisplay';
+import { ControlsBar } from './ControlsBar';
 import { ImageCore } from './ImageCore';
 import { PdfCore } from './PdfCore';
 import { StatusOverlay } from './StatusOverlay';
