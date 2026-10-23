@@ -1,18 +1,15 @@
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 export default defineConfig({
-  root: resolve(__dirname),
+  root: resolve(import.meta.dirname),
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      'drop-player': resolve(__dirname, '../src/index.ts'),
+      'drop-player': resolve(import.meta.dirname, '../src/index.ts'),
     },
   },
   build: {
@@ -20,8 +17,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        ja: resolve(__dirname, 'ja/index.html'),
+        main: resolve(import.meta.dirname, 'index.html'),
+        ja: resolve(import.meta.dirname, 'ja/index.html'),
       },
     },
   },

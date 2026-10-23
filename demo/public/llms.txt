@@ -17,12 +17,13 @@ npm i drop-player lucide-react
 **Optional peers** (install only when needed):
 
 - hls.js >=1.4: HLS video (.m3u8)
-- pdfjs-dist >=4.0: PDF canvas rendering (zoom, pan, page navigation)
+- pdfjs-dist >=5.0: PDF canvas rendering (zoom, pan, page navigation)
 - waveform-data >=4.5: Audio waveform display
 ## Quick start
 
 ```tsx
 import { Player } from 'drop-player';
+
 import 'drop-player/styles.css';
 
 function App() {
@@ -185,7 +186,7 @@ import { Share2 } from 'lucide-react';
       </ControlButton>
     ),
   }}
-/>
+/>;
 ```
 
 - `label`: tooltip text, also used as the button's `aria-label`
@@ -199,7 +200,7 @@ import { Tooltip } from 'drop-player';
 
 <Tooltip content="Description">
   <span>...</span>
-</Tooltip>
+</Tooltip>;
 ```
 
 ### `events` — `PlayerEvents`
@@ -341,7 +342,7 @@ Access imperative methods via `PlayerRef`:
 ```tsx
 const ref = useRef<PlayerRef>(null);
 
-<VideoPlayer ref={ref} sources={url} />
+<VideoPlayer ref={ref} sources={url} />;
 
 // Later:
 ref.current?.play();
@@ -415,7 +416,7 @@ Player preferences (muted state) are persisted to `localStorage` by default. Use
 
 ```tsx
 // Custom namespace
-<VideoPlayer sources="video.mp4" storageKey="my_app" />
+<VideoPlayer sources="video.mp4" storageKey="my_app" />;
 // Keys stored as: my_app_muted, my_app_volume, etc.
 
 // Custom backend (e.g. Supabase)
@@ -434,7 +435,7 @@ const supabaseStorage = {
   },
 };
 
-<VideoPlayer sources="video.mp4" storage={supabaseStorage} />
+<VideoPlayer sources="video.mp4" storage={supabaseStorage} />;
 ```
 
 The `StorageAdapter` interface requires three methods: `getItem`, `setItem`, and `removeItem`. Operations should be synchronous (return values immediately); use a local cache with async sync for remote backends.
@@ -446,25 +447,34 @@ Helper functions exported for use outside the player (custom UI, playlists, time
 ```tsx
 // From the main entry (includes React)
 import {
-  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
-  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+  formatTime,
+  formatTimecode,
+  secondsToFrames,
+  parseFrameRate,
+  formatFeetFrames,
+  formatSecondsFrames,
+  formatBarsBeats,
 } from 'drop-player';
-
 // From the lightweight sub-path (no React dependency — safe for Server Components)
 import {
-  formatTime, formatTimecode, secondsToFrames, parseFrameRate,
-  formatFeetFrames, formatSecondsFrames, formatBarsBeats,
+  formatTime,
+  formatTimecode,
+  secondsToFrames,
+  parseFrameRate,
+  formatFeetFrames,
+  formatSecondsFrames,
+  formatBarsBeats,
 } from 'drop-player/utils';
 
-formatTime(125);                    // "02:05"
-formatTime(3661);                   // "01:01:01"
-formatTimecode(125.5, 30);          // "00:02:05:15"
-formatTimecode(125.5, '30000/1001');// "00:02:05:14" (29.97fps)
-secondsToFrames(10, 24);           // 240
-parseFrameRate('30000/1001');       // 29.97...
-formatSecondsFrames(83.5, 30);     // "83+15"
-formatFeetFrames(10, 24, 16);      // "15+00"
-formatBarsBeats(10, 120, '4/4');   // "5:1"
+formatTime(125); // "02:05"
+formatTime(3661); // "01:01:01"
+formatTimecode(125.5, 30); // "00:02:05:15"
+formatTimecode(125.5, '30000/1001'); // "00:02:05:14" (29.97fps)
+secondsToFrames(10, 24); // 240
+parseFrameRate('30000/1001'); // 29.97...
+formatSecondsFrames(83.5, 30); // "83+15"
+formatFeetFrames(10, 24, 16); // "15+00"
+formatBarsBeats(10, 120, '4/4'); // "5:1"
 ```
 
 - formatTime: Format as MM:SS or HH:MM:SS

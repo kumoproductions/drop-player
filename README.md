@@ -18,7 +18,7 @@ npm i drop-player lucide-react
 | Package               | When                                              |
 | --------------------- | ------------------------------------------------- |
 | `hls.js` >=1.4        | HLS video (`.m3u8`)                               |
-| `pdfjs-dist` >=4.0    | PDF canvas rendering (zoom, pan, page navigation) |
+| `pdfjs-dist` >=5.0    | PDF canvas rendering (zoom, pan, page navigation) |
 | `waveform-data` >=4.5 | Audio waveform display                            |
 
 ## Quick start

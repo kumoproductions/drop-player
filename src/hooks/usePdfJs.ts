@@ -1,4 +1,4 @@
-import type { PDFDocumentProxy } from 'pdfjs-dist';
+import type { PDFDocumentLoadingTask, PDFDocumentProxy } from 'pdfjs-dist';
 import { useEffect, useRef, useState } from 'react';
 
 /** Lazy-loaded pdfjs-dist module (dynamic import to avoid bundling when not used) */
@@ -86,7 +86,7 @@ export function usePdfJs(options: UsePdfJsOptions): UsePdfJsReturn {
     if (!enabled || !src) return;
 
     let destroyed = false;
-    let doc: PDFDocumentProxy | null = null;
+    let loadingTask: PDFDocumentLoadingTask | null = null;
 
     const setup = async () => {
       const pdfjsLib = await importPdfJs(workerSrc, onErrorRef.current);
@@ -95,11 +95,9 @@ export function usePdfJs(options: UsePdfJsOptions): UsePdfJsReturn {
       setIsAvailable(true);
 
       try {
-        doc = await pdfjsLib.getDocument(src).promise;
-        if (destroyed) {
-          doc.destroy();
-          return;
-        }
+        loadingTask = pdfjsLib.getDocument({ url: src });
+        const doc = await loadingTask.promise;
+        if (destroyed) return;
         setPdfDocument(doc);
         setTotalPages(doc.numPages);
         setIsLoaded(true);
@@ -119,9 +117,7 @@ export function usePdfJs(options: UsePdfJsOptions): UsePdfJsReturn {
 
     return () => {
       destroyed = true;
-      if (doc) {
-        doc.destroy();
-      }
+      loadingTask?.destroy();
       setPdfDocument(null);
       setTotalPages(0);
       setIsLoaded(false);

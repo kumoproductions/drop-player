@@ -18,7 +18,7 @@ export default defineConfig(({ command }) => {
             dts({
               include: ['src/**/*'],
               exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-              rollupTypes: true,
+              bundleTypes: true,
             }),
           ]
         : []),
@@ -28,8 +28,8 @@ export default defineConfig(({ command }) => {
           build: {
             lib: {
               entry: {
-                index: resolve(__dirname, 'src/index.ts'),
-                utils: resolve(__dirname, 'src/utils-entry.ts'),
+                index: resolve(import.meta.dirname, 'src/index.ts'),
+                utils: resolve(import.meta.dirname, 'src/utils-entry.ts'),
               },
               formats: ['es'] as const,
             },

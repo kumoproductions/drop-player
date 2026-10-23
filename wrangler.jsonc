@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "drop-player",
+  "account_id": "e721f73c1fbe72de252f0f25ff55fc31",
+  "compatibility_date": "2026-10-23",
+  // Assets-only Worker serving the prerendered demo site.
+  "assets": {
+    "directory": "./demo/dist",
+    // Canonical URLs have no trailing slash (e.g. /ja -> ja/index.html).
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "single-page-application",
+  },
+  "routes": [{ "pattern": "player.drop.mov", "custom_domain": true }],
+}
